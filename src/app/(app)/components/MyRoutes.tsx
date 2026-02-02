@@ -1,28 +1,70 @@
-import Image from "next/image"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui/card"
+import { RouteCard, Route } from "./RouteCard"
+
+const placeholderRoutes: Route[] = [
+    {
+        title: 'Centro Histórico',
+        description: 'Descubre los secretos mejor guardados del casco antiguo.',
+        image: '/museo_placeholder.jpg'
+    },
+    {
+        title: 'Ruta de los Museos',
+        description: 'Un recorrido por las galerías de arte más importantes.',
+        image: '/museo_placeholder.jpg'
+    },
+    {
+        title: 'Gastronomía Local',
+        description: 'Prueba los sabores tradicionales de la región.',
+        image: '/museo_placeholder.jpg'
+    },
+    {
+        title: 'Parques y Jardines',
+        description: 'Relájate en los pulmones verdes de la ciudad.',
+        image: '/museo_placeholder.jpg'
+    },
+    {
+        title: 'Arquitectura Moderna',
+        description: 'Explora los edificios que definen el skyline actual.',
+        image: '/museo_placeholder.jpg'
+    },
+    {
+        title: 'Ruta Nocturna',
+        description: 'La magia de la ciudad iluminada tras el atardecer.',
+        image: '/museo_placeholder.jpg'
+    },
+    {
+        title: 'Miradores Espectaculares',
+        description: 'Las mejores vistas panorámicas para tus fotos.',
+        image: '/museo_placeholder.jpg'
+    },
+    {
+        title: 'Tradiciones y Culto',
+        description: 'Visita los templos y centros espirituales emblemáticos.',
+        image: '/museo_placeholder.jpg'
+    },
+    {
+        title: 'Río y Ribera',
+        description: 'Un paseo refrescante a lo largo del cauce fluvial.',
+        image: '/museo_placeholder.jpg'
+    },
+    {
+        title: 'Arte Callejero',
+        description: 'Murales y expresiones urbanas en cada rincón.',
+        image: '/museo_placeholder.jpg'
+    }
+]
 
 export const MyRoutes = () => {
     return (
-        <div>
-            <h2>Mis rutas</h2>
+        <div className="flex flex-col gap-3">
+            <h2 className="text-2xl font-bold">Mis rutas</h2>
 
-            <Card className="relative w-sm overflow-hidden py-0">
-                <div className="flex flex-row h-32">
-                    <div className="relative w-1/3 min-w-[120px]">
-                        <Image
-                            src='/museo_placeholder.jpg'
-                            fill
-                            alt="museo placeholder"
-                            className="object-cover"
-                        />
-                    </div>
-
-                    <CardHeader className="flex-1 bg-white p-4 justify-center">
-                        <CardTitle className="text-lg">prueba</CardTitle>
-                        <CardDescription className="line-clamp-2">ajsbdhsbd</CardDescription>
-                    </CardHeader>
-                </div>
-            </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {
+                    placeholderRoutes.map((r, i) => (
+                        <RouteCard key={i} route={r} />
+                    ))
+                }
+            </div>
 
         </div>
     )

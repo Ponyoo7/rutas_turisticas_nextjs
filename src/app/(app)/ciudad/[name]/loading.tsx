@@ -1,0 +1,9 @@
+import { IconLoader2 } from "@tabler/icons-react";
+
+export default function Loading() {
+    return (
+        <div className="w-full h-full flex items-center justify-center">
+            <IconLoader2 size={72} className="animate animate-spin" />
+        </div>
+    )
+}

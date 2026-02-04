@@ -1,16 +1,25 @@
-import { Map } from "@/shared/components/map/Map"
+import { locationsService } from "@/shared/services/locations.service"
+import { MapWrapper } from "./components/MapWrapper"
+import { RelevantPlances } from "./components/RelevantPlaces"
 
 export default async function CiudadPage({ params }: {
     params: Promise<{ name: string }>
 }) {
     const { name } = await params
 
-    console.log(name)
+    const res = await locationsService.getInterestPlacesByName(name)
 
     return (
         <div>
-
-            <Map center={[41.8902, 12.4922]} zoom={15} />
+            <h1 >{name}</h1>
+            {
+                res && (
+                    <>
+                        <MapWrapper places={res.places} coords={res.coords} />
+                        <RelevantPlances places={res.places} />
+                    </>
+                )
+            }
         </div>
     )
 }

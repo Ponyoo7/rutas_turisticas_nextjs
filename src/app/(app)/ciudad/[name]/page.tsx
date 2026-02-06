@@ -1,6 +1,7 @@
 import { locationsService } from "@/shared/services/locations.service"
+import { Button } from "@/shared/components/ui/button"
 import { MapWrapper } from "./components/MapWrapper"
-import { RelevantPlances } from "./components/RelevantPlaces"
+import { RelevantPlaces } from "./components/RelevantPlaces"
 
 export default async function CiudadPage({ params }: {
     params: Promise<{ name: string }>
@@ -10,13 +11,16 @@ export default async function CiudadPage({ params }: {
     const res = await locationsService.getInterestPlacesByName(name)
 
     return (
-        <div>
-            <h1 >{name}</h1>
+        <div className="flex flex-col gap-4">
+            <h1 className="text-2xl font-bold">{name}</h1>
             {
                 res && (
                     <>
-                        <MapWrapper places={res.places} coords={res.coords} />
-                        <RelevantPlances places={res.places} />
+                        <div className="flex flex-col gap-4">
+                            <MapWrapper places={res.places} coords={res.coords} />
+                            <Button className="">Crear ruta</Button>
+                        </div>
+                        <RelevantPlaces places={res.places} />
                     </>
                 )
             }

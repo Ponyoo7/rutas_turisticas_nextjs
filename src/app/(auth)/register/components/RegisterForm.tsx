@@ -2,6 +2,7 @@
 
 import { createUser } from "@/actions/user.actions"
 import { Button } from "@/shared/components/ui/button"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 interface FormData {
@@ -19,6 +20,8 @@ const initialFormData: FormData = {
 }
 
 export const RegisterForm = () => {
+    const router = useRouter()
+
     const [formData, setFormData] = useState<FormData>({
         ...initialFormData
     })
@@ -40,9 +43,11 @@ export const RegisterForm = () => {
         if (password !== repassword) return
 
 
-        createUser({
+        const data = await createUser({
             fullname, email, password
         })
+
+        if (data.success) return router.push('/login')
     }
 
     return (

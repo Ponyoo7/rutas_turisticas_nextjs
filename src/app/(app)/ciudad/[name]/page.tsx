@@ -1,7 +1,8 @@
 import { locationsService } from "@/shared/services/locations.service"
 import { Button } from "@/shared/components/ui/button"
-import { MapWrapper } from "./components/MapWrapper"
+import { MapWrapper } from "../../../../shared/components/map/MapWrapper"
 import { RelevantPlaces } from "./components/RelevantPlaces"
+import Link from "next/link"
 
 export default async function CiudadPage({ params }: {
     params: Promise<{ name: string }>
@@ -18,7 +19,9 @@ export default async function CiudadPage({ params }: {
                     <>
                         <div className="flex flex-col gap-4">
                             <MapWrapper places={res.places} coords={res.coords} />
-                            <Button className="">Crear ruta</Button>
+                            <Button className="" asChild>
+                                <Link href={`/rutas/crear?city=${name}`}>Crear ruta</Link>
+                            </Button>
                         </div>
                         <RelevantPlaces places={res.places} />
                     </>

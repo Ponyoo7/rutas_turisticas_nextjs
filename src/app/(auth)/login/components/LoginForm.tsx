@@ -2,7 +2,9 @@
 
 import { login } from "@/actions/user.actions"
 import { Button } from "@/shared/components/ui/button"
+import { useUserStore } from "@/shared/stores/useUserStore"
 import { UserCredentials } from "@/shared/types/user"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 const defaultFormLogin: UserCredentials = {
@@ -11,6 +13,11 @@ const defaultFormLogin: UserCredentials = {
 }
 
 export const LoginForm = () => {
+    const router = useRouter()
+
+    const setUser = useUserStore(state => state.setUser)
+
+
     const [formData, setFormData] = useState<UserCredentials>({
         ...defaultFormLogin
     })
@@ -24,12 +31,14 @@ export const LoginForm = () => {
         })
     }
 
-    const handleSubmit = (e: React.SyntheticEvent) => {
+    const handleSubmit = async (e: React.SyntheticEvent) => {
         e.preventDefault()
 
-        const { email, password } = formData
+        const user = await login(formData)
 
-        login(formData)
+        setUser(user)
+
+        router.push('/')
     }
 
     return (

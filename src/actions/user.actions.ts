@@ -1,6 +1,6 @@
 'use server'
 
-import { UserCredentials, UserRegister } from "@/shared/types/user"
+import { User, UserCredentials, UserRegister } from "@/shared/types/user"
 import { neon } from "@neondatabase/serverless"
 import * as bcrypt from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
@@ -35,10 +35,13 @@ export const login = async (credentials: UserCredentials) => {
 
     if (!bcrypt.compareSync(password, user.password)) throw Error('WRONG_CREDENTIALS')
 
-    const token = jwt.sign({
+    const userData = {
         id: user.id,
         email,
-    }, process.env.JWT_SECRET!)
+        fullname: user.fullname
+    }
+
+    const token = jwt.sign(userData, process.env.JWT_SECRET!)
 
     cookieStore.set({
         name: 'auth',
@@ -47,8 +50,11 @@ export const login = async (credentials: UserCredentials) => {
         path: '/'
     })
 
-    return {
-        id: user.id,
-        email
-    }
+    return userData
+}
+
+export const verifyToken = async (token: string | undefined): Promise<User | undefined | null> => {
+    if (!token) return null
+
+    return jwt.verify(token, process.env.JWT_SECRET!) as User
 }

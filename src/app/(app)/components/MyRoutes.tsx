@@ -1,3 +1,6 @@
+'use client'
+
+import { useUserStore } from "@/shared/stores/useUserStore"
 import { RouteCard, Route } from "./RouteCard"
 
 const placeholderRoutes: Route[] = [
@@ -54,17 +57,26 @@ const placeholderRoutes: Route[] = [
 ]
 
 export const MyRoutes = () => {
+    const user = useUserStore(state => state.user)
+
     return (
         <div className="flex flex-col gap-3">
-            <h2 className="text-2xl font-bold">Mis rutas</h2>
+            {
+                user && (
+                    <>
+                        <h2 className="text-2xl font-bold">Mis rutas</h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {
-                    placeholderRoutes.map((r, i) => (
-                        <RouteCard key={i} route={r} />
-                    ))
-                }
-            </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {
+                                placeholderRoutes.map((r, i) => (
+                                    <RouteCard key={i} route={r} />
+                                ))
+                            }
+                        </div>
+
+                    </>
+                )
+            }
 
         </div>
     )

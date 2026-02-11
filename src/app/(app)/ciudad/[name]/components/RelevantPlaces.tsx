@@ -6,7 +6,7 @@ interface Props {
 }
 
 export const RelevantPlaces = ({ places }: Props) => {
-    const random = places.filter(e => e.tags.name && e.tags.wikipedia && e.tags.tourism && e.tags.tourism !== 'museum' && e.tags.website).sort(() => 0.5 - Math.random()).slice(0, 6)
+    const random = places.filter(e => e.tags.tourism !== 'museum' && e.tags.website).sort(() => 0.5 - Math.random()).slice(0, 6)
 
     console.log(random)
 

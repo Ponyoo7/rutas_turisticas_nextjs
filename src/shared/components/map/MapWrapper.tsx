@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { MapSearch } from "../../../app/(app)/ciudad/[name]/components/MapSearch";
 import { useMapSearch } from "./hooks/useMapSearch";
+import { OSMElement } from "@/shared/types/locations";
 
 const MapNoSSR = dynamic(() => import("@/shared/components/map/Map"), {
     ssr: false,
@@ -10,11 +11,13 @@ const MapNoSSR = dynamic(() => import("@/shared/components/map/Map"), {
 });
 
 interface Props {
-    places: any[]
+    places: OSMElement[]
     coords: number[]
+    onClick?: (place: OSMElement) => void
+    routePlaces?: OSMElement[]
 }
 
-export const MapWrapper = ({ places, coords }: Props) => {
+export const MapWrapper = ({ places, coords, onClick, routePlaces }: Props) => {
     const {
         search,
         setSearch,
@@ -36,7 +39,7 @@ export const MapWrapper = ({ places, coords }: Props) => {
                 onSelectPlace={handleSelectPlace}
             />
 
-            <MapNoSSR places={places} zoom={15} coords={coords} flyTo={flyTo} />
+            <MapNoSSR places={places} zoom={15} coords={coords} flyTo={flyTo} onClick={onClick} routePlaces={routePlaces} />
         </div>
     )
 }

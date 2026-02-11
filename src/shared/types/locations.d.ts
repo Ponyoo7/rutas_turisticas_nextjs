@@ -18,8 +18,12 @@ export interface OSMAddress {
 export interface OSMElement {
     id: number;
     type: "node" | "way" | "relation";
-    lat: number;
-    lon: number;
+    lat?: number;
+    lon?: number;
+    center?: {
+        lat: number;
+        lon: number;
+    };
     tags: {
         name?: string;
         tourism?: string;

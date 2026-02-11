@@ -14,7 +14,7 @@ const getCoordsByCity = (city: OSMAddress): number[] => {
 }
 
 const getInterestPlaces = async (coords: number[]) => {
-    const maxAttempts = 3
+    const maxAttempts = 1
     let currentAttemps = 0
 
     while (currentAttemps < maxAttempts) {
@@ -32,7 +32,7 @@ const getInterestPlaces = async (coords: number[]) => {
             const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
             const data: OverpassResponse = await response.json();
 
-            return data ? data.elements : []
+            return data ? data.elements.filter(e => e.tags.name && e.tags.wikipedia) : []
         } catch (e) {
             console.error(e)
 

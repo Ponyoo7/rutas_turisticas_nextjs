@@ -17,10 +17,11 @@ export const LoginForm = () => {
 
     const setUser = useUserStore(state => state.setUser)
 
-
     const [formData, setFormData] = useState<UserCredentials>({
         ...defaultFormLogin
     })
+
+    const [error, setError] = useState<string | null>(null)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
@@ -33,16 +34,24 @@ export const LoginForm = () => {
 
     const handleSubmit = async (e: React.SyntheticEvent) => {
         e.preventDefault()
+        setError(null)
 
-        const user = await login(formData)
-
-        setUser(user)
-
-        router.push('/')
+        try {
+            const user = await login(formData)
+            setUser(user)
+            router.push('/')
+        } catch (err: any) {
+            setError(err.message || 'Email o contraseña incorrectos')
+        }
     }
 
     return (
         <form className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
+            {error && (
+                <div className="p-3 text-sm text-red-500 bg-red-100 border border-red-200 rounded-md">
+                    {error}
+                </div>
+            )}
             <div className="flex flex-col gap-2">
                 <label
                     htmlFor="email"

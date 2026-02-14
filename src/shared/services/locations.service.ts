@@ -1,12 +1,23 @@
-import { OSMAddress, OverpassResponse, WikiData } from '../types/locations'
+﻿import { OSMAddress, OverpassResponse, WikiData } from '../types/locations'
 
-const getCityByName = async (name: string): Promise<OSMAddress | null> => {
+const getCitiesByName = async (
+  name: string,
+  limit = 8
+): Promise<OSMAddress[]> => {
   const res = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(name)}&limit=1`,
+    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+      name
+    )}&limit=${limit}`
   )
   const dataJson = await res.json()
 
-  return dataJson.length > 0 ? dataJson.at(0) : null
+  return Array.isArray(dataJson) ? dataJson : []
+}
+
+const getCityByName = async (name: string): Promise<OSMAddress | null> => {
+  const cities = await getCitiesByName(name, 1)
+
+  return cities.length > 0 ? cities[0] : null
 }
 
 const getCoordsByCity = (city: OSMAddress): number[] => {
@@ -26,11 +37,11 @@ const getInterestPlaces = async (coords: number[]) => {
                     nwr["tourism"~"museum|attraction"](around:3000, ${coords[0]}, ${coords[1]});
                     nwr["historic"~"monument|memorial|archaeological_site"](around:3000, ${coords[0]}, ${coords[1]});
                 );
-                // Importante: 'out center' para obtener coordenadas de áreas
+                // Importante: 'out center' para obtener coordenadas de areas
                 out center;
             `
       const response = await fetch(
-        `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`,
+        `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`
       )
       const data: OverpassResponse = await response.json()
 
@@ -65,9 +76,10 @@ const getInterestPlacesByName = async (name: string) => {
   }
 }
 
-const getWikiInfo = async (wikiTag: string): Promise<WikiData | null> => {
-  // wikiTag suele ser "es:Coliseo" -> separamos el idioma y el título
-  const [lang, title] = wikiTag.split(':')
+const getWikiInfoByTitle = async (
+  title: string,
+  lang = 'en'
+): Promise<WikiData | null> => {
   const endpoint = `https://${lang}.wikipedia.org/w/api.php?action=query&format=json&prop=extracts|pageimages&exintro&explaintext&titles=${encodeURIComponent(title)}&pithumbsize=500&origin=*`
 
   try {
@@ -76,7 +88,7 @@ const getWikiInfo = async (wikiTag: string): Promise<WikiData | null> => {
     const pages = data.query.pages
     const pageId = Object.keys(pages)[0]
 
-    if (pageId === '-1') return null // No se encontró la página
+    if (pageId === '-1') return null
 
     return {
       title: pages[pageId].title,
@@ -89,10 +101,20 @@ const getWikiInfo = async (wikiTag: string): Promise<WikiData | null> => {
   }
 }
 
+const getWikiInfo = async (wikiTag: string): Promise<WikiData | null> => {
+  const [lang, title] = wikiTag.includes(':')
+    ? wikiTag.split(':')
+    : ['en', wikiTag]
+
+  return getWikiInfoByTitle(title, lang)
+}
+
 export const locationsService = {
+  getCitiesByName,
   getCityByName,
   getCoordsByCity,
   getInterestPlaces,
   getInterestPlacesByName,
   getWikiInfo,
+  getWikiInfoByTitle,
 }

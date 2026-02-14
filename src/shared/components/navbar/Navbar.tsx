@@ -14,7 +14,7 @@ export const Navbar = () => {
 
   return (
     <nav className="col-span-2 h-18 border-b p-4 flex flex-row justify-between">
-      <h1>asbdbasd</h1>
+      <h1>Route Craft</h1>
       <div className="flex flex-row justify-center gap-4">
         {user && (
           <Link href="/perfil">

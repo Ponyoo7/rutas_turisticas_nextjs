@@ -1,13 +1,14 @@
-﻿import { OSMAddress, OverpassResponse, WikiData } from '../types/locations'
+﻿import { wait } from '@/lib/utils'
+import { OSMAddress, OverpassResponse, WikiData } from '../types/locations'
 
 const getCitiesByName = async (
   name: string,
-  limit = 8
+  limit = 8,
 ): Promise<OSMAddress[]> => {
   const res = await fetch(
     `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-      name
-    )}&limit=${limit}`
+      name,
+    )}&limit=${limit}`,
   )
   const dataJson = await res.json()
 
@@ -25,10 +26,11 @@ const getCoordsByCity = (city: OSMAddress): number[] => {
 }
 
 const getInterestPlaces = async (coords: number[]) => {
-  const maxAttempts = 1
-  let currentAttemps = 0
+  const maxAttempts = 4
+  const baseDelayMs = 800
+  let currentAttempt = 0
 
-  while (currentAttemps < maxAttempts) {
+  while (currentAttempt < maxAttempts) {
     try {
       const query = `
                 [out:json][timeout:60];
@@ -41,17 +43,38 @@ const getInterestPlaces = async (coords: number[]) => {
                 out center;
             `
       const response = await fetch(
-        `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`
+        `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`,
       )
-      const data: OverpassResponse = await response.json()
+      const contentType = response.headers.get('content-type') ?? ''
+      const body = await response.text()
 
-      return data
-        ? data.elements.filter((e) => e.tags.name && e.tags.wikipedia)
+      if (!response.ok) {
+        throw new Error(
+          `Overpass respondi� con estado ${response.status} (${response.statusText})`,
+        )
+      }
+
+      if (!contentType.includes('application/json')) {
+        throw new Error(
+          `Overpass devolvi� content-type no JSON (${contentType || 'desconocido'})`,
+        )
+      }
+
+      const data: OverpassResponse = JSON.parse(body)
+
+      return data?.elements
+        ? data.elements.filter((e) => e.tags?.name && e.tags?.wikipedia)
         : []
     } catch (e) {
-      console.error(e)
+      currentAttempt++
+      console.error(
+        `Intento ${currentAttempt}/${maxAttempts} en Overpass fall�`,
+        e,
+      )
 
-      currentAttemps++
+      if (currentAttempt >= maxAttempts) break
+
+      await wait(baseDelayMs * currentAttempt)
     }
   }
 
@@ -78,7 +101,7 @@ const getInterestPlacesByName = async (name: string) => {
 
 const getWikiInfoByTitle = async (
   title: string,
-  lang = 'en'
+  lang = 'en',
 ): Promise<WikiData | null> => {
   const endpoint = `https://${lang}.wikipedia.org/w/api.php?action=query&format=json&prop=extracts|pageimages&exintro&explaintext&titles=${encodeURIComponent(title)}&pithumbsize=500&origin=*`
 

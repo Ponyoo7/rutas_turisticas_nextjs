@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 interface Props {
   place: OSMElement
   index: number
-  onDelete: (placeId: any) => void
+  onDelete: (placeId: number) => void
 }
 
 export const PlaceCard = ({ place, index, onDelete }: Props) => {
@@ -40,3 +40,4 @@ export const PlaceCard = ({ place, index, onDelete }: Props) => {
     </div>
   )
 }
+

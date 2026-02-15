@@ -3,6 +3,7 @@
 import 'leaflet/dist/leaflet.css'
 import { MapContainer, Polyline, TileLayer } from 'react-leaflet'
 import { OSMElement } from '@/shared/types/locations'
+import { getPlaceCoords } from '@/lib/utils'
 import { FlyToLocation } from './components/FlyToLocation'
 import { PlaceMarker } from './components/PlaceMarker'
 
@@ -13,14 +14,6 @@ interface MapProps {
   flyTo?: [number, number] | null
   onClick?: (place: OSMElement) => void
   routePlaces?: OSMElement[]
-}
-
-const getPlacePosition = (place: OSMElement): [number, number] | null => {
-  const lat = place.lat ?? place.center?.lat
-  const lon = place.lon ?? place.center?.lon
-
-  if (lat == null || lon == null) return null
-  return [lat, lon]
 }
 
 export default function Map({
@@ -36,7 +29,7 @@ export default function Map({
   }
 
   const routePositions = routePlaces
-    .map(getPlacePosition)
+    .map(getPlaceCoords)
     .filter((position): position is [number, number] => position !== null)
 
   return (

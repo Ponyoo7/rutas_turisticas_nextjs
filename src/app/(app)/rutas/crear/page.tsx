@@ -12,12 +12,20 @@ export default async function CrearRutaPage({
 
   const res = await locationsService.getInterestPlacesByName(city as string)
 
-  console.log(res)
-
   return (
-    <main className="p-8">
-      <h1 className="text-2xl font-bold">Creador de Rutas</h1>
-      {res && <AddToRouteMap {...res} />}
+    <main className="flex flex-col gap-6 p-6">
+      <header className="flex flex-col gap-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <h1 className="text-3xl font-bold text-gray-800">Creador de Rutas</h1>
+        <p className="text-gray-500">
+          Diseña tu propia aventura cultural añadiendo sitios al mapa.
+        </p>
+      </header>
+
+      {res && (
+        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+          <AddToRouteMap {...res} />
+        </div>
+      )}
     </main>
   )
 }

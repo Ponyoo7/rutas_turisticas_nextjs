@@ -7,10 +7,14 @@ export default function AppLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <div className="h-full grid grid-cols-[auto_1fr] grid-rows-[auto_1fr] overflow-hidden">
+        <div className="h-screen flex flex-col md:grid md:grid-cols-[auto_1fr] md:grid-rows-[auto_1fr] overflow-hidden">
             <Navbar />
-            <Sidebar />
-            <div className="w-full h-full overflow-auto">{children}</div>
+            <div className="flex-1 overflow-auto md:row-start-2 md:col-start-2">
+                {children}
+            </div>
+            <div className="md:row-start-2 md:col-start-1">
+                <Sidebar />
+            </div>
         </div>
     )
 }

@@ -1,27 +1,38 @@
-import Image from 'next/image'
-import { Card, CardHeader, CardTitle } from '@/shared/components/ui/card'
+import { getRouteStats } from '@/lib/utils'
 import { Route } from '@/shared/types/routes'
+import Link from 'next/link'
 
 interface Props {
   route: Route
 }
 
 export const RouteCard = ({ route }: Props) => {
+  const stats = getRouteStats(route.places)
+
   return (
-    <Card className="relative w-sm overflow-hidden py-0">
-      <div className="flex flex-row h-32">
-        <div className="relative w-1/3 min-w-30">
-          <Image
-            src={route.image}
-            fill
-            alt={route.name}
-            className="object-cover"
-          />
+    <Link
+      href={`/rutas/${route.id}`}
+      className="flex bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow cursor-pointer"
+    >
+      <div
+        className="w-1/3 aspect-square bg-cover bg-center"
+        style={{ backgroundImage: `url("${route.image}")` }}
+      ></div>
+      <div className="w-2/3 p-4 flex flex-col justify-center gap-2">
+        <div className="flex items-center gap-2 text-[10px] font-bold text-artis-secondary-blue uppercase tracking-widest">
+          <span className="material-symbols-outlined text-xs">Duración</span>{' '}
+          {stats.totalMinutes} MINUTOS
         </div>
-        <CardHeader className="flex-1 bg-white p-4 justify-center">
-          <CardTitle className="text-lg">{route.name}</CardTitle>
-        </CardHeader>
+        <h3 className="text-artis-primary dark:text-gray-100 text-lg font-bold leading-tight font-serif">
+          {route.name}
+        </h3>
+        <p className="text-gray-500 text-xs line-clamp-1">
+          {stats.placesCount} PARADAS
+        </p>
+        <p className="text-gray-500 text-xs line-clamp-1">
+          {stats.totalDistanceKm} KM
+        </p>
       </div>
-    </Card>
+    </Link>
   )
 }

@@ -5,6 +5,8 @@ import { locationsService } from '@/shared/services/locations.service'
 import { OSMElement, WikiData } from '@/shared/types/locations'
 import { useEffect, useState } from 'react'
 
+import { IconTrash } from '@tabler/icons-react'
+
 interface Props {
   place: OSMElement
   index: number
@@ -25,19 +27,30 @@ export const PlaceCard = ({ place, index, onDelete }: Props) => {
   return (
     <div
       key={place.id}
-      className="bg-slate-100 p-2 rounded shadow-sm text-sm border flex items-center gap-2"
+      className="bg-white p-2 pr-3 rounded-lg shadow-sm text-sm border border-gray-200 flex items-center gap-3 group hover:border-[#533d2d]/50 transition-all"
     >
-      <span className="flex items-center justify-center w-5 h-5 bg-blue-500 text-white rounded-full text-xs font-bold shrink-0">
+      <div className="flex items-center justify-center w-6 h-6 bg-[#533d2d] text-white rounded-full text-xs font-bold shrink-0 shadow-sm">
         {index}
-      </span>
-      <span>
-        <img src={placeInfo?.thumbnail?.source} />
-      </span>
-      <span className="truncate max-w-37.5">
+      </div>
+      {placeInfo?.thumbnail?.source && (
+        <div className="w-10 h-10 rounded overflow-hidden shrink-0 bg-gray-100">
+          <img
+            src={placeInfo.thumbnail.source}
+            className="w-full h-full object-cover"
+            alt=""
+          />
+        </div>
+      )}
+      <span className="truncate max-w-40 font-medium text-gray-700">
         {place.tags.name || 'Sitio sin nombre'}
       </span>
-      <Button onClick={() => onDelete(place.id)}>Borrar</Button>
+      <button
+        onClick={() => onDelete(place.id)}
+        className="ml-auto text-gray-300 hover:text-red-500 transition-colors p-1"
+        title="Eliminar sitio"
+      >
+        <IconTrash size={18} />
+      </button>
     </div>
   )
 }
-

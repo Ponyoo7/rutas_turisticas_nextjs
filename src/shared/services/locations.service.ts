@@ -8,7 +8,7 @@ const getCitiesByName = async (
   const res = await fetch(
     `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
       name,
-    )}&limit=${limit}`,
+    )}&limit=${limit}&accept-language=es`,
   )
   const dataJson = await res.json()
 
@@ -26,8 +26,8 @@ const getCoordsByCity = (city: OSMAddress): number[] => {
 }
 
 const getInterestPlaces = async (coords: number[]) => {
-  const maxAttempts = 4
-  const baseDelayMs = 800
+  const maxAttempts = 5
+  const baseDelayMs = 3000
   let currentAttempt = 0
 
   while (currentAttempt < maxAttempts) {
@@ -84,6 +84,8 @@ const getInterestPlaces = async (coords: number[]) => {
 const getInterestPlacesByName = async (name: string) => {
   const city = await getCityByName(name)
 
+  console.log(city)
+
   if (!city) return
 
   const coords = getCoordsByCity(city)
@@ -101,7 +103,7 @@ const getInterestPlacesByName = async (name: string) => {
 
 const getWikiInfoByTitle = async (
   title: string,
-  lang = 'en',
+  lang = 'es',
 ): Promise<WikiData | null> => {
   const endpoint = `https://${lang}.wikipedia.org/w/api.php?action=query&format=json&prop=extracts|pageimages&exintro&explaintext&titles=${encodeURIComponent(title)}&pithumbsize=500&origin=*`
 

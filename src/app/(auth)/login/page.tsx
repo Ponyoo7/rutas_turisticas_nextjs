@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { LoginForm } from "./components/LoginForm";
+import Link from "next/link";
 
 export default function Page() {
   return (
@@ -24,7 +25,9 @@ export default function Page() {
           <div className="w-full max-w-sm">
             <LoginForm />
           </div>
-          <p>¿Aún no estás registrado? Registrate</p>
+          <span className="flex flex-row gap-1">¿Aún no estás registrado?
+            <Link href='/register' className="text-[#533d2d] font-bold">Registrate</Link>
+          </span>
         </div>
       </main>
     </div>

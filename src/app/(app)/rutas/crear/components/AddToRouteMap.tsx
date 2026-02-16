@@ -69,17 +69,18 @@ export const AddToRouteMap = ({ places, coords, city }: Props) => {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex justify-between items-end">
-        <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex flex-col gap-2 w-full md:w-auto">
           <Input
-            placeholder="Nombre de la ruta"
+            placeholder="Nombre de la ruta..."
             value={routeName}
             onChange={(e) => setRouteName(e.target.value)}
+            className="text-lg font-semibold border-gray-200 focus:border-[#533d2d] focus:ring-[#533d2d] transition-all"
           />
           {routePlaces.length > 1 && (
-            <div className="flex items-center gap-4 text-sm text-slate-600">
-              <span className="flex items-center gap-1">
+            <div className="flex items-center gap-4 text-sm font-medium text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full w-fit">
+              <span className="flex items-center gap-1 border-r border-gray-200 pr-4">
                 {routeStats.totalDistanceKm} km
               </span>
               <span className="flex items-center gap-1">
@@ -88,32 +89,52 @@ export const AddToRouteMap = ({ places, coords, city }: Props) => {
             </div>
           )}
         </div>
-        {routePlaces.length > 1 && (
-          <Button onClick={reorganizeRoute} variant="outline" size="sm">
-            Reorganizar por proximidad
+        <div className="flex gap-2 w-full md:w-auto">
+          {routePlaces.length > 1 && (
+            <Button
+              onClick={reorganizeRoute}
+              variant="outline"
+              size="sm"
+              className="border-[#533d2d] text-[#533d2d] hover:bg-[#533d2d]/10 transition-colors"
+            >
+              Reorganizar por proximidad
+            </Button>
+          )}
+          <Button
+            onClick={handleSave}
+            disabled={!routeName || routePlaces.length === 0}
+            className="bg-[#533d2d] hover:bg-[#433124] transition-colors shadow-md disabled:bg-gray-300"
+          >
+            Guardar Ruta
           </Button>
-        )}
+        </div>
       </div>
 
-      <MapWrapper
-        places={places}
-        coords={coords}
-        onClick={addPlaceToRoute}
-        routePlaces={routePlaces}
-      />
+      <div className="rounded-xl overflow-hidden shadow-inner border border-gray-100 bg-gray-50 p-1">
+        <MapWrapper
+          places={places}
+          coords={coords}
+          onClick={addPlaceToRoute}
+          routePlaces={routePlaces}
+        />
+      </div>
 
-      <Button onClick={handleSave}>Guardar</Button>
-      <div className="flex flex-wrap gap-2">
-        {routePlaces.map((r, i) => (
-          <PlaceCard
-            key={r.id}
-            place={r}
-            index={i + 1}
-            onDelete={removePlace}
-          />
-        ))}
+      <div className="flex flex-col gap-3 p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200 min-h-24">
+        {routePlaces.length === 0 ? (
+          <p className="text-gray-400 text-sm flex items-center justify-center w-full">
+            Toca sitios en el mapa para añadirlos a tu ruta
+          </p>
+        ) : (
+          routePlaces.map((r, i) => (
+            <PlaceCard
+              key={r.id}
+              place={r}
+              index={i + 1}
+              onDelete={removePlace}
+            />
+          ))
+        )}
       </div>
     </div>
   )
 }
-

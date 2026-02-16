@@ -1,28 +1,44 @@
-import { Button } from "@/shared/components/ui/button";
-import Image from "next/image";
-
+import { Button } from '@/shared/components/ui/button'
+import Link from 'next/link'
 
 export const MainImage = () => {
-    return (
-        <div className="relative w-full h-[300px]">
-            <Image
-                src='/cupula.jpg'
-                alt="Cúpula de la iglesia"
-                fill
-                className="object-cover grayscale-20 brightness-80"
-            />
-
-            <div className="w-full h-full absolute z-1 flex flex-col justify-end gap-8 p-8">
-                <div>
-                    <p className="text-white">asjdbabsd</p>
-                    <h2>ahsdvhasd</h2>
-                    <p>ajshdvsagvhd</p>
-                </div>
-                <div className="self-center">
-                    <Button className="min-w-[350px]">Crear una ruta cultural</Button>
-                </div>
-            </div>
-
+  return (
+    <div className="p-0">
+      <div
+        className="relative flex min-h-[520px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-start justify-end px-6 pb-12 rounded-xl overflow-hidden"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(0, 0, 0, 0.0) 0%, rgba(0, 0, 0, 0.7) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBQyjntHkICpekAMqN8s8XMmmviN8OoAeiAZ9j5X4jzgEDiksJxQuXlxsDIw25C0t3rDpFELMrxN-J22BGfZEMLIqVmYSDI9z958baMWxTMy4tZfVWLR75S9FAVWJCd609JXFHfe38GqYe400lJ11fDqHYwGT0mFKPYt9N46pTg0i4TzmY86VMLkc7zqlQF9tOdutGLOMs85FLgVof_LaZQlJKZPby5QweL8_tpWVCqS3ef7ZewZpBtJaTnJcMfG6HCSL0Ph47zgoNJ")',
+        }}
+      >
+        <div className="flex flex-col gap-3 text-left z-10">
+          <span className="text-white/80 uppercase tracking-widest text-xs font-bold">
+            The Art of Travel
+          </span>
+          <h1 className="text-white text-5xl font-black leading-[1.1] tracking-tight font-serif">
+            Walk through history.
+          </h1>
+          <h2 className="text-white/90 text-base font-normal leading-relaxed max-w-[280px]">
+            Discover the soul of cities through the lens of art and time.
+          </h2>
         </div>
-    )
+        <div className="flex flex-col w-full gap-3 mt-4 z-10 gap-y-3">
+          <Button
+            className="w-full h-14 bg-artis-primary hover:bg-artis-primary/90 text-white text-base font-bold shadow-lg"
+            asChild
+          >
+            <Link href="/buscador">Create my cultural route</Link>
+          </Button>
+
+          {/* <Button
+            variant="outline"
+            className="w-full h-14 bg-white/10 backdrop-blur-md border-white/30 text-white text-base font-bold hover:bg-white/20 hover:text-white border"
+            asChild
+          >
+            <Link href="/rutas">Explore routes</Link>
+          </Button> */}
+        </div>
+      </div>
+    </div>
+  )
 }

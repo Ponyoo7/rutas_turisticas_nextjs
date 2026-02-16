@@ -3,16 +3,16 @@ import { locationsService } from '../services/locations.service'
 import { WikiData } from '../types/locations'
 
 export const defaultCityNames = [
-  'Madrid',
-  'Paris',
-  'Roma',
+  'Berlín',
   'Londres',
   'Nueva York',
   'Tokio',
-  'Barcelona',
   'Lisboa',
-  'Berlín',
+  'Roma',
+  'Paris',
   'Estambul',
+  'Madrid',
+  'Barcelona',
 ]
 
 const FALLBACK_EXTRACT = 'Sin descripcion disponible.'

@@ -1,9 +1,7 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Card, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { locationsService } from '@/shared/services/locations.service'
 import { WikiData } from '@/shared/types/locations'
 
@@ -18,9 +16,13 @@ export const CityCard = ({ city }: Props) => {
     let cancelled = false
 
     const loadCityInfo = async () => {
-      const cityFromEsWiki = await locationsService.getWikiInfoByTitle(city.title, 'es')
+      const cityFromEsWiki = await locationsService.getWikiInfoByTitle(
+        city.title,
+        'es',
+      )
       const cityFromEnWiki =
-        cityFromEsWiki ?? (await locationsService.getWikiInfoByTitle(city.title, 'en'))
+        cityFromEsWiki ??
+        (await locationsService.getWikiInfoByTitle(city.title, 'en'))
 
       if (!cancelled && cityFromEnWiki) {
         setCityInfo(cityFromEnWiki)
@@ -34,30 +36,27 @@ export const CityCard = ({ city }: Props) => {
     }
   }, [city.title])
 
-  const description = cityInfo.extract
-    ? cityInfo.extract.replace(/\s+/g, ' ').trim()
-    : 'Sin descripcion disponible.'
-
-  const shortDescription =
-    description.length > 140 ? `${description.slice(0, 140)}...` : description
-
   return (
-    <Link href={`/ciudad/${cityInfo.title}`}>
-      <Card className='relative h-full pt-0'>
-        <div className='relative h-44'>
-          <Image
-            src={cityInfo.thumbnail?.source ?? '/museo_placeholder.jpg'}
-            fill
-            alt={cityInfo.title}
-            className='rounded-t-xl object-cover'
-          />
-        </div>
-
-        <CardHeader>
-          <CardTitle>{cityInfo.title}</CardTitle>
-          <CardDescription>{shortDescription}</CardDescription>
-        </CardHeader>
-      </Card>
+    <Link
+      href={`/ciudad/${cityInfo.title}`}
+      className="flex flex-col gap-3 group h-full"
+    >
+      <div
+        className="relative w-full aspect-5/3 bg-cover bg-center rounded-xl shadow-md overflow-hidden"
+        style={{
+          backgroundImage: `url("${cityInfo.thumbnail?.source ?? '/museo_placeholder.jpg'}")`,
+        }}
+      >
+        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-all duration-300"></div>
+      </div>
+      <div className="px-1 flex flex-col gap-1">
+        <p className="text-artis-primary dark:text-gray-100 text-xl font-bold font-serif group-hover:text-artis-primary/80 transition-colors">
+          {cityInfo.title}
+        </p>
+        <p className="text-gray-500 text-sm font-medium line-clamp-2 leading-relaxed">
+          {cityInfo.extract || 'Sin descripción disponible.'}
+        </p>
+      </div>
     </Link>
   )
 }

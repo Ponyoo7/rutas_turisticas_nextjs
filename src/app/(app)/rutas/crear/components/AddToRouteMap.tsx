@@ -9,6 +9,7 @@ import { saveRoute } from '@/actions/routes.actions'
 import { locationsService } from '@/shared/services/locations.service'
 import { Input } from '@/shared/components/ui/input'
 import { formatDuration, getDistanceKm, getRouteStats } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
 
 interface Props {
   places: OSMElement[]
@@ -17,6 +18,8 @@ interface Props {
 }
 
 export const AddToRouteMap = ({ places, coords, city }: Props) => {
+  const router = useRouter()
+
   const [routePlaces, setRoutePlaces] = useState<OSMElement[]>([])
   const [routeName, setRouteName] = useState<string>('')
 
@@ -24,8 +27,6 @@ export const AddToRouteMap = ({ places, coords, city }: Props) => {
     const newRoutePlaces = [...routePlaces, place]
     setRoutePlaces(newRoutePlaces)
   }
-
-  const routeStats = getRouteStats(routePlaces)
 
   const reorganizeRoute = () => {
     if (routePlaces.length <= 2) return
@@ -66,6 +67,8 @@ export const AddToRouteMap = ({ places, coords, city }: Props) => {
       places: routePlaces,
       image: wikiCity?.thumbnail?.source ?? '',
     })
+
+    router.replace('/')
   }
 
   return (
@@ -78,16 +81,6 @@ export const AddToRouteMap = ({ places, coords, city }: Props) => {
             onChange={(e) => setRouteName(e.target.value)}
             className="text-lg font-semibold border-gray-200 focus:border-[#533d2d] focus:ring-[#533d2d] transition-all"
           />
-          {routePlaces.length > 1 && (
-            <div className="flex items-center gap-4 text-sm font-medium text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full w-fit">
-              <span className="flex items-center gap-1 border-r border-gray-200 pr-4">
-                {routeStats.totalDistanceKm} km
-              </span>
-              <span className="flex items-center gap-1">
-                {formatDuration(routeStats.totalMinutes)}
-              </span>
-            </div>
-          )}
         </div>
         <div className="flex gap-2 w-full md:w-auto">
           {routePlaces.length > 1 && (
@@ -110,7 +103,7 @@ export const AddToRouteMap = ({ places, coords, city }: Props) => {
         </div>
       </div>
 
-      <div className="rounded-xl overflow-hidden shadow-inner border border-gray-100 bg-gray-50 p-1">
+      <div className="rounded-xl overflow-hidden p-1">
         <MapWrapper
           places={places}
           coords={coords}

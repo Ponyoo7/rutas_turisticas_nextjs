@@ -1,35 +1,41 @@
-import Image from "next/image";
-import { LoginForm } from "./components/LoginForm";
-import Link from "next/link";
+import Image from 'next/image'
+import { LoginForm } from './components/LoginForm'
+import Link from 'next/link'
 
 export default function Page() {
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      <main className="flex-1 md:p-12 flex flex-col justify-center bg-white">
-        <div className="w-full md:max-w-xl mx-auto flex flex-col items-center">
-
-          <div className="relative w-full h-[300px] mb-8 overflow-hidden rounded-xl">
-            <h1 className="absolute z-10 text-white text-4xl font-light mb-6 bottom-0 w-full text-center drop-shadow-lg italic">
-              Inicio de Sesión
-            </h1>
-            <Image
-              src="/login_image.png"
-              alt="Login representativo"
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
-          </div>
-
-          <div className="w-full max-w-sm">
-            <LoginForm />
-          </div>
-          <span className="flex flex-row gap-1">¿Aún no estás registrado?
-            <Link href='/register' className="text-[#533d2d] font-bold">Registrate</Link>
+    <>
+      <div className="relative w-full h-[320px] mb-8 overflow-hidden rounded-2xl shadow-xl">
+        <div className="absolute inset-0 z-20 flex flex-col justify-end p-8 bg-linear-to-t from-black/80 via-black/20 to-transparent">
+          <span className="text-white/70 uppercase tracking-widest text-xs font-bold mb-2">
+            Artis Platform
           </span>
+          <h1 className="text-white text-4xl font-black tracking-tight font-serif italic">
+            Inicio de Sesión
+          </h1>
         </div>
-      </main>
-    </div>
-  );
+        <Image
+          src="/login_image.png"
+          alt="Login representativo"
+          fill
+          className="object-cover transition-transform duration-700 hover:scale-105"
+          priority
+        />
+      </div>
+
+      <div className="w-full bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 mb-6">
+        <LoginForm />
+      </div>
+
+      <p className="text-gray-500 dark:text-gray-400 text-sm">
+        ¿Aún no estás registrado?{' '}
+        <Link
+          href="/register"
+          className="text-artis-primary font-bold hover:underline"
+        >
+          Regístrate
+        </Link>
+      </p>
+    </>
+  )
 }

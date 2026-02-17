@@ -1,6 +1,4 @@
 import { locationsService } from '@/shared/services/locations.service'
-import { MapWrapper } from '../../../../shared/components/map/MapWrapper'
-import { OSMElement } from '@/shared/types/locations'
 import { AddToRouteMap } from './components/AddToRouteMap'
 
 export default async function CrearRutaPage({
@@ -11,21 +9,43 @@ export default async function CrearRutaPage({
   const city = (await searchParams).city
 
   const res = await locationsService.getInterestPlacesByName(city as string)
-
+  const placesWithImages =
+    res?.places.filter((p) => p.tags.image || p.tags.wikipedia) || []
+  const heroImage =
+    placesWithImages.length > 0
+      ? (await locationsService.getWikiInfo(placesWithImages[0].tags.wikipedia))
+          ?.thumbnail?.source
+      : null
   return (
-    <main className="flex flex-col gap-6 p-6">
-      <header className="flex flex-col gap-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-        <h1 className="text-3xl font-bold text-gray-800">Creador de Rutas</h1>
-        <p className="text-gray-500">
-          Diseña tu propia aventura cultural añadiendo sitios al mapa.
-        </p>
-      </header>
-
-      {res && (
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-          <AddToRouteMap {...res} />
+    <main className="w-full h-full">
+      <div className="p-4">
+        <div
+          className="relative flex min-h-[300px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-start justify-end px-6 pb-12 rounded-xl overflow-hidden"
+          style={{
+            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 100%), url("${heroImage || '/museo_placeholder.jpg'}")`,
+          }}
+        >
+          <div className="flex flex-col gap-3 text-left z-10">
+            <span className="text-white/80 uppercase tracking-widest text-xs font-bold">
+              Diseña tu aventura
+            </span>
+            <h1 className="text-white text-5xl font-black leading-[1.1] tracking-tight font-serif">
+              Creador de Rutas
+            </h1>
+            <h2 className="text-white/90 text-base font-normal leading-relaxed max-w-[400px]">
+              Selecciona los mejores lugares y crea una experiencia inolvidable.
+            </h2>
+          </div>
         </div>
-      )}
+      </div>
+
+      <div className="flex flex-col gap-4 p-4">
+        {res && (
+          <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+            <AddToRouteMap {...res} />
+          </div>
+        )}
+      </div>
     </main>
   )
 }

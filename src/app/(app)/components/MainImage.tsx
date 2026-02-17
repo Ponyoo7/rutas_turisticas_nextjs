@@ -13,13 +13,14 @@ export const MainImage = () => {
       >
         <div className="flex flex-col gap-3 text-left z-10">
           <span className="text-white/80 uppercase tracking-widest text-xs font-bold">
-            The Art of Travel
+            El arte de viajar
           </span>
           <h1 className="text-white text-5xl font-black leading-[1.1] tracking-tight font-serif">
-            Walk through history.
+            Camina a través de la historia.
           </h1>
           <h2 className="text-white/90 text-base font-normal leading-relaxed max-w-[280px]">
-            Discover the soul of cities through the lens of art and time.
+            Descubre el alma de las ciudades a través de la mirada del arte y el
+            tiempo.
           </h2>
         </div>
         <div className="flex flex-col w-full gap-3 mt-4 z-10 gap-y-3">
@@ -27,7 +28,7 @@ export const MainImage = () => {
             className="w-full h-14 bg-artis-primary hover:bg-artis-primary/90 text-white text-base font-bold shadow-lg"
             asChild
           >
-            <Link href="/buscador">Create my cultural route</Link>
+            <Link href="/buscador">Crear mi ruta cultural</Link>
           </Button>
 
           {/* <Button

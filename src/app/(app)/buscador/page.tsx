@@ -8,9 +8,32 @@ export default async function BuscadorPage() {
 
   return (
     <CitySearchProvider cities={cities}>
-      <div>
-        <SearchInput />
-        <CityList />
+      <div className="flex flex-col gap-0 min-h-screen">
+        {/* Hero Section */}
+        <div
+          className="relative flex min-h-[300px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-center justify-center px-6 pb-12 text-center"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%), url("https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=2070&auto=format&fit=crop")',
+          }}
+        >
+          <div className="flex flex-col gap-2 z-10 max-w-3xl">
+            <h1 className="text-white text-5xl font-black leading-[1.1] tracking-tight font-serif drop-shadow-lg">
+              Encuentra tu próximo destino
+            </h1>
+            <p className="text-white/90 text-lg font-medium max-w-xl mx-auto drop-shadow-md">
+              Explora las ciudades más emblemáticas y crea rutas culturales a tu
+              medida.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-col p-6 max-w-7x1 mx-auto w-full">
+          <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 flex flex-col gap-8">
+            <SearchInput />
+            <CityList />
+          </div>
+        </div>
       </div>
     </CitySearchProvider>
   )

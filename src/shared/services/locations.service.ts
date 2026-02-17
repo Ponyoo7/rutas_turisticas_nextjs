@@ -5,14 +5,20 @@ const getCitiesByName = async (
   name: string,
   limit = 8,
 ): Promise<OSMAddress[]> => {
-  const res = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-      name,
-    )}&limit=${limit}&accept-language=es`,
-  )
-  const dataJson = await res.json()
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        name,
+      )}&limit=${limit}&accept-language=es`,
+    )
+    const dataJson = await res.json()
 
-  return Array.isArray(dataJson) ? dataJson : []
+    return Array.isArray(dataJson) ? dataJson : []
+  } catch (e) {
+    console.log(e)
+
+    return []
+  }
 }
 
 const getCityByName = async (name: string): Promise<OSMAddress | null> => {
@@ -26,13 +32,7 @@ const getCoordsByCity = (city: OSMAddress): number[] => {
 }
 
 const getInterestPlaces = async (coords: number[]) => {
-  const maxAttempts = 5
-  const baseDelayMs = 3000
-  let currentAttempt = 0
-
-  while (currentAttempt < maxAttempts) {
-    try {
-      const query = `
+  const query = `
                 [out:json][timeout:60];
                 (
                     // Buscamos Nodos, Ways y Relations (nwr)
@@ -42,41 +42,29 @@ const getInterestPlaces = async (coords: number[]) => {
                 // Importante: 'out center' para obtener coordenadas de areas
                 out center;
             `
-      const response = await fetch(
-        `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`,
-      )
-      const contentType = response.headers.get('content-type') ?? ''
-      const body = await response.text()
+  const response = await fetch(
+    `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`,
+  )
+  const contentType = response.headers.get('content-type') ?? ''
+  const body = await response.text()
 
-      if (!response.ok) {
-        throw new Error(
-          `Overpass respondi� con estado ${response.status} (${response.statusText})`,
-        )
-      }
-
-      if (!contentType.includes('application/json')) {
-        throw new Error(
-          `Overpass devolvi� content-type no JSON (${contentType || 'desconocido'})`,
-        )
-      }
-
-      const data: OverpassResponse = JSON.parse(body)
-
-      return data?.elements
-        ? data.elements.filter((e) => e.tags?.name && e.tags?.wikipedia)
-        : []
-    } catch (e) {
-      currentAttempt++
-      console.error(
-        `Intento ${currentAttempt}/${maxAttempts} en Overpass fall�`,
-        e,
-      )
-
-      if (currentAttempt >= maxAttempts) break
-
-      await wait(baseDelayMs * currentAttempt)
-    }
+  if (!response.ok) {
+    throw new Error(
+      `Overpass respondi� con estado ${response.status} (${response.statusText})`,
+    )
   }
+
+  if (!contentType.includes('application/json')) {
+    throw new Error(
+      `Overpass devolvi� content-type no JSON (${contentType || 'desconocido'})`,
+    )
+  }
+
+  const data: OverpassResponse = JSON.parse(body)
+
+  return data?.elements
+    ? data.elements.filter((e) => e.tags?.name && e.tags?.wikipedia)
+    : []
 
   return []
 }
@@ -105,7 +93,41 @@ const getWikiInfoByTitle = async (
   title: string,
   lang = 'es',
 ): Promise<WikiData | null> => {
-  const endpoint = `https://${lang}.wikipedia.org/w/api.php?action=query&format=json&prop=extracts|pageimages&exintro&explaintext&titles=${encodeURIComponent(title)}&pithumbsize=500&origin=*`
+  // Wikipedia REST API is more reliable for summaries and images
+  const endpoint = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(
+    title.replace(/ /g, '_'),
+  )}`
+
+  try {
+    const res = await fetch(endpoint)
+
+    if (!res.ok) {
+      if (res.status === 404) return null
+      throw new Error(`Wikipedia REST API responded with ${res.status}`)
+    }
+
+    const data = await res.json()
+
+    return {
+      title: data.title || title,
+      extract: data.extract,
+      thumbnail: data.thumbnail,
+    }
+  } catch (error) {
+    console.error('Error en Wikipedia API:', error)
+    return null
+  }
+}
+
+const getSpanishTitle = async (
+  title: string,
+  fromLang: string,
+): Promise<string | null> => {
+  if (fromLang === 'es') return title
+
+  const endpoint = `https://${fromLang}.wikipedia.org/w/api.php?action=query&format=json&prop=langlinks&lllang=es&titles=${encodeURIComponent(
+    title,
+  )}&origin=*`
 
   try {
     const res = await fetch(endpoint)
@@ -113,15 +135,11 @@ const getWikiInfoByTitle = async (
     const pages = data.query.pages
     const pageId = Object.keys(pages)[0]
 
-    if (pageId === '-1') return null
+    if (pageId === '-1' || !pages[pageId].langlinks) return null
 
-    return {
-      title: pages[pageId].title,
-      extract: pages[pageId].extract,
-      thumbnail: pages[pageId].thumbnail,
-    }
+    return pages[pageId].langlinks[0]['*']
   } catch (error) {
-    console.error('Error en Wikipedia API:', error)
+    console.error('Error al buscar título en español:', error)
     return null
   }
 }
@@ -131,6 +149,14 @@ const getWikiInfo = async (wikiTag: string): Promise<WikiData | null> => {
     ? wikiTag.split(':')
     : ['en', wikiTag]
 
+  // Intentamos obtener la versión en español
+  const spanishTitle = await getSpanishTitle(title, lang)
+
+  if (spanishTitle) {
+    return getWikiInfoByTitle(spanishTitle, 'es')
+  }
+
+  // Si no hay versión en español, intentamos con el idioma original
   return getWikiInfoByTitle(title, lang)
 }
 

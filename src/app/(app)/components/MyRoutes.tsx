@@ -13,12 +13,12 @@ export const MyRoutes = () => {
   if (!user) return null
 
   return (
-    <section className="mt-8 mb-24 px-6">
-      <div className="flex flex-col gap-1 pb-6">
+    <section className="mt-8 mb-24">
+      <div className="flex flex-row gap-4 items-center pb-6">
         <h2 className="text-artis-primary dark:text-gray-100 text-2xl font-bold tracking-tight font-serif">
           Mis rutas
         </h2>
-        <p className="text-gray-500 text-sm">Created by you.</p>
+        <div className="h-px w-full bg-gray-200 flex-1"></div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

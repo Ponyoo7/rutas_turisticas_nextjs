@@ -10,6 +10,9 @@ interface Props {
 export const PlaceCard = async ({ place }: Props) => {
   const res = await locationsService.getWikiInfo(place.tags.wikipedia)
 
+  const imageUrl =
+    res?.thumbnail?.source || place.tags.image || '/museo_placeholder.jpg'
+
   return (
     <div className="flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow overflow-hidden group h-full">
       <div className="relative h-48 w-full overflow-hidden">
@@ -17,7 +20,7 @@ export const PlaceCard = async ({ place }: Props) => {
         <div
           className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
           style={{
-            backgroundImage: `url("${res?.thumbnail?.source || '/museo_placeholder.jpg'}")`,
+            backgroundImage: `url("${imageUrl}")`,
           }}
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent opacity-60"></div>

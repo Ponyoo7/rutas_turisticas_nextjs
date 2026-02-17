@@ -14,8 +14,6 @@ export default async function CiudadPage({
   const decodedName = decodeURIComponent(name)
   const res = await locationsService.getInterestPlacesByName(decodedName)
 
-  console.log(res)
-
   // Try to find a good image for the hero from the places/wiki
   const placesWithImages =
     res?.places.filter((p) => p.tags.image || p.tags.wikipedia) || []
@@ -26,10 +24,10 @@ export default async function CiudadPage({
       : null
 
   return (
-    <div className="flex flex-col gap-0 min-h-screen">
+    <div className="flex flex-col gap-2 min-h-screenp p-4">
       {/* Hero Section */}
       <div
-        className="relative flex min-h-[400px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-center justify-center px-6 pb-12 text-center"
+        className="relative flex min-h-[300px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-center justify-center px-6 pb-12 text-center rounded-xl"
         style={{
           backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 100%), url("${heroImage || '/museo_placeholder.jpg'}")`,
         }}
@@ -39,7 +37,7 @@ export default async function CiudadPage({
             {decodedName}
           </h1>
           <p className="text-white/90 text-lg font-medium max-w-xl mx-auto drop-shadow-md">
-            Discover the hidden gems and cultural landmarks of {decodedName}.
+            Descubre las joyas ocultas y los hitos culturales de {decodedName}.
           </p>
         </div>
 
@@ -57,11 +55,11 @@ export default async function CiudadPage({
         </div>
       </div>
 
-      <div className="flex flex-col gap-8 p-6 max-w-7xl mx-auto w-full z-20">
+      <div className="flex flex-col gap-6 max-w-7xl mx-auto w-full z-20">
         {res && (
-          <div className="grid grid-cols-1">
-            <div className="lg:col-span-8 flex flex-col gap-8">
-              <div className="bg-white p-1 rounded-2xl shadow-xl overflow-hidden aspect-video relative border-4 border-white">
+          <div className="grid grid-cols-1 rounded-xl shadow-md border border-gray-100">
+            <div className="lg:col-span-8 flex flex-col gap-4 px-4 pb-4 ">
+              <div className="bg-white overflow-hidden aspect-video relative border-4 border-white">
                 <MapWrapper places={res.places} coords={res.coords} />
               </div>
               <RelevantPlaces places={res.places} />

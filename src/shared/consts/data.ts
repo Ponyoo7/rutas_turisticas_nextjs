@@ -12,7 +12,7 @@ export const defaultCityNames = [
   'Paris',
   'Estambul',
   'Madrid',
-  'Barcelona',
+  'Valencia',
 ]
 
 const FALLBACK_EXTRACT = 'Sin descripcion disponible.'

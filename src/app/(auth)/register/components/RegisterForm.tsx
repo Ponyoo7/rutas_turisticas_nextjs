@@ -143,7 +143,10 @@ export const RegisterForm = () => {
         error={errors.repassword}
       />
 
-      <Button type="submit" className="w-full mt-2 bg-[#533d2d]">
+      <Button
+        type="submit"
+        className="w-full h-12 mt-2 bg-artis-primary hover:bg-artis-primary/90 text-white font-bold rounded-xl shadow-lg shadow-artis-primary/20 transition-all"
+      >
         Crear cuenta
       </Button>
     </form>

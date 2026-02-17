@@ -11,8 +11,6 @@ export const RelevantPlaces = ({ places }: Props) => {
     .sort(() => 0.5 - Math.random())
     .slice(0, 6)
 
-  console.log(places)
-
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center gap-4">

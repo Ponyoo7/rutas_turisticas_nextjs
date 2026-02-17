@@ -1,9 +1,11 @@
 'use client'
 
 import { logout } from '@/actions/user.actions'
+import { deleteRoute } from '@/actions/routes.actions'
 import { RouteCard } from '@/app/(app)/components/RouteCard'
 import { Button } from '@/shared/components/ui/button'
 import { useMyRoutes } from '@/shared/hooks/useMyRoutes'
+import { IconTrash } from '@tabler/icons-react'
 import { useUserStore } from '@/shared/stores/useUserStore'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -18,8 +20,9 @@ export default function Page() {
       setUser: state.setUser,
     })),
   )
-  const { myRoutes, isLoading: isRoutesLoading } = useMyRoutes()
+  const { myRoutes, isLoading: isRoutesLoading, refetch } = useMyRoutes()
   const [isSigningOut, setIsSigningOut] = useState(false)
+  const [deletingRouteId, setDeletingRouteId] = useState<number | null>(null)
 
   const handleLogout = async () => {
     setIsSigningOut(true)
@@ -31,6 +34,19 @@ export default function Page() {
 
     setUser(null)
     router.push('/')
+  }
+
+  const handleDelete = async (e: React.MouseEvent, routeId: number) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    setDeletingRouteId(routeId)
+    try {
+      await deleteRoute(routeId)
+      refetch()
+    } finally {
+      setDeletingRouteId(null)
+    }
   }
 
   return (
@@ -116,7 +132,23 @@ export default function Page() {
           {!isRoutesLoading && myRoutes.length > 0 && (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {myRoutes.map((route) => (
-                <RouteCard key={route.id} route={route} />
+                <div key={route.id} className="relative group">
+                  <RouteCard route={route} />
+                  <button
+                    onClick={(e) => handleDelete(e, route.id)}
+                    disabled={deletingRouteId === route.id}
+                    className="absolute top-2 right-2 p-2 bg-white/90 text-gray-400 hover:text-red-600 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-white"
+                    title="Eliminar ruta"
+                  >
+                    {deletingRouteId === route.id ? (
+                      <span className="material-symbols-outlined animate-spin text-sm">
+                        sync
+                      </span>
+                    ) : (
+                      <IconTrash size={18} />
+                    )}
+                  </button>
+                </div>
               ))}
             </div>
           )}

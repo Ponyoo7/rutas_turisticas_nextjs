@@ -6,7 +6,8 @@ export const useMyRoutes = () => {
   const [myRoutes, setMyRoutes] = useState<Route[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
-  useEffect(() => {
+  const loadRoutes = () => {
+    setIsLoading(true)
     getMyRoutes()
       .then((data) => {
         if (!data) return []
@@ -16,10 +17,15 @@ export const useMyRoutes = () => {
       .finally(() => {
         setIsLoading(false)
       })
+  }
+
+  useEffect(() => {
+    loadRoutes()
   }, [])
 
   return {
     myRoutes,
     isLoading,
+    refetch: loadRoutes,
   }
 }

@@ -38,6 +38,21 @@ export const saveRoute = async (createRoute: CreateRoute) => {
   return 'ok'
 }
 
+export const deleteRoute = async (id: number) => {
+  const cookieStore = await cookies()
+  const authToken = cookieStore.get('auth')
+
+  const verified = await verifyToken(authToken?.value)
+
+  if (!verified) return
+
+  const sql = neon(`${process.env.DATABASE_URL}`)
+
+  await sql`DELETE FROM routes WHERE id = ${id} AND user_id = ${verified.id}`
+
+  return 'ok'
+}
+
 export const getMyRoutes = async () => {
   const cookieStore = await cookies()
   const authToken = cookieStore.get('auth')

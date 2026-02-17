@@ -72,37 +72,7 @@ export const AddToRouteMap = ({ places, coords, city }: Props) => {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="flex flex-col gap-2 w-full md:w-auto">
-          <Input
-            placeholder="Nombre de la ruta..."
-            value={routeName}
-            onChange={(e) => setRouteName(e.target.value)}
-            className="text-lg font-semibold border-gray-200 focus:border-[#533d2d] focus:ring-[#533d2d] transition-all"
-          />
-        </div>
-        <div className="flex gap-2 w-full md:w-auto">
-          {routePlaces.length > 1 && (
-            <Button
-              onClick={reorganizeRoute}
-              variant="outline"
-              size="sm"
-              className="border-[#533d2d] text-[#533d2d] hover:bg-[#533d2d]/10 transition-colors"
-            >
-              Reorganizar por proximidad
-            </Button>
-          )}
-          <Button
-            onClick={handleSave}
-            disabled={!routeName || routePlaces.length === 0}
-            className="bg-[#533d2d] hover:bg-[#433124] transition-colors shadow-md disabled:bg-gray-300"
-          >
-            Guardar Ruta
-          </Button>
-        </div>
-      </div>
-
+    <div className="flex flex-col gap-2">
       <div className="rounded-xl overflow-hidden p-1">
         <MapWrapper
           places={places}
@@ -110,6 +80,34 @@ export const AddToRouteMap = ({ places, coords, city }: Props) => {
           onClick={addPlaceToRoute}
           routePlaces={routePlaces}
         />
+      </div>
+
+      <div className="flex flex-row gap-2 w-full md:w-auto ">
+        <Input
+          placeholder="Nombre de la ruta..."
+          value={routeName}
+          onChange={(e) => setRouteName(e.target.value)}
+          className="h-14 text-lg border-artis-primary focus:ring-artis-primary focus:border-artis-primary rounded-xl px-6"
+        />
+        <div className="flex gap-2 w-full md:w-auto items-center">
+          {routePlaces.length > 1 && (
+            <Button
+              onClick={reorganizeRoute}
+              variant="outline"
+              // size="sm"
+              className="bg-white text-artis-primary hover:bg-gray-100 font-bold shadow-lg border border-artis-primary transition-colors"
+            >
+              Reorganizar por proximidad
+            </Button>
+          )}
+          <Button
+            onClick={handleSave}
+            disabled={!routeName || routePlaces.length === 0}
+            className="bg-artis-primary text-white hover:bg-artis-primary/90 font-bold shadow-lg border-none transition-colors disabled:bg-gray-300"
+          >
+            Guardar Ruta
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200 min-h-24">

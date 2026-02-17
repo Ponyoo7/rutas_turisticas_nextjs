@@ -25,7 +25,7 @@ export const MainImage = () => {
         </div>
         <div className="flex flex-col w-full gap-3 mt-4 z-10 gap-y-3">
           <Button
-            className="w-full h-14 bg-artis-primary hover:bg-artis-primary/90 text-white text-base font-bold shadow-lg"
+            className="w-full h-14 bg-artis-primary text-white hover:bg-artis-primary/90 text-base font-bold shadow-lg border-none"
             asChild
           >
             <Link href="/buscador">Crear mi ruta cultural</Link>

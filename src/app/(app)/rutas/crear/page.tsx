@@ -17,8 +17,8 @@ export default async function CrearRutaPage({
           ?.thumbnail?.source
       : null
   return (
-    <main className="w-full h-full">
-      <div className="p-4">
+    <main className="w-full h-full p-4">
+      <div>
         <div
           className="relative flex min-h-[300px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-start justify-end px-6 pb-12 rounded-xl overflow-hidden"
           style={{
@@ -39,12 +39,8 @@ export default async function CrearRutaPage({
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 p-4">
-        {res && (
-          <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-            <AddToRouteMap {...res} />
-          </div>
-        )}
+      <div className="flex flex-col gap-4">
+        {res && <AddToRouteMap {...res} />}
       </div>
     </main>
   )

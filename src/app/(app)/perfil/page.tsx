@@ -34,7 +34,7 @@ export default function Page() {
   }
 
   return (
-    <main className="min-h-screen bg-artis-background-light dark:bg-artis-background-dark p-6 md:p-10">
+    <main className="min-h-screen dark:bg-artis-background-dark p-6 md:p-10">
       <div className="max-w-6xl mx-auto flex flex-col gap-8">
         {/* Profile Header */}
         <header className="flex flex-col md:flex-row gap-6 items-center justify-between bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
@@ -65,7 +65,7 @@ export default function Page() {
 
           <Button
             variant="outline"
-            className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-colors"
+            className="rounded-xl bg-white text-red-600 hover:bg-red-50 hover:text-red-700 font-bold shadow-lg border border-red-200 transition-colors"
             onClick={handleLogout}
             disabled={isSigningOut}
           >
@@ -105,7 +105,7 @@ export default function Page() {
                 Aún no tienes rutas creadas.
               </p>
               <Button
-                className="mt-4 bg-artis-primary rounded-xl"
+                className="mt-4 bg-artis-primary text-white hover:bg-artis-primary/90 font-bold shadow-lg border-none rounded-xl"
                 onClick={() => router.push('/buscador')}
               >
                 Crear mi primera ruta

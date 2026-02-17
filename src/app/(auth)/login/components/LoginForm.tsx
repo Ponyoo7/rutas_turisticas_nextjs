@@ -2,6 +2,7 @@
 
 import { login } from '@/actions/user.actions'
 import { Button } from '@/shared/components/ui/button'
+import { Input } from '@/shared/components/ui/input'
 import { useUserStore } from '@/shared/stores/useUserStore'
 import { UserCredentials } from '@/shared/types/user'
 import { useRouter } from 'next/navigation'
@@ -60,14 +61,14 @@ export const LoginForm = () => {
         >
           Email
         </label>
-        <input
+        <Input
           id="email"
           type="email"
           placeholder="ejemplo@correo.com"
           name="email"
           value={formData.email}
           onChange={handleChange}
-          className="flex h-12 w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-base transition-all focus:outline-none focus:ring-2 focus:ring-artis-primary/20 focus:border-artis-primary dark:border-gray-700 dark:bg-gray-800"
+          className="h-14 text-lg border-artis-primary focus:ring-artis-primary focus:border-artis-primary rounded-xl px-6"
         />
       </div>
 
@@ -78,20 +79,20 @@ export const LoginForm = () => {
         >
           Contraseña
         </label>
-        <input
+        <Input
           id="password"
           type="password"
           name="password"
           placeholder="********"
           value={formData.password}
           onChange={handleChange}
-          className="flex h-12 w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-base transition-all focus:outline-none focus:ring-2 focus:ring-artis-primary/20 focus:border-artis-primary dark:border-gray-700 dark:bg-gray-800"
+          className="h-14 text-lg border-artis-primary focus:ring-artis-primary focus:border-artis-primary rounded-xl px-6"
         />
       </div>
 
       <Button
         type="submit"
-        className="w-full h-12 mt-2 bg-artis-primary hover:bg-artis-primary/90 text-white font-bold rounded-xl shadow-lg shadow-artis-primary/20 transition-all"
+        className="w-full h-12 mt-2 bg-artis-primary text-white hover:bg-artis-primary/90 font-bold rounded-xl shadow-lg border-none transition-all"
       >
         Acceder
       </Button>

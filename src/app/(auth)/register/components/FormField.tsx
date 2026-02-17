@@ -1,4 +1,5 @@
 import { InputHTMLAttributes } from 'react'
+import { Input } from '@/shared/components/ui/input'
 
 interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string
@@ -21,9 +22,9 @@ export const FormField = ({
       >
         {label}
       </label>
-      <input
+      <Input
         id={id}
-        className={`flex h-12 w-full rounded-xl border ${error ? 'border-red-500' : 'border-gray-200'} bg-white px-4 py-2 text-base transition-all focus:outline-none focus:ring-2 focus:ring-artis-primary/20 focus:border-artis-primary dark:border-gray-700 dark:bg-gray-800 ${className}`}
+        className={`h-14 text-lg ${error ? 'border-red-500' : 'border-artis-primary'} focus:ring-artis-primary focus:border-artis-primary rounded-xl px-6 ${className ?? ''}`}
         {...props}
       />
       {error && (

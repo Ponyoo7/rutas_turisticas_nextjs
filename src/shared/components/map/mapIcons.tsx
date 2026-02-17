@@ -12,9 +12,21 @@ import {
 } from '@tabler/icons-react'
 import { OSMElement } from '@/shared/types/locations'
 
+export const legendItems = [
+  { label: 'Museo', color: 'bg-blue-400', icon: IconBuildingBank },
+  { label: 'Atracción', color: 'bg-rose-400', icon: IconBuildingBridge },
+  { label: 'Monumento', color: 'bg-purple-400', icon: IconBuildingMonument },
+  { label: 'Arqueológico', color: 'bg-green-500', icon: IconTeapot },
+  { label: 'Otros', color: 'bg-amber-400', icon: IconMapPin },
+]
+
 const createCustomIcon = (
-  IconComponent: ComponentType<{ size?: number; color?: string; stroke?: number }>,
-  bgClass: string
+  IconComponent: ComponentType<{
+    size?: number
+    color?: string
+    stroke?: number
+  }>,
+  bgClass: string,
 ) => {
   const iconHtml = renderToStaticMarkup(
     <div
@@ -24,7 +36,7 @@ const createCustomIcon = (
       <div
         className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] ${bgClass.replace('bg-', 'border-t-')}`}
       />
-    </div>
+    </div>,
   )
 
   return L.divIcon({
@@ -37,17 +49,20 @@ const createCustomIcon = (
 }
 
 const icons = {
-  museum: createCustomIcon(IconBuildingBank, 'bg-blue-500'),
-  attraction: createCustomIcon(IconBuildingBridge, 'bg-orange-500'),
-  monument: createCustomIcon(IconBuildingMonument, 'bg-red-500'),
-  archaeological: createCustomIcon(IconTeapot, 'bg-green-500'),
-  default: createCustomIcon(IconMapPin, 'bg-amber-500'),
+  museum: createCustomIcon(legendItems[0].icon, legendItems[0].color),
+  attraction: createCustomIcon(legendItems[1].icon, legendItems[1].color),
+  monument: createCustomIcon(legendItems[2].icon, legendItems[2].color),
+  archaeological: createCustomIcon(legendItems[3].icon, legendItems[3].color),
+  default: createCustomIcon(legendItems[4].icon, legendItems[4].color),
 }
 
 export const getIconForPlace = (place: OSMElement) => {
   if (place.tags.tourism === 'museum') return icons.museum
   if (place.tags.tourism === 'attraction') return icons.attraction
-  if (place.tags.historic === 'monument' || place.tags.historic === 'memorial') {
+  if (
+    place.tags.historic === 'monument' ||
+    place.tags.historic === 'memorial'
+  ) {
     return icons.monument
   }
   if (place.tags.historic === 'archaeological_site') return icons.archaeological

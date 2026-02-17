@@ -25,7 +25,10 @@ export const MyRoutes = () => {
         {myRoutes.length === 0 && (
           <div className="text-center py-8">
             <p className="text-gray-500 mb-4">No tienes ninguna ruta creada</p>
-            <Button className="bg-artis-primary text-white" asChild>
+            <Button
+              className="bg-artis-primary text-white hover:bg-artis-primary/90 font-bold shadow-lg border-none"
+              asChild
+            >
               <Link href="/buscador">Crea tu primera ruta</Link>
             </Button>
           </div>

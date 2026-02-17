@@ -22,7 +22,7 @@ export const MapSearch = ({
         <div className="h-px w-full bg-gray-200 flex-1"></div>
       </div>
 
-      <div className="relative">
+      <div className="relative m-2">
         <svg
           className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
           xmlns="http://www.w3.org/2000/svg"

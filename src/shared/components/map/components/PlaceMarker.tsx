@@ -7,15 +7,19 @@ import { getIconForPlace } from '../mapIcons'
 
 interface PlaceMarkerProps {
   place: OSMElement
-  onHandleClick: (place: OSMElement) => void
+  onClick?: (place: OSMElement) => void
 }
 
-export const PlaceMarker = ({ place, onHandleClick }: PlaceMarkerProps) => {
+export const PlaceMarker = ({ place, onClick }: PlaceMarkerProps) => {
   const map = useMap()
   const lat = place.lat || place.center?.lat
   const lon = place.lon || place.center?.lon
 
   if (!lat || !lon) return null
+
+  const handlePlaceClick = (place: OSMElement) => {
+    if (onClick) onClick(place)
+  }
 
   return (
     <Marker position={[lat, lon]} icon={getIconForPlace(place)}>
@@ -26,15 +30,18 @@ export const PlaceMarker = ({ place, onHandleClick }: PlaceMarkerProps) => {
             ? 'Sitio Arqueologico'
             : (place.tags.tourism ?? 'Turismo')}
         </p>
-        <Button
-          size="sm"
-          onClick={() => {
-            onHandleClick(place)
-            map.closePopup()
-          }}
-        >
-          Anadir a la ruta
-        </Button>
+        {onClick && (
+          <Button
+            className="bg-artis-primary text-white hover:bg-artis-primary/90 font-bold shadow-lg border-none transition-colors"
+            size="sm"
+            onClick={() => {
+              handlePlaceClick(place)
+              map.closePopup()
+            }}
+          >
+            Anadir a la ruta
+          </Button>
+        )}
       </Popup>
     </Marker>
   )

@@ -1,28 +1,56 @@
-﻿import Link from 'next/link'
+﻿'use client'
+
+import Link from 'next/link'
 import { WikiData } from '@/shared/types/locations'
+import { useState } from 'react'
+import { Button } from '@/shared/components/ui/button'
 
 interface Props {
   city: WikiData
 }
 
 export const FeaturedCityCard = ({ city }: Props) => {
+  const [isHovering, setIsHovering] = useState<boolean>(false)
+
   return (
-    <Link
-      href={`/ciudad/${city.title}`}
-      className="flex flex-col gap-3 shrink-0 w-64 group"
-    >
+    <div className="flex flex-col gap-3 shrink-0 w-64 group">
       <div
-        className="relative w-full aspect-4/5 bg-cover bg-center rounded-xl shadow-md overflow-hidden"
-        style={{
-          backgroundImage: `url("${city.thumbnail?.source ?? '/museo_placeholder.jpg'}")`,
-        }}
+        className="relative w-full aspect-4/5 rounded-xl shadow-md overflow-hidden"
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
       >
-        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-all duration-300"></div>
-        {/* <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded-full">
-          <span className="text-[10px] font-bold uppercase tracking-tighter text-artis-primary">
-            City
-          </span>
-        </div> */}
+        {/* Capa de fondo con la imagen y el blur */}
+        <div
+          className={`absolute inset-0 bg-cover bg-center transition-all duration-500 ${isHovering ? 'blur-[2px] scale-110' : 'scale-100'}`}
+          style={{
+            backgroundImage: `url("${city.thumbnail?.source ?? '/museo_placeholder.jpg'}")`,
+          }}
+        />
+
+        {/* Overlay para oscurecer un poco y resaltar botones */}
+        <div
+          className={`absolute inset-0 bg-black/20 transition-opacity duration-300 ${isHovering ? 'opacity-100' : 'opacity-0'}`}
+        />
+
+        {/* Contenedor de botones (sin blur) */}
+        <div
+          className={`absolute inset-0 flex flex-col items-center justify-center gap-3 transition-all duration-300 ${
+            isHovering ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}
+        >
+          <Button
+            className="w-32 bg-white text-artis-primary hover:bg-gray-100 font-bold shadow-lg"
+            asChild
+          >
+            <Link href={`/ciudad/${city.title}`}>Explora</Link>
+          </Button>
+          <Button
+            className="w-32 bg-artis-primary text-white hover:bg-artis-primary/90 font-bold shadow-lg border-none"
+            asChild
+          >
+            <Link href={`/rutas/crear?city=${city.title}`}>Crear ruta</Link>
+          </Button>
+        </div>
       </div>
       <div className="px-1">
         <p className="text-artis-primary dark:text-gray-100 text-lg font-bold font-serif">
@@ -32,6 +60,6 @@ export const FeaturedCityCard = ({ city }: Props) => {
           {city.extract}
         </p>
       </div>
-    </Link>
+    </div>
   )
 }

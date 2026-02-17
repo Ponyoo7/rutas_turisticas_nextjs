@@ -14,7 +14,10 @@ export const RouteDetailHeader = ({ route }: RouteDetailHeaderProps) => {
         <h1 className="text-3xl font-bold text-slate-900">{route.name}</h1>
       </div>
 
-      <Button asChild variant="outline">
+      <Button
+        asChild
+        className="bg-white text-artis-primary hover:bg-gray-100 font-bold shadow-lg border border-artis-primary"
+      >
         <Link href="/rutas">Volver a rutas</Link>
       </Button>
     </header>

@@ -6,6 +6,7 @@ import { OSMElement } from '@/shared/types/locations'
 import { getPlaceCoords } from '@/lib/utils'
 import { FlyToLocation } from './components/FlyToLocation'
 import { PlaceMarker } from './components/PlaceMarker'
+import { MapLegend } from './components/MapLegend'
 
 interface MapProps {
   places: OSMElement[]
@@ -24,16 +25,13 @@ export default function Map({
   onClick,
   routePlaces = [],
 }: MapProps) {
-  const handlePlaceClick = (place: OSMElement) => {
-    if (onClick) onClick(place)
-  }
-
   const routePositions = routePlaces
     .map(getPlaceCoords)
     .filter((position): position is [number, number] => position !== null)
 
   return (
     <div className="relative w-full h-[600px]">
+      <MapLegend />
       {places.length > 0 && (
         <MapContainer
           center={coords as [number, number]}
@@ -44,11 +42,16 @@ export default function Map({
           <FlyToLocation coords={flyTo} />
 
           {routePositions.length > 0 && (
-            <Polyline positions={routePositions} color="#805826" weight={10} opacity={0.7} />
+            <Polyline
+              positions={routePositions}
+              color="#805826"
+              weight={6}
+              opacity={0.8}
+            />
           )}
 
           {places.map((place) => (
-            <PlaceMarker key={place.id} place={place} onHandleClick={handlePlaceClick} />
+            <PlaceMarker key={place.id} place={place} onClick={onClick} />
           ))}
         </MapContainer>
       )}

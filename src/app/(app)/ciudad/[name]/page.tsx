@@ -24,7 +24,7 @@ export default async function CiudadPage({
       : null
 
   return (
-    <div className="flex flex-col gap-2 min-h-screenp p-4">
+    <div className="flex flex-col gap-6 min-h-screenp p-4">
       {/* Hero Section */}
       <div
         className="relative flex min-h-[300px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-center justify-center px-6 pb-12 text-center rounded-xl"
@@ -44,7 +44,7 @@ export default async function CiudadPage({
         <div className="z-10 mt-6">
           {res && (
             <Button
-              className="bg-artis-primary hover:bg-artis-primary/90 text-white font-bold px-8 py-6 text-lg shadow-xl"
+              className="bg-artis-primary text-white hover:bg-artis-primary/90 font-bold px-8 py-6 text-lg shadow-lg border-none"
               asChild
             >
               <Link href={`/rutas/crear?city=${name}`}>
@@ -55,11 +55,11 @@ export default async function CiudadPage({
         </div>
       </div>
 
-      <div className="flex flex-col gap-6 max-w-7xl mx-auto w-full z-20">
+      <div className="flex flex-col gap-6 w-full z-20">
         {res && (
-          <div className="grid grid-cols-1 rounded-xl shadow-md border border-gray-100">
+          <div className="grid grid-cols-1">
             <div className="lg:col-span-8 flex flex-col gap-4 px-4 pb-4 ">
-              <div className="bg-white overflow-hidden aspect-video relative border-4 border-white">
+              <div className="bg-white overflow-hidden relative">
                 <MapWrapper places={res.places} coords={res.coords} />
               </div>
               <RelevantPlaces places={res.places} />

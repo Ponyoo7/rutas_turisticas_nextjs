@@ -145,7 +145,7 @@ export const RegisterForm = () => {
 
       <Button
         type="submit"
-        className="w-full h-12 mt-2 bg-artis-primary hover:bg-artis-primary/90 text-white font-bold rounded-xl shadow-lg shadow-artis-primary/20 transition-all"
+        className="w-full h-12 mt-2 bg-artis-primary text-white hover:bg-artis-primary/90 font-bold rounded-xl shadow-lg border-none transition-all"
       >
         Crear cuenta
       </Button>

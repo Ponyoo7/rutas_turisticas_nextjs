@@ -8,10 +8,10 @@ export default async function BuscadorPage() {
 
   return (
     <CitySearchProvider cities={cities}>
-      <div className="flex flex-col gap-0 min-h-screen">
+      <div className="flex flex-col gap-6 min-h-screen p-4">
         {/* Hero Section */}
         <div
-          className="relative flex min-h-[300px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-center justify-center px-6 pb-12 text-center"
+          className="relative flex min-h-[300px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-center justify-center px-6 pb-12 text-center rounded-xl"
           style={{
             backgroundImage:
               'linear-gradient(rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%), url("https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=2070&auto=format&fit=crop")',
@@ -28,8 +28,8 @@ export default async function BuscadorPage() {
           </div>
         </div>
 
-        <div className="flex flex-col p-6 max-w-7x1 mx-auto w-full">
-          <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 flex flex-col gap-8">
+        <div className="flex flex-col max-w-7x1 mx-auto w-full">
+          <div className="flex flex-col gap-8">
             <SearchInput />
             <CityList />
           </div>

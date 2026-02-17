@@ -46,7 +46,6 @@ export const CityCard = ({ city }: Props) => {
       onMouseLeave={() => setIsHovering(false)}
     >
       <div className="relative w-full aspect-5/3 rounded-xl shadow-md overflow-hidden">
-        {/* Capa de fondo con la imagen y el blur */}
         <div
           className={`absolute inset-0 bg-cover bg-center transition-all duration-500 ${isHovering ? 'blur-[2px] scale-110' : 'scale-100'}`}
           style={{
@@ -54,12 +53,10 @@ export const CityCard = ({ city }: Props) => {
           }}
         />
 
-        {/* Overlay para oscurecer un poco */}
         <div
           className={`absolute inset-0 bg-black/20 transition-opacity duration-300 ${isHovering ? 'opacity-100' : 'opacity-0'}`}
         />
 
-        {/* Contenedor de botones (sin blur) */}
         <div
           className={`absolute inset-0 flex flex-col items-center justify-center gap-3 transition-all duration-300 ${
             isHovering ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'

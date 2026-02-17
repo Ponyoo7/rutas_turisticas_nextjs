@@ -9,7 +9,6 @@ export default async function BuscadorPage() {
   return (
     <CitySearchProvider cities={cities}>
       <div className="flex flex-col gap-6 min-h-screen p-4">
-        {/* Hero Section */}
         <div
           className="relative flex min-h-[300px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-center justify-center px-6 pb-12 text-center rounded-xl"
           style={{

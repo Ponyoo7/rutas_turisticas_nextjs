@@ -1,4 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card'
 import { formatDuration, getRouteStats } from '@/lib/utils'
 import { OSMElement } from '@/shared/types/locations'
 
@@ -13,23 +18,31 @@ export const RouteStatsCards = ({ places }: RouteStatsCardsProps) => {
     <section className="grid grid-cols-1 gap-3 md:grid-cols-3">
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-medium text-slate-600">Paradas</CardTitle>
+          <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            Paradas
+          </CardTitle>
         </CardHeader>
-        <CardContent className="text-3xl font-bold">{stats.placesCount}</CardContent>
+        <CardContent className="text-3xl font-bold">
+          {stats.placesCount}
+        </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-medium text-slate-600">
+          <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
             Distancia estimada
           </CardTitle>
         </CardHeader>
-        <CardContent className="text-3xl font-bold">{stats.totalDistanceKm} km</CardContent>
+        <CardContent className="text-3xl font-bold">
+          {stats.totalDistanceKm} km
+        </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-medium text-slate-600">Tiempo a pie</CardTitle>
+          <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            Tiempo a pie
+          </CardTitle>
         </CardHeader>
         <CardContent className="text-3xl font-bold">
           {formatDuration(stats.totalMinutes)}
@@ -38,4 +51,3 @@ export const RouteStatsCards = ({ places }: RouteStatsCardsProps) => {
     </section>
   )
 }
-

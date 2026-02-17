@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { MainImage } from './components/MainImage'
 import { FeaturedCities } from './components/FeaturedCities'
 import { MyRoutes } from './components/MyRoutes'

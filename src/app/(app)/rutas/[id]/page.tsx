@@ -2,7 +2,6 @@ import { getMyRouteById } from '@/actions/routes.actions'
 import { verifyToken } from '@/actions/user.actions'
 import { cookies } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
-import { RouteDetailHeader } from './components/RouteDetailHeader'
 import { RouteStatsCards } from './components/RouteStatsCards'
 import { RoutePlacesList } from './components/RoutePlacesList'
 import { RouteDetailMap } from './components/RouteDetailMap'
@@ -28,32 +27,39 @@ export default async function Page({ params }: PageProps) {
   if (!route) notFound()
 
   return (
-    <main className="min-h-screen bg-artis-background-light dark:bg-artis-background-dark py-10 px-6 md:px-12">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 p-8 md:p-10">
-          <RouteDetailHeader route={route} />
-          <div className="mt-8">
-            <RouteStatsCards places={route.places} />
+    <main className="w-full h-full p-4">
+      <div className="flex flex-col gap-6">
+        <section className="mt-8">
+          <div className="flex flex-row gap-4 items-center pb-6">
+            <h2 className="text-artis-primary dark:text-gray-100 text-2xl font-bold tracking-tight font-serif">
+              Estadísticas
+            </h2>
+            <div className="h-px w-full bg-gray-200 flex-1"></div>
           </div>
-        </div>
+          <RouteStatsCards places={route.places} />
+        </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-7 space-y-8">
-            <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 p-8">
-              <h2 className="text-2xl font-bold font-serif text-artis-primary dark:text-white mb-6 flex items-center gap-3">
-                <span className="material-symbols-outlined">map</span>
+        <div className="grid grid-cols-1 gap-6">
+          <section>
+            <div className="flex flex-row gap-4 items-center pb-6">
+              <h2 className="text-artis-primary dark:text-gray-100 text-2xl font-bold tracking-tight font-serif">
+                Mapa
+              </h2>
+              <div className="h-px w-full bg-gray-200 flex-1"></div>
+            </div>
+            <div className="rounded-2xl overflow-hidden sticky top-8 ">
+              <RouteDetailMap places={route.places} />
+            </div>
+          </section>
+          <section>
+            <div className="flex flex-row gap-4 items-center pb-6">
+              <h2 className="text-artis-primary dark:text-gray-100 text-2xl font-bold tracking-tight font-serif">
                 Itinerario
               </h2>
-              <RoutePlacesList places={route.places} />
+              <div className="h-px w-full bg-gray-200 flex-1"></div>
             </div>
-          </div>
-          <div className="lg:col-span-5">
-            <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-md border border-gray-100 dark:border-gray-800 overflow-hidden sticky top-8">
-              <div className="h-[500px] w-full relative">
-                <RouteDetailMap places={route.places} />
-              </div>
-            </div>
-          </div>
+            <RoutePlacesList places={route.places} />
+          </section>
         </div>
       </div>
     </main>

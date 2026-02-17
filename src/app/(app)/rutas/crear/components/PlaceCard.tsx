@@ -27,9 +27,9 @@ export const PlaceCard = ({ place, index, onDelete }: Props) => {
   return (
     <div
       key={place.id}
-      className="bg-white p-2 pr-3 rounded-lg shadow-sm text-sm border border-gray-200 flex items-center gap-3 group hover:border-[#533d2d]/50 transition-all"
+      className="bg-white p-2 pr-3 rounded-lg shadow-sm text-sm border border-gray-200 flex items-center gap-3 group hover:border-artis-primary/50 transition-all"
     >
-      <div className="flex items-center justify-center w-6 h-6 bg-[#533d2d] text-white rounded-full text-xs font-bold shrink-0 shadow-sm">
+      <div className="flex items-center justify-center w-6 h-6 bg-artis-primary text-white rounded-full text-xs font-bold shrink-0 shadow-sm">
         {index}
       </div>
       {placeInfo?.thumbnail?.source && (

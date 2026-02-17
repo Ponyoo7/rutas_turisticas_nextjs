@@ -19,7 +19,6 @@ export const FeaturedCityCard = ({ city }: Props) => {
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
-        {/* Capa de fondo con la imagen y el blur */}
         <div
           className={`absolute inset-0 bg-cover bg-center transition-all duration-500 ${isHovering ? 'blur-[2px] scale-110' : 'scale-100'}`}
           style={{
@@ -27,12 +26,10 @@ export const FeaturedCityCard = ({ city }: Props) => {
           }}
         />
 
-        {/* Overlay para oscurecer un poco y resaltar botones */}
         <div
           className={`absolute inset-0 bg-black/20 transition-opacity duration-300 ${isHovering ? 'opacity-100' : 'opacity-0'}`}
         />
 
-        {/* Contenedor de botones (sin blur) */}
         <div
           className={`absolute inset-0 flex flex-col items-center justify-center gap-3 transition-all duration-300 ${
             isHovering ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'

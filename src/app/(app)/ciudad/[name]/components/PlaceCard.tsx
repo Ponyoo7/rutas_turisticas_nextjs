@@ -45,7 +45,7 @@ export const PlaceCard = async ({ place }: Props) => {
             target="_blank"
             className="text-artis-primary text-xs font-bold uppercase tracking-wider hover:underline mt-auto pt-2"
           >
-            Visit Website
+            Visitar web
           </Link>
         )}
       </div>

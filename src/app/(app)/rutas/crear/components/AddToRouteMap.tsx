@@ -24,6 +24,7 @@ export const AddToRouteMap = ({ places, coords, city }: Props) => {
   const [routeName, setRouteName] = useState<string>('')
 
   const addPlaceToRoute = (place: OSMElement) => {
+    if (routePlaces.some((p) => p.id === place.id)) return
     const newRoutePlaces = [...routePlaces, place]
     setRoutePlaces(newRoutePlaces)
   }

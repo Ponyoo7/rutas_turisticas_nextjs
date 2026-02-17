@@ -30,7 +30,7 @@ export default function Page() {
     }
 
     setUser(null)
-    router.push('/login')
+    router.push('/')
   }
 
   return (

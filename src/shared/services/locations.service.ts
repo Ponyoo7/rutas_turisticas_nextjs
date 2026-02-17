@@ -103,7 +103,8 @@ const getWikiInfoByTitle = async (
 
     if (!res.ok) {
       if (res.status === 404) return null
-      throw new Error(`Wikipedia REST API responded with ${res.status}`)
+      console.warn(`Wikipedia REST API responded with ${res.status}`)
+      return null
     }
 
     const data = await res.json()

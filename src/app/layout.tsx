@@ -3,6 +3,7 @@ import './globals.css'
 import { verifyToken } from '@/actions/user.actions'
 import { UserProvider } from '@/shared/components/providers/UserProvider'
 import { Manrope, Noto_Serif } from 'next/font/google'
+import { Metadata } from 'next'
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -15,6 +16,10 @@ const notoSerif = Noto_Serif({
   display: 'swap',
   variable: '--font-noto-serif',
 })
+
+export const metadata: Metadata = {
+  title: 'Route Craft',
+}
 
 export default async function RootLayout({
   children,

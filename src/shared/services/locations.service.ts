@@ -1,6 +1,17 @@
 ﻿import { wait } from '@/lib/utils'
 import { OSMAddress, OverpassResponse, WikiData } from '../types/locations'
 
+const OVERPASS_ENDPOINTS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+]
+
+const OVERPASS_RADIUS_METERS = 2000
+const OVERPASS_SERVER_TIMEOUT_SECONDS = 120
+const OVERPASS_CLIENT_TIMEOUT_MS = 12000
+const OVERPASS_RATE_LIMIT_RETRY_DELAY_MS = 30000
+const OVERPASS_RATE_LIMIT_RETRIES = 1
+
 const getCitiesByName = async (
   name: string,
   limit = 8,
@@ -31,40 +42,85 @@ const getCoordsByCity = (city: OSMAddress): number[] => {
   return [parseFloat(city.lat), parseFloat(city.lon)]
 }
 
+const buildOverpassQuery = ([lat, lon]: number[]) => {
+  return `
+    [out:json][timeout:${OVERPASS_SERVER_TIMEOUT_SECONDS}];
+    (
+      nwr["tourism"~"museum|attraction"]["name"]["wikipedia"](around:${OVERPASS_RADIUS_METERS},${lat},${lon});
+      nwr["historic"~"monument|memorial|archaeological_site"]["name"]["wikipedia"](around:${OVERPASS_RADIUS_METERS},${lat},${lon});
+    );
+    out center qt;
+  `
+}
+
 const getInterestPlaces = async (coords: number[]) => {
-  const query = `
-                [out:json][timeout:60];
-                (
-                    // Buscamos Nodos, Ways y Relations (nwr)
-                    nwr["tourism"~"museum|attraction"](around:3000, ${coords[0]}, ${coords[1]});
-                    nwr["historic"~"monument|memorial|archaeological_site"](around:3000, ${coords[0]}, ${coords[1]});
-                );
-                // Importante: 'out center' para obtener coordenadas de areas
-                out center;
-            `
-  const response = await fetch(
-    `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`,
-  )
-  const contentType = response.headers.get('content-type') ?? ''
-  const body = await response.text()
+  const [lat, lon] = coords
 
-  if (!response.ok) {
-    throw new Error(
-      `Overpass respondi� con estado ${response.status} (${response.statusText})`,
-    )
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return []
+
+  const query = buildOverpassQuery([lat, lon])
+
+  for (const endpoint of OVERPASS_ENDPOINTS) {
+    for (let retry = 0; retry <= OVERPASS_RATE_LIMIT_RETRIES; retry++) {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(
+        () => controller.abort(),
+        OVERPASS_CLIENT_TIMEOUT_MS,
+      )
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          },
+          body: `data=${encodeURIComponent(query)}`,
+          signal: controller.signal,
+        })
+
+        const contentType = response.headers.get('content-type') ?? ''
+        const body = await response.text()
+
+        if (!response.ok) {
+          if (response.status === 429 && retry < OVERPASS_RATE_LIMIT_RETRIES) {
+            console.warn(
+              `[Overpass] 429 in ${endpoint}. Retrying in ${OVERPASS_RATE_LIMIT_RETRY_DELAY_MS / 1000}s.`,
+            )
+            await wait(OVERPASS_RATE_LIMIT_RETRY_DELAY_MS)
+            continue
+          }
+
+          const briefBody = body.slice(0, 120).replace(/\s+/g, ' ').trim()
+          throw new Error(
+            `status ${response.status} (${response.statusText})${briefBody ? `: ${briefBody}` : ''}`,
+          )
+        }
+
+        if (
+          !contentType.includes('application/json') &&
+          !body.trim().startsWith('{')
+        ) {
+          throw new Error(`non-JSON content-type (${contentType || 'unknown'})`)
+        }
+
+        const data: OverpassResponse = JSON.parse(body)
+        const elements = data?.elements ?? []
+
+        return elements.filter((e) => e.tags?.name && e.tags?.wikipedia)
+      } catch (error) {
+        const reason = error instanceof Error ? error.message : String(error)
+        console.warn(`[Overpass] Request failed in ${endpoint}: ${reason}`)
+        
+        throw new Error('Error de uso en la api de Overpass')
+      } finally {
+        clearTimeout(timeoutId)
+      }
+    }
+
+    await wait(300)
   }
 
-  if (!contentType.includes('application/json')) {
-    throw new Error(
-      `Overpass devolvi� content-type no JSON (${contentType || 'desconocido'})`,
-    )
-  }
-
-  const data: OverpassResponse = JSON.parse(body)
-
-  return data?.elements
-    ? data.elements.filter((e) => e.tags?.name && e.tags?.wikipedia)
-    : []
+  console.error('[Overpass] Could not fetch interest places from available endpoints.')
 
   return []
 }

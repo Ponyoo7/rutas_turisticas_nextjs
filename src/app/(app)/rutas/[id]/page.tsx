@@ -5,6 +5,7 @@ import { notFound, redirect } from 'next/navigation'
 import { RouteStatsCards } from './components/RouteStatsCards'
 import { RoutePlacesList } from './components/RoutePlacesList'
 import { RouteDetailMap } from './components/RouteDetailMap'
+import { DeleteRouteButton } from './components/DeleteRouteButton'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -35,6 +36,7 @@ export default async function Page({ params }: PageProps) {
               Estadísticas
             </h2>
             <div className="h-px w-full bg-gray-200 flex-1"></div>
+            <DeleteRouteButton routeId={parsedId} />
           </div>
           <RouteStatsCards places={route.places} />
         </section>

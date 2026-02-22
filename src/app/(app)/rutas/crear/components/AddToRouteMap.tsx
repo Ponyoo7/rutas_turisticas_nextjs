@@ -83,7 +83,7 @@ export const AddToRouteMap = ({ places, coords, city }: Props) => {
         />
       </div>
 
-      <div className="flex flex-row gap-2 w-full md:w-auto ">
+      <div className="gap-2 w-full grid grid-cols-1 md:grid-cols-2">
         <Input
           placeholder="Nombre de la ruta..."
           value={routeName}

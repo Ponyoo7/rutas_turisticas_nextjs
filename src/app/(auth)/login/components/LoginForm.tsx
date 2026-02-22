@@ -37,13 +37,15 @@ export const LoginForm = () => {
     e.preventDefault()
     setError(null)
 
-    try {
-      const user = await login(formData)
-      setUser(user)
-      router.push('/')
-    } catch (err: any) {
-      setError(err.message || 'Email o contraseña incorrectos')
+    const result = await login(formData)
+
+    if (!result.ok) {
+      setError(result.error)
+      return
     }
+
+    setUser(result.user)
+    router.push('/')
   }
 
   return (

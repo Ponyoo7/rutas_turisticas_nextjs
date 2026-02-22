@@ -6,6 +6,36 @@ import * as bcrypt from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
 import { cookies } from 'next/headers'
 
+type LoginResult =
+  | {
+      ok: true
+      user: User
+    }
+  | {
+      ok: false
+      error: string
+    }
+
+type CreateUserResult =
+  | {
+      ok: true
+    }
+  | {
+      ok: false
+      error: string
+    }
+
+const INVALID_CREDENTIALS_ERROR = 'Email o contraseña incorrectos'
+const LOGIN_GENERIC_ERROR = 'No se pudo iniciar sesión. Inténtalo de nuevo.'
+const EMAIL_ALREADY_REGISTERED_ERROR = 'Ya existe una cuenta con ese email'
+const REGISTER_GENERIC_ERROR = 'No se pudo crear la cuenta. Inténtalo de nuevo.'
+
+const isPgErrorWithCode = (error: unknown, code: string) => {
+  if (typeof error !== 'object' || error === null) return false
+  if (!('code' in error)) return false
+  return error.code === code
+}
+
 const validatePassword = (password: string) => {
   const minLength = 8
   const hasUpperCase = /[A-Z]/.test(password)
@@ -20,24 +50,47 @@ const validatePassword = (password: string) => {
   return null
 }
 
-export const createUser = async (user: UserRegister) => {
+export const createUser = async (
+  user: UserRegister,
+): Promise<CreateUserResult> => {
   const { fullname, password, email, image } = user
 
   const passwordError = validatePassword(password)
-  if (passwordError) throw Error(passwordError)
+  if (passwordError) {
+    return {
+      ok: false,
+      error: passwordError,
+    }
+  }
 
-  const sql = neon(`${process.env.DATABASE_URL}`)
+  try {
+    const sql = neon(`${process.env.DATABASE_URL}`)
 
-  const encryptedPassword = bcrypt.hashSync(password, 10)
+    const encryptedPassword = bcrypt.hashSync(password, 10)
 
-  await sql`INSERT INTO users (fullname, email, password, image) values (${fullname}, ${email}, ${encryptedPassword}, ${image})`
+    await sql`INSERT INTO users (fullname, email, password, image) values (${fullname}, ${email}, ${encryptedPassword}, ${image})`
 
-  return {
-    success: true,
+    return {
+      ok: true,
+    }
+  } catch (error) {
+    if (isPgErrorWithCode(error, '23505')) {
+      return {
+        ok: false,
+        error: EMAIL_ALREADY_REGISTERED_ERROR,
+      }
+    }
+
+    return {
+      ok: false,
+      error: REGISTER_GENERIC_ERROR,
+    }
   }
 }
 
-export const login = async (credentials: UserCredentials) => {
+export const login = async (
+  credentials: UserCredentials,
+): Promise<LoginResult> => {
   try {
     const cookieStore = await cookies()
 
@@ -47,14 +100,23 @@ export const login = async (credentials: UserCredentials) => {
 
     const data = await sql`SELECT * FROM users WHERE email = ${email}`
 
-    if (data.length === 0) throw Error('INVALID_CREDENTIALS')
+    if (data.length === 0) {
+      return {
+        ok: false,
+        error: INVALID_CREDENTIALS_ERROR,
+      }
+    }
 
     const user = data[0]
 
-    if (!bcrypt.compareSync(password, user.password))
-      throw Error('INVALID_CREDENTIALS')
+    if (!bcrypt.compareSync(password, user.password)) {
+      return {
+        ok: false,
+        error: INVALID_CREDENTIALS_ERROR,
+      }
+    }
 
-    const userData = {
+    const userData: User = {
       id: user.id,
       email,
       fullname: user.fullname,
@@ -70,9 +132,15 @@ export const login = async (credentials: UserCredentials) => {
       path: '/',
     })
 
-    return userData
-  } catch (error) {
-    throw Error('Email o contraseña incorrectos')
+    return {
+      ok: true,
+      user: userData,
+    }
+  } catch {
+    return {
+      ok: false,
+      error: LOGIN_GENERIC_ERROR,
+    }
   }
 }
 
@@ -81,7 +149,11 @@ export const verifyToken = async (
 ): Promise<User | undefined | null> => {
   if (!token) return null
 
-  return jwt.verify(token, process.env.JWT_SECRET!) as User
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET!) as User
+  } catch {
+    return null
+  }
 }
 
 export const logout = async () => {

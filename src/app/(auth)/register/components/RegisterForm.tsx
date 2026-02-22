@@ -85,18 +85,19 @@ export const RegisterForm = () => {
 
     const profileImage = `https://ui-avatars.com/api/?name=${fullname}&rounded=true`
 
-    try {
-      const data = await createUser({
-        fullname,
-        email,
-        password,
-        image: profileImage,
-      })
+    const result = await createUser({
+      fullname,
+      email,
+      password,
+      image: profileImage,
+    })
 
-      if (data.success) return router.push('/login')
-    } catch (error: any) {
-      setServerError(error.message || 'Error al crear la cuenta')
+    if (!result.ok) {
+      setServerError(result.error)
+      return
     }
+
+    router.push('/login')
   }
 
   return (

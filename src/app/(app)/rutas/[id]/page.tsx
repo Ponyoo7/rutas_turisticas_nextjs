@@ -1,11 +1,14 @@
 import { getMyRouteById } from '@/actions/routes.actions'
 import { verifyToken } from '@/actions/user.actions'
+import { Button } from '@/shared/components/ui/button'
+import { IconEdit } from '@tabler/icons-react'
 import { cookies } from 'next/headers'
+import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import { RouteStatsCards } from './components/RouteStatsCards'
-import { RoutePlacesList } from './components/RoutePlacesList'
-import { RouteDetailMap } from './components/RouteDetailMap'
 import { DeleteRouteButton } from './components/DeleteRouteButton'
+import { RouteDetailMap } from './components/RouteDetailMap'
+import { RoutePlacesList } from './components/RoutePlacesList'
+import { RouteStatsCards } from './components/RouteStatsCards'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -33,9 +36,19 @@ export default async function Page({ params }: PageProps) {
         <section className="mt-8">
           <div className="flex flex-row gap-4 items-center pb-6">
             <h2 className="text-artis-primary dark:text-gray-100 text-2xl font-bold tracking-tight font-serif">
-              Estadísticas
+              Estadisticas
             </h2>
             <div className="h-px w-full bg-gray-200 flex-1"></div>
+            <Button
+              variant="outline"
+              className="rounded-xl bg-white text-artis-primary hover:bg-gray-50 font-bold shadow-lg border border-artis-primary/30 transition-colors gap-2"
+              asChild
+            >
+              <Link href={`/rutas/crear?routeId=${parsedId}`}>
+                <IconEdit size={18} />
+                Editar ruta
+              </Link>
+            </Button>
             <DeleteRouteButton routeId={parsedId} />
           </div>
           <RouteStatsCards places={route.places} />

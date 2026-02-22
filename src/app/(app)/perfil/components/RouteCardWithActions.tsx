@@ -2,11 +2,13 @@
 
 import { deleteRoute } from '@/actions/routes.actions'
 import { RouteCard } from '@/app/(app)/components/RouteCard'
-import { IconLoader2, IconTrash } from '@tabler/icons-react'
+import { Route } from '@/shared/types/routes'
+import { IconEdit, IconLoader2, IconTrash } from '@tabler/icons-react'
+import Link from 'next/link'
 import { useState } from 'react'
 
 interface RouteCardWithActionsProps {
-  route: any // Replace with proper type if available
+  route: Route
   onDelete: () => void
 }
 
@@ -32,18 +34,27 @@ export function RouteCardWithActions({
   return (
     <div className="relative group">
       <RouteCard route={route} />
-      <button
-        onClick={handleDelete}
-        disabled={isDeleting}
-        className="cursor-pointer absolute bottom-2 right-2 p-2 bg-white/90 text-gray-400 hover:text-red-600 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-white"
-        title="Eliminar ruta"
-      >
-        {isDeleting ? (
-          <IconLoader2 className="animate-spin" size="16" />
-        ) : (
-          <IconTrash size={18} />
-        )}
-      </button>
+      <div className="absolute bottom-2 right-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <Link
+          href={`/rutas/crear?routeId=${route.id}`}
+          className="cursor-pointer p-2 bg-white/90 text-gray-400 hover:text-artis-primary rounded-full shadow-sm hover:bg-white"
+          title="Editar ruta"
+        >
+          <IconEdit size={18} />
+        </Link>
+        <button
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="cursor-pointer p-2 bg-white/90 text-gray-400 hover:text-red-600 rounded-full shadow-sm hover:bg-white"
+          title="Eliminar ruta"
+        >
+          {isDeleting ? (
+            <IconLoader2 className="animate-spin" size={16} />
+          ) : (
+            <IconTrash size={18} />
+          )}
+        </button>
+      </div>
     </div>
   )
 }

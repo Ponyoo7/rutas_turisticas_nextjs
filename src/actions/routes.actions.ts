@@ -1,6 +1,6 @@
 'use server'
 
-import { CreateRoute, Route } from '@/shared/types/routes'
+import { CreateRoute, Route, UpdateRoute } from '@/shared/types/routes'
 import { OSMElement } from '@/shared/types/locations'
 import { cookies } from 'next/headers'
 import { verifyToken } from './user.actions'
@@ -49,6 +49,32 @@ export const deleteRoute = async (id: number) => {
   const sql = neon(`${process.env.DATABASE_URL}`)
 
   await sql`DELETE FROM routes WHERE id = ${id} AND user_id = ${verified.id}`
+
+  return 'ok'
+}
+
+export const updateRoute = async ({
+  id,
+  name,
+  places,
+  image,
+}: UpdateRoute) => {
+  const cookieStore = await cookies()
+  const authToken = cookieStore.get('auth')
+
+  const verified = await verifyToken(authToken?.value)
+
+  if (!verified) return
+
+  const sql = neon(`${process.env.DATABASE_URL}`)
+
+  if (typeof image === 'string') {
+    await sql`UPDATE routes SET name = ${name}, places = ${places}, image = ${image} WHERE id = ${id} AND user_id = ${verified.id}`
+
+    return 'ok'
+  }
+
+  await sql`UPDATE routes SET name = ${name}, places = ${places} WHERE id = ${id} AND user_id = ${verified.id}`
 
   return 'ok'
 }

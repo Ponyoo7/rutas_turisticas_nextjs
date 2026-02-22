@@ -5,23 +5,38 @@ import { OSMAddress, OSMElement } from '@/shared/types/locations'
 import { useState } from 'react'
 import { Button } from '@/shared/components/ui/button'
 import { PlaceCard } from './PlaceCard'
-import { saveRoute } from '@/actions/routes.actions'
+import { saveRoute, updateRoute } from '@/actions/routes.actions'
 import { locationsService } from '@/shared/services/locations.service'
 import { Input } from '@/shared/components/ui/input'
-import { formatDuration, getDistanceKm, getRouteStats } from '@/lib/utils'
+import { getDistanceKm } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
+import { IconLoader2 } from '@tabler/icons-react'
 
 interface Props {
   places: OSMElement[]
   coords: number[]
-  city: OSMAddress
+  city?: OSMAddress
+  routeId?: number
+  initialRouteName?: string
+  initialRoutePlaces?: OSMElement[]
+  initialImage?: string
 }
 
-export const AddToRouteMap = ({ places, coords, city }: Props) => {
+export const AddToRouteMap = ({
+  places,
+  coords,
+  city,
+  routeId,
+  initialRouteName = '',
+  initialRoutePlaces = [],
+  initialImage = '',
+}: Props) => {
   const router = useRouter()
+  const isEditMode = typeof routeId === 'number'
+  const [isSaving, setIsSaving] = useState(false)
 
-  const [routePlaces, setRoutePlaces] = useState<OSMElement[]>([])
-  const [routeName, setRouteName] = useState<string>('')
+  const [routePlaces, setRoutePlaces] = useState<OSMElement[]>(initialRoutePlaces)
+  const [routeName, setRouteName] = useState<string>(initialRouteName)
 
   const addPlaceToRoute = (place: OSMElement) => {
     if (routePlaces.some((p) => p.id === place.id)) return
@@ -61,15 +76,34 @@ export const AddToRouteMap = ({ places, coords, city }: Props) => {
   }
 
   const handleSave = async () => {
-    const wikiCity = await locationsService.getWikiInfo(`es:${city.name}`)
+    setIsSaving(true)
+    try {
+      if (isEditMode && routeId) {
+        await updateRoute({
+          id: routeId,
+          name: routeName,
+          places: routePlaces,
+          image: initialImage || undefined,
+        })
 
-    await saveRoute({
-      name: routeName,
-      places: routePlaces,
-      image: wikiCity?.thumbnail?.source ?? '',
-    })
+        router.replace(`/rutas/${routeId}`)
+        return
+      }
 
-    router.replace('/')
+      const wikiCity = city
+        ? await locationsService.getWikiInfo(`es:${city.name}`)
+        : null
+
+      await saveRoute({
+        name: routeName,
+        places: routePlaces,
+        image: wikiCity?.thumbnail?.source ?? initialImage,
+      })
+
+      router.replace('/')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -103,10 +137,19 @@ export const AddToRouteMap = ({ places, coords, city }: Props) => {
           )}
           <Button
             onClick={handleSave}
-            disabled={!routeName || routePlaces.length === 0}
+            disabled={!routeName || routePlaces.length === 0 || isSaving}
             className="bg-artis-primary text-white hover:bg-artis-primary/90 font-bold shadow-lg border-none transition-colors disabled:bg-gray-300"
           >
-            Guardar Ruta
+            {isSaving ? (
+              <>
+                <IconLoader2 className="animate-spin" />
+                Guardando...
+              </>
+            ) : isEditMode ? (
+              'Actualizar Ruta'
+            ) : (
+              'Guardar Ruta'
+            )}
           </Button>
         </div>
       </div>

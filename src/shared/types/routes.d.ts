@@ -6,6 +6,13 @@ export interface CreateRoute {
   image: string
 }
 
+export interface UpdateRoute {
+  id: number
+  name: string
+  places: OSMElement[]
+  image?: string
+}
+
 export interface Route {
   id: number
   user_id: string

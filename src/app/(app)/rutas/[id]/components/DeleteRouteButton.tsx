@@ -32,7 +32,7 @@ export function DeleteRouteButton({ routeId }: DeleteRouteButtonProps) {
       variant="outline"
       onClick={handleDelete}
       disabled={isDeleting}
-      className="rounded-xl bg-white text-red-600 hover:bg-red-50 hover:text-red-700 font-bold shadow-lg border border-red-200 transition-colors gap-2"
+      className="rounded-xl bg-white text-red-600 hover:bg-red-50 hover:text-red-700 font-bold shadow-lg border border-red-200 transition-colors gap-2 cursor-pointer"
     >
       {isDeleting ? (
         <>

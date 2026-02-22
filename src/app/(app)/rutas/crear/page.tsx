@@ -1,6 +1,10 @@
 import { getMyRouteById } from '@/actions/routes.actions'
 import { getPlaceCoords } from '@/lib/utils'
 import { locationsService } from '@/shared/services/locations.service'
+import {
+  getInterestPlacesByCoordsCached,
+  getInterestPlacesByNameCached,
+} from '@/shared/services/locations.cached.server'
 import { OSMElement } from '@/shared/types/locations'
 import { notFound } from 'next/navigation'
 import { AddToRouteMap } from './components/AddToRouteMap'
@@ -35,7 +39,7 @@ export default async function CrearRutaPage({
   if (isEditMode && !routeToEdit) notFound()
 
   const cityResult = cityParam
-    ? await locationsService.getInterestPlacesByName(cityParam)
+    ? await getInterestPlacesByNameCached(cityParam)
     : null
   const routeCenter = routeToEdit?.places[0]
     ? getPlaceCoords(routeToEdit.places[0])
@@ -44,7 +48,10 @@ export default async function CrearRutaPage({
 
   if (routeCenter) {
     try {
-      fallbackPlaces = await locationsService.getInterestPlaces(routeCenter)
+      fallbackPlaces = await getInterestPlacesByCoordsCached(
+        routeCenter[0],
+        routeCenter[1],
+      )
     } catch {
       fallbackPlaces = []
     }

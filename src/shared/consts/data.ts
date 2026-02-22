@@ -1,4 +1,6 @@
-import { cache } from 'react'
+import 'server-only'
+
+import { unstable_cache } from 'next/cache'
 import { locationsService } from '../services/locations.service'
 import { WikiData } from '../types/locations'
 
@@ -21,7 +23,7 @@ const fallbackCity = (name: string): WikiData => ({
   extract: FALLBACK_EXTRACT,
 })
 
-export const getDefaultCities = cache(async (): Promise<WikiData[]> => {
+const getDefaultCitiesUncached = async (): Promise<WikiData[]> => {
   const cities = await Promise.all(
     defaultCityNames.map((cityName) =>
       locationsService.getWikiInfoByTitle(cityName, 'es'),
@@ -31,4 +33,13 @@ export const getDefaultCities = cache(async (): Promise<WikiData[]> => {
   return cities.map(
     (city, index) => city ?? fallbackCity(defaultCityNames[index]),
   )
-})
+}
+
+export const getDefaultCities = unstable_cache(
+  getDefaultCitiesUncached,
+  ['default-cities'],
+  {
+    revalidate: false,
+    tags: ['default-cities'],
+  },
+)

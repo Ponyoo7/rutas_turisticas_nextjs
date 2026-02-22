@@ -1,8 +1,6 @@
-import { locationsService } from '@/shared/services/locations.service'
-import { Button } from '@/shared/components/ui/button'
+import { getInterestPlacesByNameCached } from '@/shared/services/locations.cached.server'
 import { MapWrapper } from '../../../../shared/components/map/MapWrapper'
 import { RelevantPlaces } from './components/RelevantPlaces'
-import Link from 'next/link'
 import { CityHeader } from './components/CityHeader'
 
 export default async function CiudadPage({
@@ -13,7 +11,7 @@ export default async function CiudadPage({
   const { name } = await params
 
   const decodedName = decodeURIComponent(name)
-  const res = await locationsService.getInterestPlacesByName(decodedName)
+  const res = await getInterestPlacesByNameCached(decodedName)
 
   return (
     <div className="flex flex-col gap-6 min-h-screenp p-4">

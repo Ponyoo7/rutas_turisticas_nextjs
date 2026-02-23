@@ -12,6 +12,11 @@ interface RouteCardWithActionsProps {
   onDelete: () => void
 }
 
+/**
+ * Variante especializada del componente `RouteCard` que muestra una superposición (overlay)
+ * visible al pasar el ratón (hover) con accesos rápidos a la edición y la eliminación
+ * definitiva de dicha ruta (Server Action `deleteRoute`).
+ */
 export function RouteCardWithActions({
   route,
   onDelete,

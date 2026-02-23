@@ -21,6 +21,10 @@ const normalizePlaces = (places: unknown): OSMElement[] => {
   return []
 }
 
+/**
+ * Guarda una nueva ruta en la base de datos asociada al usuario autenticado.
+ * Verifica la cookie de autenticación antes de ejecutar el INSERT.
+ */
 export const saveRoute = async (createRoute: CreateRoute) => {
   const { name, places, image } = createRoute
 
@@ -38,6 +42,10 @@ export const saveRoute = async (createRoute: CreateRoute) => {
   return 'ok'
 }
 
+/**
+ * Elimina una ruta de la base de datos dado su ID.
+ * Por seguridad, también valida que la ruta pertenezca al usuario autenticado (`user_id = ...`).
+ */
 export const deleteRoute = async (id: number) => {
   const cookieStore = await cookies()
   const authToken = cookieStore.get('auth')
@@ -53,12 +61,12 @@ export const deleteRoute = async (id: number) => {
   return 'ok'
 }
 
-export const updateRoute = async ({
-  id,
-  name,
-  places,
-  image,
-}: UpdateRoute) => {
+/**
+ * Actualiza los datos (nombre, lugares, imagen) de una ruta existente.
+ * Valida que el `user_id` coincida con el del usuario autenticado para evitar
+ * modificaciones no autorizadas por parte de otros usuarios.
+ */
+export const updateRoute = async ({ id, name, places, image }: UpdateRoute) => {
   const cookieStore = await cookies()
   const authToken = cookieStore.get('auth')
 
@@ -79,6 +87,10 @@ export const updateRoute = async ({
   return 'ok'
 }
 
+/**
+ * Obtiene todas las rutas asociadas al usuario autenticado.
+ * Normaliza los lugares (JSON -> Array de OSMElement) antes de devolverlos al cliente.
+ */
 export const getMyRoutes = async () => {
   const cookieStore = await cookies()
   const authToken = cookieStore.get('auth')
@@ -97,6 +109,11 @@ export const getMyRoutes = async () => {
   })) as Route[]
 }
 
+/**
+ * Obtiene los detalles de una ruta específica por su ID.
+ * Verifica que dicha ruta pertenezca al usuario actualmente autenticado,
+ * devolviendo null si no existe o no tiene permisos.
+ */
 export const getMyRouteById = async (id: number): Promise<Route | null> => {
   const cookieStore = await cookies()
   const authToken = cookieStore.get('auth')

@@ -9,6 +9,10 @@ interface Props {
   city: WikiData
 }
 
+/**
+ * Tarjeta individual para presentar una ciudad en el carrusel de ciudades destacadas.
+ * Incluye atajos interactivos flotantes (explorar ciudad o crear ruta).
+ */
 export const FeaturedCityCard = ({ city }: Props) => {
   const [isHovering, setIsHovering] = useState<boolean>(false)
 

@@ -57,6 +57,12 @@ const getSimilarityScore = (title: string, query: string) => {
   return 0
 }
 
+/**
+ * Proveedor de contexto para la búsqueda de ciudades.
+ * Mantiene el estado de la búsqueda (`query`) y combina las ciudades inyectadas por defecto
+ * con resultados dinámicos obtenidos desde la API de OpenStreetMap realizando peticiones diferidas (debounced).
+ * Calcula una puntuación de similitud para ordenar y filtrar los resultados mostrados.
+ */
 export const CitySearchProvider = ({
   children,
   cities,
@@ -75,7 +81,10 @@ export const CitySearchProvider = ({
 
     const timeoutId = setTimeout(async () => {
       try {
-        const matches = await locationsService.getCitiesByName(normalizedQuery, 10)
+        const matches = await locationsService.getCitiesByName(
+          normalizedQuery,
+          10,
+        )
 
         if (isCancelled) {
           return
@@ -142,7 +151,7 @@ export const CitySearchProvider = ({
       cities,
       filteredCities,
     }),
-    [cities, query, filteredCities]
+    [cities, query, filteredCities],
   )
 
   return (
@@ -152,6 +161,7 @@ export const CitySearchProvider = ({
   )
 }
 
+/** Hook personalizado para consumir de forma segura el estado de búsqueda de ciudades. */
 export const useCitySearch = () => {
   const context = useContext(CitySearchContext)
 

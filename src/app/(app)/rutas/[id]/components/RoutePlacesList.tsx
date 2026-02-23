@@ -6,6 +6,10 @@ interface RoutePlacesListProps {
   places: OSMElement[]
 }
 
+/**
+ * Componente mapeador que itera y renderiza una lista secuencial de las paradas (`RoutePlaceCard`),
+ * garantizando la presentación de los lugares en el orden original del itinerario.
+ */
 export const RoutePlacesList = ({ places }: RoutePlacesListProps) => {
   return (
     <section className="space-y-3">

@@ -13,6 +13,8 @@ export default async function CiudadPage({
   const decodedName = decodeURIComponent(name)
   const res = await getInterestPlacesByNameCached(decodedName)
 
+  console.log(res)
+
   return (
     <div className="flex flex-col gap-6 min-h-screenp p-4">
       <CityHeader places={res?.places ?? []} name={decodedName} />

@@ -21,6 +21,11 @@ const initialFormData: FormData = {
   repassword: '',
 }
 
+/**
+ * Componente de formulario para el registro de nuevos usuarios.
+ * Maneja internamente el estado del formulario, la validación de campos (email, contraseña)
+ * y la llamada a la Server Action `createUser` para registrar la información en la base de datos.
+ */
 export const RegisterForm = () => {
   const router = useRouter()
 
@@ -31,6 +36,10 @@ export const RegisterForm = () => {
   const [errors, setErrors] = useState<Partial<FormData>>({})
   const [serverError, setServerError] = useState<string | null>(null)
 
+  /**
+   * Valida un campo en específico (nombre, email, contraseñas...).
+   * Retorna el mensaje de error o una cadena vacía si es válido.
+   */
   const validateField = (name: string, value: string) => {
     let error = ''
 
@@ -69,6 +78,11 @@ export const RegisterForm = () => {
     validateField(name, value)
   }
 
+  /**
+   * Se ejecuta al enviar el formulario (submit).
+   * Vuelve a validar todos los campos y de ser exitoso llama al backend (`createUser`).
+   * Por defecto, se autogenera un avatar usando ui-avatars.
+   */
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault()
     setServerError(null)

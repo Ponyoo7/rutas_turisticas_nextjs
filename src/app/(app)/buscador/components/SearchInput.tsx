@@ -3,6 +3,10 @@
 import { Input } from '@/shared/components/ui/input'
 import { useCitySearch } from '../context/useCitySearch'
 
+/**
+ * Componente de entrada de texto (input) para buscar ciudades.
+ * Actualiza el texto de búsqueda (`query`) global expuesto por el contexto `useCitySearch`.
+ */
 export const SearchInput = () => {
   const { query, setQuery } = useCitySearch()
 

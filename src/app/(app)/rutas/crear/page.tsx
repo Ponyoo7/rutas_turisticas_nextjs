@@ -22,6 +22,15 @@ const mergePlaces = (basePlaces: OSMElement[], extraPlaces: OSMElement[]) => {
   return result
 }
 
+/**
+ * Página `CrearRutaPage`
+ *
+ * Permite tanto la creación de nuevas rutas como la edición de rutas existentes.
+ *
+ * Modos de operación:
+ * - Creación: Recibe el parámetro `city` para buscar lugares de interés en una ciudad.
+ * - Edición: Recibe `routeId` para cargar una ruta guardada por el usuario (verificando autoría con `getMyRouteById`).
+ */
 export default async function CrearRutaPage({
   searchParams,
 }: {
@@ -32,12 +41,14 @@ export default async function CrearRutaPage({
   const routeIdParam =
     typeof params.routeId === 'string' ? Number(params.routeId) : null
 
+  // Determinamos si estamos en "Modo Edición" y obtenemos los datos de la ruta
   const isEditMode =
     routeIdParam != null && Number.isInteger(routeIdParam) && routeIdParam > 0
   const routeToEdit = isEditMode ? await getMyRouteById(routeIdParam) : null
 
   if (isEditMode && !routeToEdit) notFound()
 
+  // Obtenemos todos los lugares de interés de la ciudad objetivo si existe el parámetro city
   const cityResult = cityParam
     ? await getInterestPlacesByNameCached(cityParam)
     : null
@@ -58,9 +69,12 @@ export default async function CrearRutaPage({
   }
 
   const mapCoords = cityResult?.coords ?? routeCenter
+
+  // Fusionamos los lugares que ya formaban parte de la ruta editada con
+  // los nuevos lugares obtenidos por ciudad o proximidad, evitando duplicados.
   const mapPlaces = routeToEdit
     ? mergePlaces(routeToEdit.places, cityResult?.places ?? fallbackPlaces)
-    : cityResult?.places ?? []
+    : (cityResult?.places ?? [])
 
   if (!mapCoords || mapPlaces.length === 0) notFound()
 

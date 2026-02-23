@@ -13,6 +13,12 @@ const defaultFormLogin: UserCredentials = {
   password: '',
 }
 
+/**
+ * Componente principal del formulario de Inicio de sesión.
+ * Gestiona el estado local del formulario de login y llama a la Server Action `login`
+ * para procesar las credenciales. Si la respuesta es exitosa, guarda el usuario en
+ * el store de Zustand (`useUserStore`) y redirige a la página principal.
+ */
 export const LoginForm = () => {
   const router = useRouter()
 
@@ -33,6 +39,10 @@ export const LoginForm = () => {
     })
   }
 
+  /**
+   * Maneja el envío del formulario. Previene recarga completa, limpia
+   * errores pasados e invoca la autenticación en el servidor.
+   */
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault()
     setError(null)

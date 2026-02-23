@@ -2,16 +2,21 @@
 import { OSMAddress, OverpassResponse, WikiData } from '../types/locations'
 
 const OVERPASS_ENDPOINTS = [
+  'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
   'https://overpass-api.de/api/interpreter',
-  'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter',
 ]
 
 const OVERPASS_RADIUS_METERS = 2000
 const OVERPASS_SERVER_TIMEOUT_SECONDS = 120
 const OVERPASS_CLIENT_TIMEOUT_MS = 12000
-const OVERPASS_RATE_LIMIT_RETRY_DELAY_MS = 30000
-const OVERPASS_RATE_LIMIT_RETRIES = 1
+const OVERPASS_RATE_LIMIT_RETRY_DELAY_MS = 1500
+const OVERPASS_RATE_LIMIT_RETRIES = 3
 
+/**
+ * Busca ciudades por nombre utilizando la API de Nominatim (OpenStreetMap).
+ * Retorna una lista de coincidencias ordenadas por relevancia.
+ */
 const getCitiesByName = async (
   name: string,
   limit = 8,
@@ -32,10 +37,10 @@ const getCitiesByName = async (
   }
 }
 
-const getCityByName = async (name: string): Promise<OSMAddress | null> => {
+const getCityByName = async (name: string): Promise<OSMAddress> => {
   const cities = await getCitiesByName(name, 1)
 
-  return cities.length > 0 ? cities[0] : null
+  return cities[0]
 }
 
 const getCoordsByCity = (city: OSMAddress): number[] => {
@@ -53,6 +58,11 @@ const buildOverpassQuery = ([lat, lon]: number[]) => {
   `
 }
 
+/**
+ * Obtiene lugares de interés (museos, atracciones, monumentos) cercanos a unas coordenadas dadas
+ * utilizando la API de Overpass. Implementa reintentos automáticos y rotación de servidores (endpoints)
+ * en caso de fallos o límite de peticiones (Rate Limit).
+ */
 const getInterestPlaces = async (coords: number[]) => {
   const [lat, lon] = coords
 
@@ -110,7 +120,7 @@ const getInterestPlaces = async (coords: number[]) => {
       } catch (error) {
         const reason = error instanceof Error ? error.message : String(error)
         console.warn(`[Overpass] Request failed in ${endpoint}: ${reason}`)
-        
+
         throw new Error('Error de uso en la api de Overpass')
       } finally {
         clearTimeout(timeoutId)
@@ -120,7 +130,9 @@ const getInterestPlaces = async (coords: number[]) => {
     await wait(300)
   }
 
-  console.error('[Overpass] Could not fetch interest places from available endpoints.')
+  console.error(
+    '[Overpass] Could not fetch interest places from available endpoints.',
+  )
 
   return []
 }
@@ -128,13 +140,7 @@ const getInterestPlaces = async (coords: number[]) => {
 const getInterestPlacesByName = async (name: string) => {
   const city = await getCityByName(name)
 
-  console.log(city)
-
-  if (!city) return
-
   const coords = getCoordsByCity(city)
-
-  if (!coords) return
 
   const places = await getInterestPlaces(coords)
 
@@ -145,6 +151,10 @@ const getInterestPlacesByName = async (name: string) => {
   }
 }
 
+/**
+ * Obtiene el resumen y la imagen en miniatura de un artículo de Wikipedia usando su API REST.
+ * Es más efectiva y rápida para extraer introducciones y fotos principales en comparación con la API Action.
+ */
 const getWikiInfoByTitle = async (
   title: string,
   lang = 'es',
@@ -201,6 +211,11 @@ const getSpanishTitle = async (
   }
 }
 
+/**
+ * Función principal para obtener información de Wikipedia de un lugar.
+ * Primero intenta localizar si existe una versión del artículo en español (usando getSpanishTitle) y,
+ * si la encuentra, devuelve la información en español. Si no, usa el idioma original.
+ */
 const getWikiInfo = async (wikiTag: string): Promise<WikiData | null> => {
   const [lang, title] = wikiTag.includes(':')
     ? wikiTag.split(':')

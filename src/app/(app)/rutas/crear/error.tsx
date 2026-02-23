@@ -4,6 +4,10 @@ import { Button } from '@/shared/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { useEffect, useTransition } from 'react'
 
+/**
+ * Componente de Error boundary que intercepta fallos ocurridos durante el proceso de
+ * creación o edición de una ruta (por ej. errores de red). Permite intentar recargar.
+ */
 export default function ErrorPage({
   error,
   reset,

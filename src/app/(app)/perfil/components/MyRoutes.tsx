@@ -5,6 +5,13 @@ import { Button } from '@/shared/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { RouteCardWithActions } from './RouteCardWithActions'
 
+/**
+ * Componente `MyRoutes`
+ *
+ * Muestra el listado de las rutas creadas por el usuario autenticado.
+ * Utiliza el custom hook `useMyRoutes` para obtener los datos de la API y
+ * manejar el estado de carga (loading) y la actualización (refetch) al eliminar una ruta.
+ */
 export function MyRoutes() {
   const router = useRouter()
   const { myRoutes, isLoading, refetch } = useMyRoutes()

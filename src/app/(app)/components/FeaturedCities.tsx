@@ -6,6 +6,10 @@ import {
   CarouselItem,
 } from '@/shared/components/ui/carousel'
 
+/**
+ * Componente que renderiza una sección con un carrusel interactivo
+ * mostrando sugerencias de ciudades populares para explorar.
+ */
 export const FeaturedCities = async () => {
   const cities = await getDefaultCities()
 

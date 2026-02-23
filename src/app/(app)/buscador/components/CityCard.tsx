@@ -11,6 +11,11 @@ interface Props {
   city: WikiData
 }
 
+/**
+ * Tarjeta individual para mostrar información de una ciudad.
+ * Hace peticiones a Wikipedia de forma asíncrona para cargar la imagen y descripción pertinentes.
+ * Incluye botones de acción para explorar la ciudad o crear una ruta en la misma.
+ */
 export const CityCard = ({ city }: Props) => {
   const [cityInfo, setCityInfo] = useState<WikiData>(city)
   const [isHovering, setIsHovering] = useState<boolean>(false)

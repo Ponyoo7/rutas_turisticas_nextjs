@@ -13,6 +13,11 @@ interface Props {
   onDelete: (placeId: number) => void
 }
 
+/**
+ * Componente que representa un lugar añadido recientemente a la ruta en curso.
+ * Intenta cargar, después de montarse, su imagen representativa desde Wikipedia para previsualización.
+ * Contiene el control numérico de índice y un botón para descartarlo (eliminarlo).
+ */
 export const PlaceCard = ({ place, index, onDelete }: Props) => {
   const [placeInfo, setPlaceInfo] = useState<WikiData | null>(null)
 

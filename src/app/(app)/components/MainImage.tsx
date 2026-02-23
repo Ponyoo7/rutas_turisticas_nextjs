@@ -1,6 +1,11 @@
 import { Button } from '@/shared/components/ui/button'
 import Link from 'next/link'
 
+/**
+ * Componente Hero principal usado en el "Home" de la aplicación.
+ * Ofrece una vista visualmente atractiva con un Call To Action (CTA) primordial
+ * hacia la página del buscador.
+ */
 export const MainImage = () => {
   return (
     <div className="p-0">

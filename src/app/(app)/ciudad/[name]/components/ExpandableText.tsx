@@ -7,6 +7,10 @@ interface Props {
   limit: number
 }
 
+/**
+ * Componente que recorta fragmentos de texto muy largos (como descripciones completas de Wikipedia)
+ * según un límite de palabras y provee un botón interactivo de "Leer más / Leer menos" para expandirlo.
+ */
 export const ExpandableText = ({ text, limit }: Props) => {
   const [isExpanded, setIsExpanded] = useState(false)
 

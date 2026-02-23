@@ -4,6 +4,11 @@ import Link from 'next/link'
 import { Button } from '@/shared/components/ui/button'
 import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react'
 
+/**
+ * Página principal de Inicio de Sesión.
+ * Muestra un hero image superior y el formulario de autenticación centrado (`LoginForm`).
+ * Incluye también el enlace para ir a la página de registro.
+ */
 export default function Page() {
   return (
     <>
@@ -23,8 +28,11 @@ export default function Page() {
           className="object-cover transition-transform duration-700 hover:scale-105"
           priority
         />
-        <Button asChild className='z-100 absolute top-2 left-2 bg-transparent hover:bg-neutral-500/40 cursor-pointer'>
-          <Link href='/'>
+        <Button
+          asChild
+          className="z-100 absolute top-2 left-2 bg-transparent hover:bg-neutral-500/40 cursor-pointer"
+        >
+          <Link href="/">
             <IconArrowLeft />
             <span>Volver</span>
           </Link>

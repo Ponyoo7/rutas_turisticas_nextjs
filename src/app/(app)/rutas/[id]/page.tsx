@@ -14,6 +14,12 @@ interface PageProps {
   params: Promise<{ id: string }>
 }
 
+/**
+ * Página principal de los detalles de una ruta completada (`[id]`).
+ * Actúa protegida: redirige a /login si no hay token válido guardado en la sesión.
+ * Carga todos los lugares asociados a la ruta del usuario, desglosándolo en tres ejes:
+ * 1) Estadísticas, 2) Mapa Interactivo Integral y 3) Lista del Itinerario.
+ */
 export default async function Page({ params }: PageProps) {
   const { id } = await params
   const parsedId = Number(id)

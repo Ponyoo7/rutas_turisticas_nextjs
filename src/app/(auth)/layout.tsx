@@ -1,3 +1,7 @@
+/**
+ * Renderiza el diseño base para las páginas de autenticación (Login / Registro).
+ * Mantiene un diseño centrado y limpio con estilos base adaptables.
+ */
 export default function AuthLayout({
   children,
 }: {

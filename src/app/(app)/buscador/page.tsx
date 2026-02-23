@@ -3,6 +3,11 @@ import { CityList } from './components/CityList'
 import { SearchInput } from './components/SearchInput'
 import { CitySearchProvider } from './context/useCitySearch'
 
+/**
+ * Página principal del Buscador.
+ * Carga las ciudades por defecto y envuelve la interfaz de búsqueda (`SearchInput` y `CityList`)
+ * dentro del contexto `CitySearchProvider` para manejar el estado global de la búsqueda.
+ */
 export default async function BuscadorPage() {
   const cities = await getDefaultCities()
 

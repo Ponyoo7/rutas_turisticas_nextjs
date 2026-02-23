@@ -4,6 +4,11 @@ import { IconArrowLeft } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
+/**
+ * Página principal de Registro.
+ * Contiene una imagen de cabecera decorativa y el componente `RegisterForm`
+ * donde los nuevos usuarios se pueden crear una cuenta.
+ */
 export default function Page() {
   return (
     <>
@@ -24,8 +29,11 @@ export default function Page() {
           priority
         />
 
-        <Button asChild className='z-100 absolute top-2 left-2 bg-transparent hover:bg-neutral-500/40 cursor-pointer'>
-          <Link href='/'>
+        <Button
+          asChild
+          className="z-100 absolute top-2 left-2 bg-transparent hover:bg-neutral-500/40 cursor-pointer"
+        >
+          <Link href="/">
             <IconArrowLeft />
             <span>Volver</span>
           </Link>

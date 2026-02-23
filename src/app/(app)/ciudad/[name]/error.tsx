@@ -4,6 +4,10 @@ import { Button } from '@/shared/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { useEffect, useTransition } from 'react'
 
+/**
+ * Página de error específica de la ruta de visualización de ciudades `[name]`.
+ * Permite al usuario reintentar cargar la página en caso de que fallen las llamadas a la API de mapas u otras de red.
+ */
 export default function ErrorPage({
   error,
   reset,

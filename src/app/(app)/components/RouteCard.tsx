@@ -6,6 +6,11 @@ interface Props {
   route: Route
 }
 
+/**
+ * Componente visual de tarjeta que resume la información clave de una ruta.
+ * Analiza la lista de lugares (`getRouteStats`) para extraer y mostrar
+ * la distancia total, la duración estimada de recorrido y el conteo de paradas.
+ */
 export const RouteCard = ({ route }: Props) => {
   const stats = getRouteStats(route.places)
 

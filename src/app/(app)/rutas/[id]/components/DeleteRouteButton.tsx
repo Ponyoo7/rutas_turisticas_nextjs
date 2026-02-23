@@ -10,6 +10,11 @@ interface DeleteRouteButtonProps {
   routeId: number
 }
 
+/**
+ * Botón para eliminar definitivamente una ruta.
+ * Implementa un diálogo nativo de confirmación y hace uso de la Server Action `deleteRoute`.
+ * Redirige a la página principal de "Mis Rutas" (/perfil) en caso de completarse con éxito.
+ */
 export function DeleteRouteButton({ routeId }: DeleteRouteButtonProps) {
   const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)

@@ -35,7 +35,8 @@ export const AddToRouteMap = ({
   const isEditMode = typeof routeId === 'number'
   const [isSaving, setIsSaving] = useState(false)
 
-  const [routePlaces, setRoutePlaces] = useState<OSMElement[]>(initialRoutePlaces)
+  const [routePlaces, setRoutePlaces] =
+    useState<OSMElement[]>(initialRoutePlaces)
   const [routeName, setRouteName] = useState<string>(initialRouteName)
 
   const addPlaceToRoute = (place: OSMElement) => {
@@ -44,6 +45,11 @@ export const AddToRouteMap = ({
     setRoutePlaces(newRoutePlaces)
   }
 
+  /**
+   * Reorganiza los lugares de la ruta basándose en el algoritmo del "Vecino Más Cercano"
+   * (Nearest Neighbor). Comienza por el primer lugar seleccionado y busca secuencialmente
+   * el punto más cercano restante para optimizar el camino.
+   */
   const reorganizeRoute = () => {
     if (routePlaces.length <= 2) return
 
@@ -75,6 +81,12 @@ export const AddToRouteMap = ({
     setRoutePlaces(newRoutePlaces)
   }
 
+  /**
+   * Guarda o actualiza la ruta actual.
+   * Si está en modo edición, invoca `updateRoute`.
+   * Si es una ruta nueva, intenta obtener información de la ciudad en Wikipedia
+   * (como una imagen principal) antes de guardarla con `saveRoute`.
+   */
   const handleSave = async () => {
     setIsSaving(true)
     try {

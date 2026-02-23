@@ -6,6 +6,11 @@ import { useMyRoutes } from '@/shared/hooks/useMyRoutes'
 import { Button } from '@/shared/components/ui/button'
 import Link from 'next/link'
 
+/**
+ * Sección embebida en la página inicial para usuarios autenticados.
+ * Carga desde el custom hook las rutas del usuario y las renderiza
+ * promoviendo la creación de una nueva en caso de no existir ninguna.
+ */
 export const MyRoutes = () => {
   const { myRoutes } = useMyRoutes()
   const user = useUserStore((state) => state.user)

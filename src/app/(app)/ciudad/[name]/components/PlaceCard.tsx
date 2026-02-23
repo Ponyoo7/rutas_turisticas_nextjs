@@ -7,6 +7,11 @@ interface Props {
   place: OSMElement
 }
 
+/**
+ * Tarjeta individual para presentar un lugar de interés en la vista de ciudad.
+ * Hace fetch a Wikipedia asíncronamente para intentar obtener una imagen y descripción detallada,
+ * empleando una imagen de relleno (`museo_placeholder.jpg`) si no encuentra resultados.
+ */
 export const PlaceCard = async ({ place }: Props) => {
   const res = await locationsService.getWikiInfo(place.tags.wikipedia)
 

@@ -7,6 +7,11 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useShallow } from 'zustand/shallow'
 
+/**
+ * Cabecera de la página de perfil.
+ * Recupera el usuario autenticado desde el estado local (`useUserStore`), presentando
+ * su avatar e información básica. Incorpora además el botón para desconectarse (`logout`).
+ */
 export function ProfileHeader() {
   const router = useRouter()
   const { user, isLoading, setUser } = useUserStore(

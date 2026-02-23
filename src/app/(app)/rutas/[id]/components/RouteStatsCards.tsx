@@ -11,6 +11,11 @@ interface RouteStatsCardsProps {
   places: OSMElement[]
 }
 
+/**
+ * Componente que expone una pequeña cuadrícula con tarjetas informativas,
+ * mostrando métricas esenciales calculadas (`getRouteStats`) sobre el itinerario:
+ * cantidad de paradas, distancia estimada sumada y tiempo a pie requerido.
+ */
 export const RouteStatsCards = ({ places }: RouteStatsCardsProps) => {
   const stats = getRouteStats(places)
 

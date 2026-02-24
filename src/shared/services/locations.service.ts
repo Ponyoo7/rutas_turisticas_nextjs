@@ -174,11 +174,31 @@ const getWikiInfoByTitle = async (
     }
 
     const data = await res.json()
+    const thumbnail = data.thumbnail
+
+    // Aumentar la resolución del thumbnail para que no se vea borroso (de 320px a 800px)
+    if (thumbnail && data.originalimage) {
+      const targetWidth = 800
+      if (data.originalimage.width >= targetWidth) {
+        thumbnail.source = thumbnail.source.replace(
+          /\/\d+px-/,
+          `/${targetWidth}px-`,
+        )
+        thumbnail.width = targetWidth
+        thumbnail.height = Math.round(
+          (targetWidth * data.originalimage.height) / data.originalimage.width,
+        )
+      } else {
+        thumbnail.source = data.originalimage.source
+        thumbnail.width = data.originalimage.width
+        thumbnail.height = data.originalimage.height
+      }
+    }
 
     return {
       title: data.title || title,
       extract: data.extract,
-      thumbnail: data.thumbnail,
+      thumbnail: thumbnail,
     }
   } catch (error) {
     console.error('Error en Wikipedia API:', error)

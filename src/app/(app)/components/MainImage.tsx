@@ -13,7 +13,7 @@ export const MainImage = () => {
         className="relative flex min-h-[520px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-start justify-end px-6 pb-12 rounded-xl overflow-hidden"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(0, 0, 0, 0.0) 0%, rgba(0, 0, 0, 0.7) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBQyjntHkICpekAMqN8s8XMmmviN8OoAeiAZ9j5X4jzgEDiksJxQuXlxsDIw25C0t3rDpFELMrxN-J22BGfZEMLIqVmYSDI9z958baMWxTMy4tZfVWLR75S9FAVWJCd609JXFHfe38GqYe400lJ11fDqHYwGT0mFKPYt9N46pTg0i4TzmY86VMLkc7zqlQF9tOdutGLOMs85FLgVof_LaZQlJKZPby5QweL8_tpWVCqS3ef7ZewZpBtJaTnJcMfG6HCSL0Ph47zgoNJ")',
+            'linear-gradient(rgba(0, 0, 0, 0.0) 0%, rgba(0, 0, 0, 0.7) 100%), url("https://cdn-imgix.headout.com/media/images/66bb4cc2e114ddd6d0d9f99037768beb-Pantheon%20Rome%20The%20Altar%20of%20the%20Holy%20Spirit.jpg")',
         }}
       >
         <div className="flex flex-col gap-3 text-left z-10">

@@ -1,6 +1,6 @@
 'use server'
 
-import { User, UserCredentials, UserRegister } from '@/shared/types/user'
+import { User, UserCredentials, UserRegister, UserRole } from '@/shared/types/user'
 import { neon } from '@neondatabase/serverless'
 import * as bcrypt from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
@@ -25,6 +25,34 @@ type CreateUserResult =
       error: string
     }
 
+type DbUserRow = {
+  id: string | number
+  fullname: string
+  email: string
+  image: string
+  password?: string
+  role?: unknown
+  verified?: unknown
+}
+
+type LegacyJwtUser = {
+  id?: string | number
+  fullname?: string
+  email?: string
+  image?: string
+  role?: unknown
+  verified?: unknown
+}
+
+type CompleteJwtUser = {
+  id: string | number
+  fullname: string
+  email: string
+  image: string
+  role: unknown
+  verified: boolean
+}
+
 const INVALID_CREDENTIALS_ERROR = 'Email o contraseña incorrectos'
 const LOGIN_GENERIC_ERROR = 'No se pudo iniciar sesión. Inténtalo de nuevo.'
 const EMAIL_ALREADY_REGISTERED_ERROR = 'Ya existe una cuenta con ese email'
@@ -48,6 +76,48 @@ const validatePassword = (password: string) => {
   if (!hasNumber) return 'La contraseña debe tener al menos un número'
 
   return null
+}
+
+const normalizeRole = (role: unknown): UserRole => {
+  if (role === 'admin' || role === 'master') return role
+
+  return 'user'
+}
+
+const normalizeVerified = (verified: unknown) => verified === true
+
+const hasCompleteUserShape = (
+  payload: LegacyJwtUser,
+): payload is CompleteJwtUser =>
+  payload.id != null &&
+  typeof payload.fullname === 'string' &&
+  typeof payload.email === 'string' &&
+  typeof payload.image === 'string' &&
+  typeof payload.role === 'string' &&
+  typeof payload.verified === 'boolean'
+
+const mapDbUserToUser = (user: DbUserRow): User => ({
+  id: String(user.id),
+  fullname: user.fullname,
+  email: user.email,
+  image: user.image,
+  role: normalizeRole(user.role),
+  verified: normalizeVerified(user.verified),
+})
+
+const getUserById = async (id: string): Promise<User | null> => {
+  const sql = neon(`${process.env.DATABASE_URL}`)
+
+  const data = await sql`
+    SELECT id, fullname, email, image, role, verified
+    FROM users
+    WHERE id = ${id}
+    LIMIT 1
+  `
+
+  if (data.length === 0) return null
+
+  return mapDbUserToUser(data[0] as DbUserRow)
 }
 
 export const createUser = async (
@@ -98,7 +168,12 @@ export const login = async (
 
     const sql = neon(`${process.env.DATABASE_URL}`)
 
-    const data = await sql`SELECT * FROM users WHERE email = ${email}`
+    const data = await sql`
+      SELECT id, fullname, email, image, password, role, verified
+      FROM users
+      WHERE email = ${email}
+      LIMIT 1
+    `
 
     if (data.length === 0) {
       return {
@@ -107,21 +182,16 @@ export const login = async (
       }
     }
 
-    const user = data[0]
+    const user = data[0] as DbUserRow
 
-    if (!bcrypt.compareSync(password, user.password)) {
+    if (!user.password || !bcrypt.compareSync(password, user.password)) {
       return {
         ok: false,
         error: INVALID_CREDENTIALS_ERROR,
       }
     }
 
-    const userData: User = {
-      id: user.id,
-      email,
-      fullname: user.fullname,
-      image: user.image,
-    }
+    const userData = mapDbUserToUser(user)
 
     const token = jwt.sign(userData, process.env.JWT_SECRET!)
 
@@ -130,6 +200,8 @@ export const login = async (
       value: token,
       httpOnly: true,
       path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
     })
 
     return {
@@ -150,7 +222,26 @@ export const verifyToken = async (
   if (!token) return null
 
   try {
-    return jwt.verify(token, process.env.JWT_SECRET!) as User
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!)
+
+    if (typeof decoded !== 'object' || decoded === null) return null
+
+    const payload = decoded as LegacyJwtUser
+
+    if (payload.id == null) return null
+
+    if (hasCompleteUserShape(payload)) {
+      return {
+        id: String(payload.id),
+        fullname: payload.fullname,
+        email: payload.email,
+        image: payload.image,
+        role: normalizeRole(payload.role),
+        verified: normalizeVerified(payload.verified),
+      }
+    }
+
+    return await getUserById(String(payload.id))
   } catch {
     return null
   }

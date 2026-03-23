@@ -3,15 +3,35 @@ import { OSMAddress, OverpassResponse, WikiData } from '../types/locations'
 
 const OVERPASS_ENDPOINTS = [
   'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
-  'https://overpass-api.de/api/interpreter',
   'https://overpass.private.coffee/api/interpreter',
+  'https://overpass-api.de/api/interpreter',
 ]
 
 const OVERPASS_RADIUS_METERS = 2000
 const OVERPASS_SERVER_TIMEOUT_SECONDS = 120
-const OVERPASS_CLIENT_TIMEOUT_MS = 12000
+const OVERPASS_CLIENT_TIMEOUT_MS = 200000000
 const OVERPASS_RATE_LIMIT_RETRY_DELAY_MS = 1500
 const OVERPASS_RATE_LIMIT_RETRIES = 3
+const ROUTECRAFT_USER_AGENT = 'RouteCraft/1.0 (contacto: cqc1999@gmail.com)'
+const ROUTECRAFT_REFERER = 'https://rutas-turisticas-nextjs.vercel.app/'
+
+const buildApiHeaders = (options?: { includeFormContentType?: boolean }) => {
+  const headers = new Headers()
+
+  if (options?.includeFormContentType) {
+    headers.set(
+      'Content-Type',
+      'application/x-www-form-urlencoded; charset=UTF-8',
+    )
+  }
+
+  if (typeof window === 'undefined') {
+    headers.set('User-Agent', ROUTECRAFT_USER_AGENT)
+    headers.set('Referer', ROUTECRAFT_REFERER)
+  }
+
+  return headers
+}
 
 /**
  * Busca ciudades por nombre utilizando la API de Nominatim (OpenStreetMap).
@@ -26,6 +46,9 @@ const getCitiesByName = async (
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
         name,
       )}&limit=${limit}&accept-language=es`,
+      {
+        headers: buildApiHeaders(),
+      },
     )
     const dataJson = await res.json()
 
@@ -81,9 +104,7 @@ const getInterestPlaces = async (coords: number[]) => {
       try {
         const response = await fetch(endpoint, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          },
+          headers: buildApiHeaders({ includeFormContentType: true }),
           body: `data=${encodeURIComponent(query)}`,
           signal: controller.signal,
         })
@@ -118,8 +139,7 @@ const getInterestPlaces = async (coords: number[]) => {
 
         return elements.filter((e) => e.tags?.name && e.tags?.wikipedia)
       } catch (error) {
-        const reason = error instanceof Error ? error.message : String(error)
-        console.warn(`[Overpass] Request failed in ${endpoint}: ${reason}`)
+        console.error(error)
 
         throw new Error('Error de uso en la api de Overpass')
       } finally {
@@ -165,7 +185,9 @@ const getWikiInfoByTitle = async (
   )}`
 
   try {
-    const res = await fetch(endpoint)
+    const res = await fetch(endpoint, {
+      headers: buildApiHeaders(),
+    })
 
     if (!res.ok) {
       if (res.status === 404) return null
@@ -217,7 +239,9 @@ const getSpanishTitle = async (
   )}&origin=*`
 
   try {
-    const res = await fetch(endpoint)
+    const res = await fetch(endpoint, {
+      headers: buildApiHeaders(),
+    })
     const data = await res.json()
     const pages = data.query.pages
     const pageId = Object.keys(pages)[0]

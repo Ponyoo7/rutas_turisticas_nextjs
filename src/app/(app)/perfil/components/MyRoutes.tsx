@@ -5,6 +5,7 @@ import { Button } from '@/shared/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { RouteCardWithActions } from './RouteCardWithActions'
 
+
 /**
  * Componente `MyRoutes`
  *
@@ -15,9 +16,11 @@ import { RouteCardWithActions } from './RouteCardWithActions'
 export function MyRoutes() {
   const router = useRouter()
   const { myRoutes, isLoading, refetch } = useMyRoutes()
+   
 
   return (
     <section className="flex flex-col gap-6">
+    
       <div className="flex items-center gap-4">
         <h2 className="text-2xl font-bold font-serif text-artis-primary dark:text-white">
           Mis rutas

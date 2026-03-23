@@ -1,3 +1,5 @@
+export type UserRole = 'user' | 'admin' | 'master'
+
 export interface UserRegister {
   fullname: string
   email: string
@@ -15,4 +17,6 @@ export interface User {
   fullname: string
   email: string
   image: string
+  role: UserRole
+  verified: boolean
 }

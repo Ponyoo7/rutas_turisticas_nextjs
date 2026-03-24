@@ -37,9 +37,9 @@ const getDefaultCitiesUncached = async (): Promise<WikiData[]> => {
 
 export const getDefaultCities = unstable_cache(
   getDefaultCitiesUncached,
-  ['default-cities'],
+  ['default-cities-v2'],
   {
-    revalidate: false,
-    tags: ['default-cities'],
+    revalidate: 60 * 60 * 24,
+    tags: ['default-cities-v2'],
   },
 )

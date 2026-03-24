@@ -19,6 +19,9 @@ interface Props {
 export const CityCard = ({ city }: Props) => {
   const [cityInfo, setCityInfo] = useState<WikiData>(city)
   const [isHovering, setIsHovering] = useState<boolean>(false)
+  const image =
+    locationsService.toRenderableImageUrl(cityInfo.thumbnail?.source) ??
+    '/museo_placeholder.jpg'
 
   useEffect(() => {
     let cancelled = false
@@ -54,7 +57,7 @@ export const CityCard = ({ city }: Props) => {
         <div
           className={`absolute inset-0 bg-cover bg-center transition-all duration-500 ${isHovering ? 'blur-[2px] scale-110' : 'scale-100'}`}
           style={{
-            backgroundImage: `url("${cityInfo.thumbnail?.source ?? '/museo_placeholder.jpg'}")`,
+            backgroundImage: `url("${image}")`,
           }}
         />
 

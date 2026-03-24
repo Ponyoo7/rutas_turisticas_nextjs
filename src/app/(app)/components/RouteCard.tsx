@@ -1,4 +1,5 @@
 import { getRouteStats } from '@/lib/utils'
+import { locationsService } from '@/shared/services/locations.service'
 import { Route } from '@/shared/types/routes'
 import Link from 'next/link'
 
@@ -13,6 +14,9 @@ interface Props {
  */
 export const RouteCard = ({ route }: Props) => {
   const stats = getRouteStats(route.places)
+  const image =
+    locationsService.toRenderableImageUrl(route.image) ??
+    '/museo_placeholder.jpg'
 
   return (
     <Link
@@ -21,7 +25,7 @@ export const RouteCard = ({ route }: Props) => {
     >
       <div
         className="w-1/3 aspect-square bg-cover bg-center"
-        style={{ backgroundImage: `url("${route.image}")` }}
+        style={{ backgroundImage: `url("${image}")` }}
       ></div>
       <div className="w-2/3 p-4 flex flex-col justify-center gap-2">
         <div className="flex items-center gap-2 text-[10px] font-bold text-artis-secondary-blue uppercase tracking-widest">

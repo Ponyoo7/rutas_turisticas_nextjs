@@ -2,6 +2,7 @@
 
 import { verifyToken } from '@/actions/user.actions'
 import { canAccessAdmin } from '@/lib/auth'
+import { locationsService } from '@/shared/services/locations.service'
 import { OSMElement } from '@/shared/types/locations'
 import { UserRole } from '@/shared/types/user'
 import { neon } from '@neondatabase/serverless'
@@ -198,7 +199,7 @@ export const getAdminRoutes = async (
     return {
       id: row.id,
       name: row.name,
-      image: typeof row.image === 'string' && row.image.length > 0 ? row.image : null,
+      image: locationsService.toRenderableImageUrl(row.image),
       featured: normalizeFeatured(row.featured),
       userId: String(row.user_id),
       ownerFullname: row.owner_fullname,
@@ -241,7 +242,7 @@ export const getAdminRouteById = async (
   return {
     id: row.id,
     name: row.name,
-    image: typeof row.image === 'string' && row.image.length > 0 ? row.image : null,
+    image: locationsService.toRenderableImageUrl(row.image),
     places: normalizePlaces(row.places),
     featured: normalizeFeatured(row.featured),
     userId: String(row.user_id),

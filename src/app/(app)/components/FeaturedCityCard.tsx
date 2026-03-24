@@ -1,6 +1,7 @@
 ﻿'use client'
 
 import Link from 'next/link'
+import { locationsService } from '@/shared/services/locations.service'
 import { WikiData } from '@/shared/types/locations'
 import { useState } from 'react'
 import { Button } from '@/shared/components/ui/button'
@@ -15,6 +16,9 @@ interface Props {
  */
 export const FeaturedCityCard = ({ city }: Props) => {
   const [isHovering, setIsHovering] = useState<boolean>(false)
+  const image =
+    locationsService.toRenderableImageUrl(city.thumbnail?.source) ??
+    '/museo_placeholder.jpg'
 
   return (
     <div className="flex flex-col gap-3 shrink-0 w-64 group">
@@ -26,7 +30,7 @@ export const FeaturedCityCard = ({ city }: Props) => {
         <div
           className={`absolute inset-0 bg-cover bg-center transition-all duration-500 ${isHovering ? 'blur-[2px] scale-110' : 'scale-100'}`}
           style={{
-            backgroundImage: `url("${city.thumbnail?.source ?? '/museo_placeholder.jpg'}")`,
+            backgroundImage: `url("${image}")`,
           }}
         />
 

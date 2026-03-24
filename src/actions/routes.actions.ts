@@ -2,6 +2,7 @@
 
 import { CreateRoute, Route, UpdateRoute } from '@/shared/types/routes'
 import { OSMElement } from '@/shared/types/locations'
+import { locationsService } from '@/shared/services/locations.service'
 import { cookies } from 'next/headers'
 import { verifyToken } from './user.actions'
 import { neon } from '@neondatabase/serverless'
@@ -46,7 +47,7 @@ const normalizeRoute = (route: RouteRow): Route => ({
   user_id: String(route.user_id),
   name: route.name,
   places: normalizePlaces(route.places),
-  image: typeof route.image === 'string' ? route.image : '',
+  image: locationsService.toRenderableImageUrl(route.image) ?? '',
   featured: route.featured === true,
 })
 
@@ -56,6 +57,7 @@ const normalizeRoute = (route: RouteRow): Route => ({
  */
 export const saveRoute = async (createRoute: CreateRoute) => {
   const { name, places, image } = createRoute
+  const canonicalImage = locationsService.normalizeCanonicalImageUrl(image) ?? ''
 
   const cookieStore = await cookies()
   const authToken = cookieStore.get('auth')
@@ -66,7 +68,7 @@ export const saveRoute = async (createRoute: CreateRoute) => {
 
   const sql = neon(`${process.env.DATABASE_URL}`)
 
-  await sql`INSERT INTO routes (user_id, name, places, image) values (${verified?.id}, ${name}, ${places}, ${image})`
+  await sql`INSERT INTO routes (user_id, name, places, image) values (${verified?.id}, ${name}, ${places}, ${canonicalImage})`
 
   return 'ok'
 }
@@ -106,7 +108,10 @@ export const updateRoute = async ({ id, name, places, image }: UpdateRoute) => {
   const sql = neon(`${process.env.DATABASE_URL}`)
 
   if (typeof image === 'string') {
-    await sql`UPDATE routes SET name = ${name}, places = ${places}, image = ${image} WHERE id = ${id} AND user_id = ${verified.id}`
+    const canonicalImage =
+      locationsService.normalizeCanonicalImageUrl(image) ?? ''
+
+    await sql`UPDATE routes SET name = ${name}, places = ${places}, image = ${canonicalImage} WHERE id = ${id} AND user_id = ${verified.id}`
 
     return 'ok'
   }
@@ -224,7 +229,7 @@ export const getMyFavoriteRouteIds = async (): Promise<number[]> => {
     SELECT user_favorite_routes.route_id
     FROM user_favorite_routes
     INNER JOIN routes ON routes.id = user_favorite_routes.route_id
-    WHERE user_id = ${verified.id}
+    WHERE user_favorite_routes.user_id = ${verified.id}
       AND routes.featured = true
   `
 

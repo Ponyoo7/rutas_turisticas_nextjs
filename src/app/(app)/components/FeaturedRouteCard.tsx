@@ -1,6 +1,7 @@
 'use client'
 
 import { formatDuration, getRouteStats } from '@/lib/utils'
+import { locationsService } from '@/shared/services/locations.service'
 import { Route } from '@/shared/types/routes'
 import { useRouter } from 'next/navigation'
 import { FavoriteRouteButton } from './FavoriteRouteButton'
@@ -25,6 +26,7 @@ export function FeaturedRouteCard({
   const router = useRouter()
   const stats = getRouteStats(route.places)
   const previewPlaces = route.places.slice(0, 2)
+  const image = locationsService.toRenderableImageUrl(route.image)
 
   const navigateToRoute = () => {
     if (!href) return
@@ -59,11 +61,11 @@ export function FeaturedRouteCard({
           className="absolute right-4 top-4 z-10"
         />
 
-        {route.image ? (
+        {image ? (
           // Route images can come from external dynamic URLs not covered by next/image config.
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={route.image}
+            src={image}
             alt={`Imagen de la ruta ${route.name}`}
             className="h-full w-full object-cover"
           />

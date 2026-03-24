@@ -1,5 +1,6 @@
 import { getAdminRouteById } from '@/actions/admin.actions'
 import { getPlaceCoords, getPlaceTypeLabel } from '@/lib/utils'
+import { locationsService } from '@/shared/services/locations.service'
 import { Button } from '@/shared/components/ui/button'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -17,6 +18,8 @@ export default async function Page({ params }: PageProps) {
   const route = await getAdminRouteById(parsedId)
 
   if (!route) notFound()
+
+  const image = locationsService.toRenderableImageUrl(route.image)
 
   return (
     <section className="flex flex-col gap-6">
@@ -46,11 +49,11 @@ export default async function Page({ params }: PageProps) {
 
         <div className="mt-8 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,1fr)]">
           <div className="overflow-hidden rounded-[24px] border border-artis-primary/10 bg-[#f7f1e8]">
-            {route.image ? (
+            {image ? (
               // Route images can come from external dynamic URLs not covered by next/image config.
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={route.image}
+                src={image}
                 alt={`Imagen principal de ${route.name}`}
                 className="h-full min-h-[280px] w-full object-cover"
               />

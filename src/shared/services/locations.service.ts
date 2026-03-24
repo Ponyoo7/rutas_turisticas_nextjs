@@ -7,16 +7,17 @@ import {
 } from '../types/locations'
 
 const OVERPASS_ENDPOINTS = [
-  'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
-  'https://overpass.private.coffee/api/interpreter',
   'https://overpass-api.de/api/interpreter',
+  'https://lz4.overpass-api.de/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter',
 ]
 
 const OVERPASS_RADIUS_METERS = 2000
 const OVERPASS_SERVER_TIMEOUT_SECONDS = 120
-const OVERPASS_CLIENT_TIMEOUT_MS = 200000000
-const OVERPASS_RATE_LIMIT_RETRY_DELAY_MS = 1500
-const OVERPASS_RATE_LIMIT_RETRIES = 3
+const OVERPASS_CLIENT_TIMEOUT_MS = 15000
+const OVERPASS_RETRY_DELAY_MS = 1500
+const OVERPASS_REQUEST_RETRIES = 3
+const OVERPASS_RETRYABLE_STATUS_CODES = new Set([408, 429, 500, 502, 503, 504])
 const WIKI_RETRY_DELAY_MS = 600
 const WIKI_RETRY_ATTEMPTS = 3
 const WIKI_RETRYABLE_STATUS_CODES = new Set([429, 500, 502, 503, 504])
@@ -105,29 +106,6 @@ const buildWikiCacheKey = (lang: string, title: string) =>
 const ensureHttps = (url: string) =>
   url.startsWith('//') ? `https:${url}` : url.replace(/^http:\/\//i, 'https://')
 
-const isWikiImageProxyUrl = (value: string) =>
-  value.startsWith(`${WIKI_IMAGE_PROXY_PATH}?url=`)
-
-const shouldProxyWikiImage = (urlLike: string) => {
-  if (isWikiImageProxyUrl(urlLike)) return false
-
-  try {
-    const url = new URL(ensureHttps(urlLike))
-
-    return (
-      url.hostname === 'upload.wikimedia.org' ||
-      url.hostname === 'commons.wikimedia.org'
-    )
-  } catch {
-    return false
-  }
-}
-
-const toClientImageUrl = (source: string) =>
-  shouldProxyWikiImage(source)
-    ? `${WIKI_IMAGE_PROXY_PATH}?url=${encodeURIComponent(source)}`
-    : source
-
 const safelyDecodeURIComponent = (value: string) => {
   try {
     return decodeURIComponent(value)
@@ -144,6 +122,22 @@ const buildCommonsFilePathUrl = (fileName: string) => {
   if (!normalizedFileName) return null
 
   return `${COMMONS_FILE_PATH_PREFIX}${encodeURIComponent(normalizedFileName)}`
+}
+
+const extractProxyImageUrl = (urlLike: string) => {
+  try {
+    const url = urlLike.startsWith('http://') || urlLike.startsWith('https://')
+      ? new URL(urlLike)
+      : new URL(urlLike, 'https://routecraft.local')
+
+    if (url.pathname !== WIKI_IMAGE_PROXY_PATH) return null
+
+    const proxiedUrl = url.searchParams.get('url')
+
+    return proxiedUrl ? safelyDecodeURIComponent(proxiedUrl) : null
+  } catch {
+    return null
+  }
 }
 
 const extractCommonsFileNameFromUrl = (urlLike: string) => {
@@ -167,13 +161,35 @@ const extractCommonsFileNameFromUrl = (urlLike: string) => {
   }
 }
 
-const normalizeImageSource = (source?: string | null) => {
+const shouldProxyWikiImage = (urlLike: string) => {
+  try {
+    const url = new URL(ensureHttps(urlLike))
+
+    return (
+      url.hostname === 'upload.wikimedia.org' ||
+      url.hostname === 'commons.wikimedia.org'
+    )
+  } catch {
+    return false
+  }
+}
+
+const normalizeCanonicalImageUrl = (source?: string | null) => {
   if (typeof source !== 'string') return null
 
   const trimmedSource = source.trim()
 
   if (!trimmedSource || /^Category:/i.test(trimmedSource)) return null
-  if (isWikiImageProxyUrl(trimmedSource)) return trimmedSource
+
+  const proxiedSource = extractProxyImageUrl(trimmedSource)
+
+  if (proxiedSource) {
+    return normalizeCanonicalImageUrl(proxiedSource)
+  }
+
+  if (trimmedSource.startsWith('/')) {
+    return trimmedSource
+  }
 
   const commonsFileName = extractCommonsFileNameFromUrl(trimmedSource)
 
@@ -204,24 +220,37 @@ const normalizeImageSource = (source?: string | null) => {
   return null
 }
 
+const toRenderableImageUrl = (source?: string | null) => {
+  const canonicalSource = normalizeCanonicalImageUrl(source)
+
+  if (!canonicalSource) return null
+  if (canonicalSource.startsWith('/')) return canonicalSource
+
+  return shouldProxyWikiImage(canonicalSource)
+    ? `${WIKI_IMAGE_PROXY_PATH}?url=${encodeURIComponent(canonicalSource)}`
+    : canonicalSource
+}
+
 const getSummaryThumbnail = (
   data: WikiSummaryResponse,
 ): WikiData['thumbnail'] | undefined => {
-  const thumbnailSource = normalizeImageSource(data.thumbnail?.source)
+  const thumbnailSource = normalizeCanonicalImageUrl(data.thumbnail?.source)
 
   if (thumbnailSource && data.thumbnail) {
     return {
       ...data.thumbnail,
-      source: toClientImageUrl(thumbnailSource),
+      source: thumbnailSource,
     }
   }
 
-  const originalImageSource = normalizeImageSource(data.originalimage?.source)
+  const originalImageSource = normalizeCanonicalImageUrl(
+    data.originalimage?.source,
+  )
 
   if (originalImageSource && data.originalimage) {
     return {
       ...data.originalimage,
-      source: toClientImageUrl(originalImageSource),
+      source: originalImageSource,
     }
   }
 
@@ -278,10 +307,6 @@ const splitWikiTag = (wikiTag: string) => {
   ] as const
 }
 
-/**
- * Busca ciudades por nombre utilizando la API de Nominatim (OpenStreetMap).
- * Retorna una lista de coincidencias ordenadas por relevancia.
- */
 const getCitiesByName = async (
   name: string,
   limit = 8,
@@ -305,10 +330,10 @@ const getCitiesByName = async (
   }
 }
 
-const getCityByName = async (name: string): Promise<OSMAddress> => {
+const getCityByName = async (name: string): Promise<OSMAddress | null> => {
   const cities = await getCitiesByName(name, 1)
 
-  return cities[0]
+  return cities[0] ?? null
 }
 
 const getCoordsByCity = (city: OSMAddress): number[] => {
@@ -326,20 +351,16 @@ const buildOverpassQuery = ([lat, lon]: number[]) => {
   `
 }
 
-/**
- * Obtiene lugares de interés (museos, atracciones, monumentos) cercanos a unas coordenadas dadas
- * utilizando la API de Overpass. Implementa reintentos automáticos y rotación de servidores (endpoints)
- * en caso de fallos o límite de peticiones (Rate Limit).
- */
 const getInterestPlaces = async (coords: number[]) => {
   const [lat, lon] = coords
 
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return []
 
   const query = buildOverpassQuery([lat, lon])
+  let lastError: Error | null = null
 
   for (const endpoint of OVERPASS_ENDPOINTS) {
-    for (let retry = 0; retry <= OVERPASS_RATE_LIMIT_RETRIES; retry++) {
+    for (let retry = 0; retry <= OVERPASS_REQUEST_RETRIES; retry++) {
       const controller = new AbortController()
       const timeoutId = setTimeout(
         () => controller.abort(),
@@ -358,11 +379,14 @@ const getInterestPlaces = async (coords: number[]) => {
         const body = await response.text()
 
         if (!response.ok) {
-          if (response.status === 429 && retry < OVERPASS_RATE_LIMIT_RETRIES) {
+          if (
+            OVERPASS_RETRYABLE_STATUS_CODES.has(response.status) &&
+            retry < OVERPASS_REQUEST_RETRIES
+          ) {
             console.warn(
-              `[Overpass] 429 in ${endpoint}. Retrying in ${OVERPASS_RATE_LIMIT_RETRY_DELAY_MS / 1000}s.`,
+              `[Overpass] ${response.status} in ${endpoint}. Retrying in ${OVERPASS_RETRY_DELAY_MS / 1000}s.`,
             )
-            await wait(OVERPASS_RATE_LIMIT_RETRY_DELAY_MS)
+            await wait(OVERPASS_RETRY_DELAY_MS)
             continue
           }
 
@@ -382,11 +406,29 @@ const getInterestPlaces = async (coords: number[]) => {
         const data: OverpassResponse = JSON.parse(body)
         const elements = data?.elements ?? []
 
-        return elements.filter((e) => e.tags?.name && e.tags?.wikipedia)
+        return elements.filter(
+          (element) => element.tags?.name && element.tags?.wikipedia,
+        )
       } catch (error) {
-        console.error(error)
+        const normalizedError =
+          error instanceof Error ? error : new Error(String(error))
 
-        throw new Error('Error de uso en la api de Overpass')
+        if (
+          normalizedError.name === 'AbortError' &&
+          retry < OVERPASS_REQUEST_RETRIES
+        ) {
+          console.warn(
+            `[Overpass] Timeout in ${endpoint}. Retrying in ${OVERPASS_RETRY_DELAY_MS / 1000}s.`,
+          )
+          await wait(OVERPASS_RETRY_DELAY_MS)
+          continue
+        }
+
+        lastError = normalizedError
+        console.warn(
+          `[Overpass] Failed in ${endpoint}: ${normalizedError.message}`,
+        )
+        break
       } finally {
         clearTimeout(timeoutId)
       }
@@ -397,6 +439,7 @@ const getInterestPlaces = async (coords: number[]) => {
 
   console.error(
     '[Overpass] Could not fetch interest places from available endpoints.',
+    lastError,
   )
 
   return []
@@ -404,6 +447,7 @@ const getInterestPlaces = async (coords: number[]) => {
 
 const getInterestPlacesByName = async (name: string) => {
   const city = await getCityByName(name)
+  if (!city) return null
 
   const coords = getCoordsByCity(city)
 
@@ -416,10 +460,6 @@ const getInterestPlacesByName = async (name: string) => {
   }
 }
 
-/**
- * Obtiene el resumen y la imagen en miniatura de un artículo de Wikipedia usando su API REST.
- * Es más efectiva y rápida para extraer introducciones y fotos principales en comparación con la API Action.
- */
 const getWikiInfoByTitle = async (
   title: string,
   lang = 'es',
@@ -493,19 +533,14 @@ const getPlaceImage = (
   ]
 
   for (const candidate of candidates) {
-    const normalizedImage = normalizeImageSource(candidate)
+    const renderableImage = toRenderableImageUrl(candidate)
 
-    if (normalizedImage) return toClientImageUrl(normalizedImage)
+    if (renderableImage) return renderableImage
   }
 
   return null
 }
 
-/**
- * Función principal para obtener información de Wikipedia de un lugar.
- * Primero intenta localizar si existe una versión del artículo en español (usando getSpanishTitle) y,
- * si la encuentra, devuelve la información en español. Si no, usa el idioma original.
- */
 const getWikiInfo = async (wikiTag: string): Promise<WikiData | null> => {
   const normalizedTag = wikiTag.trim()
 
@@ -549,4 +584,6 @@ export const locationsService = {
   getPlaceImage,
   getWikiInfo,
   getWikiInfoByTitle,
+  normalizeCanonicalImageUrl,
+  toRenderableImageUrl,
 }

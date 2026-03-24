@@ -86,7 +86,7 @@ export default async function CrearRutaPage({
       ? await locationsService.getWikiInfo(heroPlace.tags.wikipedia)
       : null
   const heroImage =
-    routeToEdit?.image ||
+    locationsService.toRenderableImageUrl(routeToEdit?.image) ||
     (heroPlace ? locationsService.getPlaceImage(heroPlace, heroWikiInfo) : null)
 
   return (

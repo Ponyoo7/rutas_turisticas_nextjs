@@ -27,10 +27,7 @@ export const RoutePlaceCard = ({ place, index }: RoutePlaceCardProps) => {
   }, [place.tags.wikipedia])
 
   const image =
-    placeInfo?.thumbnail?.source ||
-    place.tags.image ||
-    place.tags.wikipedia_image ||
-    '/museo_placeholder.jpg'
+    locationsService.getPlaceImage(place, placeInfo) || '/museo_placeholder.jpg'
 
   return (
     <div className="flex bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">

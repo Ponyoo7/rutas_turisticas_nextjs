@@ -1,14 +1,21 @@
 import { OSMElement } from '@/shared/types/locations'
 import { PlaceCard } from './PlaceCard'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from '@/shared/components/ui/carousel'
 
 interface Props {
   places: OSMElement[]
 }
 
 export const RelevantPlaces = ({ places }: Props) => {
-  const random = places
+  const selectedPlaces = places
     .filter((e) => e.tags.tourism !== 'museum' && e.tags.website)
-    .sort(() => 0.5 - Math.random())
+    .sort((left, right) =>
+      (left.tags.name ?? '').localeCompare(right.tags.name ?? ''),
+    )
     .slice(0, 6)
 
   return (
@@ -19,11 +26,18 @@ export const RelevantPlaces = ({ places }: Props) => {
         </h2>
         <div className="h-px bg-gray-200 flex-1"></div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {random.map((r) => (
-          <PlaceCard key={r.id} place={r} />
-        ))}
-      </div>
+      <Carousel className="w-full" opts={{ align: 'start' }}>
+        <CarouselContent>
+          {selectedPlaces.map((place) => (
+            <CarouselItem
+              key={place.id}
+              className="basis-[86%] sm:basis-[58%] lg:basis-[42%] xl:basis-[32%]"
+            >
+              <PlaceCard place={place} />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { getInterestPlacesByNameCached } from '@/shared/services/locations.cache
 import { MapWrapper } from '../../../../shared/components/map/MapWrapper'
 import { RelevantPlaces } from './components/RelevantPlaces'
 import { CityHeader } from './components/CityHeader'
+import { VerifiedRoutes } from './components/VerifiedRoutes'
 
 export default async function CiudadPage({
   params,
@@ -13,8 +14,6 @@ export default async function CiudadPage({
   const decodedName = decodeURIComponent(name)
   const res = await getInterestPlacesByNameCached(decodedName)
 
-  console.log(res)
-
   return (
     <div className="flex flex-col gap-6 min-h-screenp p-4">
       <CityHeader places={res?.places ?? []} name={decodedName} />
@@ -25,6 +24,7 @@ export default async function CiudadPage({
               <div className="bg-white overflow-hidden relative">
                 <MapWrapper places={res.places} coords={res.coords} />
               </div>
+              <VerifiedRoutes name={decodedName} places={res.places} />
               <RelevantPlaces places={res.places} />
             </div>
             {/* Sidebar/Extra content could go here in lg:col-span-4 */}

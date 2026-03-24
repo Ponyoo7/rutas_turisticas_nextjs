@@ -1,5 +1,10 @@
-﻿import { wait } from '@/lib/utils'
-import { OSMAddress, OverpassResponse, WikiData } from '../types/locations'
+import { wait } from '@/lib/utils'
+import {
+  OSMAddress,
+  OSMElement,
+  OverpassResponse,
+  WikiData,
+} from '../types/locations'
 
 const OVERPASS_ENDPOINTS = [
   'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
@@ -12,8 +17,40 @@ const OVERPASS_SERVER_TIMEOUT_SECONDS = 120
 const OVERPASS_CLIENT_TIMEOUT_MS = 200000000
 const OVERPASS_RATE_LIMIT_RETRY_DELAY_MS = 1500
 const OVERPASS_RATE_LIMIT_RETRIES = 3
+const WIKI_RETRY_DELAY_MS = 600
+const WIKI_RETRY_ATTEMPTS = 3
+const WIKI_RETRYABLE_STATUS_CODES = new Set([429, 500, 502, 503, 504])
+const IMAGE_EXTENSION_REGEX =
+  /\.(?:avif|gif|jpe?g|png|svg|webp)(?:$|[?#])/i
+const COMMONS_FILE_PATH_PREFIX =
+  'https://commons.wikimedia.org/wiki/Special:FilePath/'
+const WIKI_IMAGE_PROXY_PATH = '/api/wiki-image'
 const ROUTECRAFT_USER_AGENT = 'RouteCraft/1.0 (contacto: cqc1999@gmail.com)'
 const ROUTECRAFT_REFERER = 'https://rutas-turisticas-nextjs.vercel.app/'
+
+interface WikiSummaryResponse {
+  title?: string
+  extract?: string
+  thumbnail?: WikiData['thumbnail']
+  originalimage?: WikiData['thumbnail']
+}
+
+interface WikiLangLinksResponse {
+  query?: {
+    pages?: Record<
+      string,
+      {
+        langlinks?: Array<{
+          '*': string
+        }>
+      }
+    >
+  }
+}
+
+const wikiInfoByTitleCache = new Map<string, Promise<WikiData | null>>()
+const wikiInfoCache = new Map<string, Promise<WikiData | null>>()
+const spanishTitleCache = new Map<string, Promise<string | null>>()
 
 const buildApiHeaders = (options?: { includeFormContentType?: boolean }) => {
   const headers = new Headers()
@@ -31,6 +68,214 @@ const buildApiHeaders = (options?: { includeFormContentType?: boolean }) => {
   }
 
   return headers
+}
+
+const memoizeAsync = <T>(
+  cache: Map<string, Promise<T>>,
+  key: string,
+  factory: () => Promise<T>,
+) => {
+  const cached = cache.get(key)
+
+  if (cached) return cached
+
+  const promise = factory()
+    .then((result) => {
+      if (result == null) {
+        cache.delete(key)
+      }
+
+      return result
+    })
+    .catch((error) => {
+      cache.delete(key)
+      throw error
+    })
+
+  cache.set(key, promise)
+
+  return promise
+}
+
+const normalizeWikiTitle = (title: string) => title.trim().replace(/_/g, ' ')
+
+const buildWikiCacheKey = (lang: string, title: string) =>
+  `${lang.toLowerCase()}:${normalizeWikiTitle(title).toLowerCase()}`
+
+const ensureHttps = (url: string) =>
+  url.startsWith('//') ? `https:${url}` : url.replace(/^http:\/\//i, 'https://')
+
+const isWikiImageProxyUrl = (value: string) =>
+  value.startsWith(`${WIKI_IMAGE_PROXY_PATH}?url=`)
+
+const shouldProxyWikiImage = (urlLike: string) => {
+  if (isWikiImageProxyUrl(urlLike)) return false
+
+  try {
+    const url = new URL(ensureHttps(urlLike))
+
+    return (
+      url.hostname === 'upload.wikimedia.org' ||
+      url.hostname === 'commons.wikimedia.org'
+    )
+  } catch {
+    return false
+  }
+}
+
+const toClientImageUrl = (source: string) =>
+  shouldProxyWikiImage(source)
+    ? `${WIKI_IMAGE_PROXY_PATH}?url=${encodeURIComponent(source)}`
+    : source
+
+const safelyDecodeURIComponent = (value: string) => {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
+}
+
+const buildCommonsFilePathUrl = (fileName: string) => {
+  const normalizedFileName = safelyDecodeURIComponent(fileName)
+    .replace(/^File:/i, '')
+    .trim()
+
+  if (!normalizedFileName) return null
+
+  return `${COMMONS_FILE_PATH_PREFIX}${encodeURIComponent(normalizedFileName)}`
+}
+
+const extractCommonsFileNameFromUrl = (urlLike: string) => {
+  try {
+    const url = new URL(ensureHttps(urlLike))
+    const specialFileMatch = url.pathname.match(
+      /^\/wiki\/Special:(?:FilePath|Redirect\/file)\/(.+)$/i,
+    )
+
+    if (specialFileMatch) {
+      return safelyDecodeURIComponent(specialFileMatch[1]).trim()
+    }
+
+    const filePageMatch = url.pathname.match(/^\/wiki\/File:(.+)$/i)
+
+    if (!filePageMatch) return null
+
+    return safelyDecodeURIComponent(filePageMatch[1]).trim()
+  } catch {
+    return null
+  }
+}
+
+const normalizeImageSource = (source?: string | null) => {
+  if (typeof source !== 'string') return null
+
+  const trimmedSource = source.trim()
+
+  if (!trimmedSource || /^Category:/i.test(trimmedSource)) return null
+  if (isWikiImageProxyUrl(trimmedSource)) return trimmedSource
+
+  const commonsFileName = extractCommonsFileNameFromUrl(trimmedSource)
+
+  if (commonsFileName) {
+    return buildCommonsFilePathUrl(commonsFileName)
+  }
+
+  if (/^File:/i.test(trimmedSource)) {
+    return buildCommonsFilePathUrl(trimmedSource)
+  }
+
+  const normalizedUrl = ensureHttps(trimmedSource)
+
+  if (/^https?:\/\/upload\.wikimedia\.org\//i.test(normalizedUrl)) {
+    return normalizedUrl
+  }
+
+  try {
+    const url = new URL(normalizedUrl)
+
+    if (IMAGE_EXTENSION_REGEX.test(url.pathname)) {
+      return normalizedUrl
+    }
+  } catch {
+    return null
+  }
+
+  return null
+}
+
+const getSummaryThumbnail = (
+  data: WikiSummaryResponse,
+): WikiData['thumbnail'] | undefined => {
+  const thumbnailSource = normalizeImageSource(data.thumbnail?.source)
+
+  if (thumbnailSource && data.thumbnail) {
+    return {
+      ...data.thumbnail,
+      source: toClientImageUrl(thumbnailSource),
+    }
+  }
+
+  const originalImageSource = normalizeImageSource(data.originalimage?.source)
+
+  if (originalImageSource && data.originalimage) {
+    return {
+      ...data.originalimage,
+      source: toClientImageUrl(originalImageSource),
+    }
+  }
+
+  return undefined
+}
+
+const fetchWikipediaJson = async <T>(endpoint: string): Promise<T | null> => {
+  for (let attempt = 0; attempt < WIKI_RETRY_ATTEMPTS; attempt++) {
+    try {
+      const res = await fetch(endpoint, {
+        headers: buildApiHeaders(),
+      })
+
+      if (res.ok) {
+        return (await res.json()) as T
+      }
+
+      if (res.status === 404) return null
+
+      if (
+        WIKI_RETRYABLE_STATUS_CODES.has(res.status) &&
+        attempt < WIKI_RETRY_ATTEMPTS - 1
+      ) {
+        await wait(WIKI_RETRY_DELAY_MS * (attempt + 1))
+        continue
+      }
+
+      console.warn(`Wikipedia API responded with ${res.status}: ${endpoint}`)
+      return null
+    } catch (error) {
+      if (attempt < WIKI_RETRY_ATTEMPTS - 1) {
+        await wait(WIKI_RETRY_DELAY_MS * (attempt + 1))
+        continue
+      }
+
+      console.error('Error en Wikipedia API:', error)
+      return null
+    }
+  }
+
+  return null
+}
+
+const splitWikiTag = (wikiTag: string) => {
+  const separatorIndex = wikiTag.indexOf(':')
+
+  if (separatorIndex === -1) {
+    return ['en', normalizeWikiTitle(wikiTag)] as const
+  }
+
+  return [
+    wikiTag.slice(0, separatorIndex).trim().toLowerCase(),
+    normalizeWikiTitle(wikiTag.slice(separatorIndex + 1)),
+  ] as const
 }
 
 /**
@@ -179,80 +424,81 @@ const getWikiInfoByTitle = async (
   title: string,
   lang = 'es',
 ): Promise<WikiData | null> => {
-  // Wikipedia REST API is more reliable for summaries and images
-  const endpoint = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(
-    title.replace(/ /g, '_'),
-  )}`
+  const normalizedTitle = normalizeWikiTitle(title)
 
-  try {
-    const res = await fetch(endpoint, {
-      headers: buildApiHeaders(),
-    })
+  if (!normalizedTitle) return null
 
-    if (!res.ok) {
-      if (res.status === 404) return null
-      console.warn(`Wikipedia REST API responded with ${res.status}`)
-      return null
-    }
+  return memoizeAsync(
+    wikiInfoByTitleCache,
+    buildWikiCacheKey(lang, normalizedTitle),
+    async () => {
+      const endpoint = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(
+        normalizedTitle.replace(/ /g, '_'),
+      )}`
+      const data = await fetchWikipediaJson<WikiSummaryResponse>(endpoint)
 
-    const data = await res.json()
-    const thumbnail = data.thumbnail
+      if (!data) return null
 
-    // Aumentar la resolución del thumbnail para que no se vea borroso (de 320px a 800px)
-    if (thumbnail && data.originalimage) {
-      const targetWidth = 800
-      if (data.originalimage.width >= targetWidth) {
-        thumbnail.source = thumbnail.source.replace(
-          /\/\d+px-/,
-          `/${targetWidth}px-`,
-        )
-        thumbnail.width = targetWidth
-        thumbnail.height = Math.round(
-          (targetWidth * data.originalimage.height) / data.originalimage.width,
-        )
-      } else {
-        thumbnail.source = data.originalimage.source
-        thumbnail.width = data.originalimage.width
-        thumbnail.height = data.originalimage.height
+      return {
+        title: data.title || normalizedTitle,
+        extract: data.extract ?? '',
+        thumbnail: getSummaryThumbnail(data),
       }
-    }
-
-    return {
-      title: data.title || title,
-      extract: data.extract,
-      thumbnail: thumbnail,
-    }
-  } catch (error) {
-    console.error('Error en Wikipedia API:', error)
-    return null
-  }
+    },
+  )
 }
 
 const getSpanishTitle = async (
   title: string,
   fromLang: string,
 ): Promise<string | null> => {
-  if (fromLang === 'es') return title
+  const normalizedTitle = normalizeWikiTitle(title)
 
-  const endpoint = `https://${fromLang}.wikipedia.org/w/api.php?action=query&format=json&prop=langlinks&lllang=es&titles=${encodeURIComponent(
-    title,
-  )}&origin=*`
+  if (!normalizedTitle) return null
+  if (fromLang === 'es') return normalizedTitle
 
-  try {
-    const res = await fetch(endpoint, {
-      headers: buildApiHeaders(),
-    })
-    const data = await res.json()
-    const pages = data.query.pages
-    const pageId = Object.keys(pages)[0]
+  return memoizeAsync(
+    spanishTitleCache,
+    buildWikiCacheKey(fromLang, normalizedTitle),
+    async () => {
+      const endpoint = `https://${fromLang}.wikipedia.org/w/api.php?action=query&format=json&prop=langlinks&lllang=es&titles=${encodeURIComponent(
+        normalizedTitle,
+      )}&origin=*`
+      const data = await fetchWikipediaJson<WikiLangLinksResponse>(endpoint)
+      const pages = data?.query?.pages
 
-    if (pageId === '-1' || !pages[pageId].langlinks) return null
+      if (!pages) return null
 
-    return pages[pageId].langlinks[0]['*']
-  } catch (error) {
-    console.error('Error al buscar título en español:', error)
-    return null
+      const pageId = Object.keys(pages)[0]
+
+      if (!pageId || pageId === '-1' || !pages[pageId]?.langlinks?.length) {
+        return null
+      }
+
+      return pages[pageId].langlinks[0]['*'] ?? null
+    },
+  )
+}
+
+const getPlaceImage = (
+  place: Pick<OSMElement, 'tags'>,
+  wikiInfo?: WikiData | null,
+) => {
+  const candidates = [
+    wikiInfo?.thumbnail?.source,
+    place.tags.wikipedia_image,
+    place.tags.image,
+    place.tags['wikimedia_commons:path'],
+    place.tags.wikimedia_commons,
+  ]
+
+  for (const candidate of candidates) {
+    const normalizedImage = normalizeImageSource(candidate)
+
+    if (normalizedImage) return toClientImageUrl(normalizedImage)
   }
+
+  return null
 }
 
 /**
@@ -261,19 +507,37 @@ const getSpanishTitle = async (
  * si la encuentra, devuelve la información en español. Si no, usa el idioma original.
  */
 const getWikiInfo = async (wikiTag: string): Promise<WikiData | null> => {
-  const [lang, title] = wikiTag.includes(':')
-    ? wikiTag.split(':')
-    : ['en', wikiTag]
+  const normalizedTag = wikiTag.trim()
 
-  // Intentamos obtener la versión en español
-  const spanishTitle = await getSpanishTitle(title, lang)
+  if (!normalizedTag) return null
 
-  if (spanishTitle) {
-    return getWikiInfoByTitle(spanishTitle, 'es')
-  }
+  const [lang, title] = splitWikiTag(normalizedTag)
 
-  // Si no hay versión en español, intentamos con el idioma original
-  return getWikiInfoByTitle(title, lang)
+  return memoizeAsync(wikiInfoCache, buildWikiCacheKey(lang, title), async () => {
+    const spanishTitle = await getSpanishTitle(title, lang)
+
+    if (spanishTitle) {
+      const spanishInfo = await getWikiInfoByTitle(spanishTitle, 'es')
+
+      if (spanishInfo?.thumbnail?.source || lang === 'es') {
+        return spanishInfo
+      }
+
+      const originalInfo = await getWikiInfoByTitle(title, lang)
+
+      if (spanishInfo) {
+        return {
+          ...spanishInfo,
+          extract: spanishInfo.extract || originalInfo?.extract || '',
+          thumbnail: spanishInfo.thumbnail ?? originalInfo?.thumbnail,
+        }
+      }
+
+      return originalInfo
+    }
+
+    return getWikiInfoByTitle(title, lang)
+  })
 }
 
 export const locationsService = {
@@ -282,6 +546,7 @@ export const locationsService = {
   getCoordsByCity,
   getInterestPlaces,
   getInterestPlacesByName,
+  getPlaceImage,
   getWikiInfo,
   getWikiInfoByTitle,
 }

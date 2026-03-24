@@ -1,4 +1,5 @@
 import { ProfileHeader } from './components/ProfileHeader'
+import { FavoriteRoutes } from './components/FavoriteRoutes'
 import { MyRoutes } from './components/MyRoutes'
 
 /**
@@ -11,6 +12,7 @@ export default function Page() {
     <main className="min-h-screen dark:bg-artis-background-dark p-6 md:p-10">
       <div className="max-w-6xl mx-auto flex flex-col gap-8">
         <ProfileHeader />
+        <FavoriteRoutes />
         <MyRoutes />
       </div>
     </main>

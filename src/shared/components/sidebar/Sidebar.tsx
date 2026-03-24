@@ -61,9 +61,15 @@ export const Sidebar = () => {
 
   const showAdminSection = !isLoading && canAccessAdmin(user)
   const isAdminArea = pathname.startsWith('/admin')
+  const getItemClasses = (isActive: boolean) =>
+    `flex min-h-11 flex-1 flex-row items-center justify-center gap-2 rounded-xl px-3 py-2 transition-colors duration-200 md:justify-start ${
+      isActive
+        ? 'bg-artis-primary/10 font-bold text-artis-primary'
+        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+    }`
 
   return (
-    <aside className="w-full border-t border-artis-primary/10 bg-white/80 px-4 py-3 backdrop-blur-sm md:h-full md:w-72 md:border-t-0 md:border-r md:px-4 md:py-6">
+    <aside className="w-full px-4 py-3 backdrop-blur-sm md:h-full md:w-72 md:px-4 md:py-6">
       <div className="flex flex-col gap-4">
         <nav className="flex flex-wrap items-center gap-2 md:flex-col md:items-stretch">
           {baseItems.map((item) => {
@@ -73,11 +79,7 @@ export const Sidebar = () => {
               <Link
                 key={item.label}
                 href={item.href}
-                className={`flex min-h-11 flex-1 flex-row items-center justify-center gap-2 rounded-xl px-3 py-2 transition-colors duration-200 md:justify-start ${
-                  isActive
-                    ? 'bg-artis-primary/10 font-bold text-artis-primary'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                }`}
+                className={getItemClasses(isActive)}
               >
                 <item.icon size={22} />
                 <span className="text-base font-serif">{item.label}</span>
@@ -87,7 +89,7 @@ export const Sidebar = () => {
         </nav>
 
         {showAdminSection && (
-          <div className="border-t border-artis-primary/10 pt-4">
+          <div className="pt-4">
             <div className="mb-3 flex items-center gap-3 px-1">
               <span
                 className={`text-[11px] font-bold uppercase tracking-[0.3em] ${
@@ -107,14 +109,10 @@ export const Sidebar = () => {
                   <Link
                     key={item.label}
                     href={item.href}
-                    className={`flex min-h-10 flex-1 flex-row items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors duration-200 md:pl-5 ${
-                      isActive
-                        ? 'bg-artis-primary text-white shadow-sm'
-                        : 'text-gray-600 hover:bg-[#f6efe6] hover:text-artis-primary'
-                    }`}
+                    className={getItemClasses(isActive)}
                   >
-                    <item.icon size={18} />
-                    <span className="font-medium">{item.label}</span>
+                    <item.icon size={22} />
+                    <span className="text-base font-serif">{item.label}</span>
                   </Link>
                 )
               })}

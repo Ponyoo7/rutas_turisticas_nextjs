@@ -19,4 +19,5 @@ export interface Route {
   name: string
   places: OSMElement[]
   image: string
+  featured: boolean
 }

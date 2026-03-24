@@ -78,17 +78,16 @@ export default async function CrearRutaPage({
 
   if (!mapCoords || mapPlaces.length === 0) notFound()
 
-  const firstImage = mapPlaces.find(
-    (place) => typeof place.tags.image === 'string',
+  const heroPlace = mapPlaces.find(
+    (place) => locationsService.getPlaceImage(place) || place.tags.wikipedia,
   )
-  const firstWikiTag = mapPlaces.find((place) => place.tags.wikipedia)?.tags
-    .wikipedia
+  const heroWikiInfo =
+    heroPlace?.tags.wikipedia
+      ? await locationsService.getWikiInfo(heroPlace.tags.wikipedia)
+      : null
   const heroImage =
     routeToEdit?.image ||
-    firstImage?.tags.image ||
-    (firstWikiTag
-      ? (await locationsService.getWikiInfo(firstWikiTag))?.thumbnail?.source
-      : null)
+    (heroPlace ? locationsService.getPlaceImage(heroPlace, heroWikiInfo) : null)
 
   return (
     <main className="w-full h-full p-4">

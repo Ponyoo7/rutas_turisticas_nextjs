@@ -1,6 +1,5 @@
 'use client'
 
-import { Button } from '@/shared/components/ui/button'
 import { locationsService } from '@/shared/services/locations.service'
 import { OSMElement, WikiData } from '@/shared/types/locations'
 import { useEffect, useState } from 'react'
@@ -20,14 +19,15 @@ interface Props {
  */
 export const PlaceCard = ({ place, index, onDelete }: Props) => {
   const [placeInfo, setPlaceInfo] = useState<WikiData | null>(null)
+  const image = locationsService.getPlaceImage(place, placeInfo)
 
   useEffect(() => {
-    if (!place) return
+    if (!place.tags.wikipedia) return
 
     locationsService.getWikiInfo(place.tags.wikipedia).then((res) => {
       setPlaceInfo(res)
     })
-  }, [])
+  }, [place.tags.wikipedia])
 
   return (
     <div
@@ -37,13 +37,9 @@ export const PlaceCard = ({ place, index, onDelete }: Props) => {
       <div className="flex items-center justify-center w-6 h-6 bg-artis-primary text-white rounded-full text-xs font-bold shrink-0 shadow-sm">
         {index}
       </div>
-      {placeInfo?.thumbnail?.source && (
+      {image && (
         <div className="w-10 h-10 rounded overflow-hidden shrink-0 bg-gray-100">
-          <img
-            src={placeInfo.thumbnail.source}
-            className="w-full h-full object-cover"
-            alt=""
-          />
+          <img src={image} className="w-full h-full object-cover" alt="" />
         </div>
       )}
       <span className="truncate max-w-40 font-medium text-gray-700">

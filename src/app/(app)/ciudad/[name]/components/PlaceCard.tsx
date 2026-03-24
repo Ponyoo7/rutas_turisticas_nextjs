@@ -14,9 +14,8 @@ interface Props {
  */
 export const PlaceCard = async ({ place }: Props) => {
   const res = await locationsService.getWikiInfo(place.tags.wikipedia)
-
   const imageUrl =
-    res?.thumbnail?.source || place.tags.image || '/museo_placeholder.jpg'
+    locationsService.getPlaceImage(place, res) || '/museo_placeholder.jpg'
 
   return (
     <div className="flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow overflow-hidden group h-full">

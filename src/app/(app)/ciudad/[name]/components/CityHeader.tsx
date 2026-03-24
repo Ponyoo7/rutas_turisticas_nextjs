@@ -9,13 +9,16 @@ interface Props {
 }
 
 export const CityHeader = async ({ places, name }: Props) => {
-  const placesWithImages =
-    places.filter((p) => p.tags.image || p.tags.wikipedia) || []
-  const heroImage =
-    placesWithImages.length > 0
-      ? (await locationsService.getWikiInfo(placesWithImages[0].tags.wikipedia))
-          ?.thumbnail?.source
+  const heroPlace = places.find(
+    (place) => locationsService.getPlaceImage(place) || place.tags.wikipedia,
+  )
+  const heroWikiInfo =
+    heroPlace?.tags.wikipedia
+      ? await locationsService.getWikiInfo(heroPlace.tags.wikipedia)
       : null
+  const heroImage = heroPlace
+    ? locationsService.getPlaceImage(heroPlace, heroWikiInfo)
+    : null
 
   return (
     <div

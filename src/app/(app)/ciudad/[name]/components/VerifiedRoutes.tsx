@@ -3,14 +3,12 @@ import {
   getMyFavoriteRouteIds,
 } from '@/actions/routes.actions'
 import { FeaturedRouteCard } from '@/app/(app)/components/FeaturedRouteCard'
-import { Button } from '@/shared/components/ui/button'
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
 } from '@/shared/components/ui/carousel'
 import { OSMElement } from '@/shared/types/locations'
-import Link from 'next/link'
 
 interface Props {
   name: string
@@ -43,12 +41,6 @@ export const VerifiedRoutes = async ({ name, places }: Props) => {
             Cuando publiquemos una ruta destacada para esta ciudad, aparecera
             aqui junto a sus paradas y su duracion estimada.
           </p>
-          <Button
-            className="mt-6 bg-artis-primary text-white hover:bg-artis-primary/90"
-            asChild
-          >
-            <Link href={`/rutas/crear?city=${name}`}>Crear ruta en {name}</Link>
-          </Button>
         </div>
       ) : (
         <Carousel className="w-full" opts={{ align: 'start' }}>

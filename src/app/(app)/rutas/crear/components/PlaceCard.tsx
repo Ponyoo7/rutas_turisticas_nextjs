@@ -1,10 +1,10 @@
 'use client'
 
+import { getPlaceTypeLabel } from '@/lib/utils'
 import { locationsService } from '@/shared/services/locations.service'
 import { OSMElement, WikiData } from '@/shared/types/locations'
+import { IconChevronRight, IconTrash } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
-
-import { IconTrash } from '@tabler/icons-react'
 
 interface Props {
   place: OSMElement
@@ -13,9 +13,9 @@ interface Props {
 }
 
 /**
- * Componente que representa un lugar añadido recientemente a la ruta en curso.
- * Intenta cargar, después de montarse, su imagen representativa desde Wikipedia para previsualización.
- * Contiene el control numérico de índice y un botón para descartarlo (eliminarlo).
+ * Tarjeta visual para una parada ya incluida en la ruta.
+ * Mantiene la miniatura del lugar, su orden dentro del itinerario y la accion
+ * de eliminarla del recorrido.
  */
 export const PlaceCard = ({ place, index, onDelete }: Props) => {
   const [placeInfo, setPlaceInfo] = useState<WikiData | null>(null)
@@ -30,24 +30,50 @@ export const PlaceCard = ({ place, index, onDelete }: Props) => {
   }, [place.tags.wikipedia])
 
   return (
-    <div
-      key={place.id}
-      className="bg-white p-2 pr-3 rounded-lg shadow-sm text-sm border border-gray-200 flex items-center gap-3 group hover:border-artis-primary/50 transition-all"
-    >
-      <div className="flex items-center justify-center w-6 h-6 bg-artis-primary text-white rounded-full text-xs font-bold shrink-0 shadow-sm">
+    <div className="group flex items-center gap-4 rounded-[24px] border border-[#eadfce] bg-[#fffdf9] p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-artis-primary/25 hover:shadow-md">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-artis-primary text-sm font-bold text-white shadow-sm">
         {index}
       </div>
-      {image && (
-        <div className="w-10 h-10 rounded overflow-hidden shrink-0 bg-gray-100">
-          <img src={image} className="w-full h-full object-cover" alt="" />
-        </div>
-      )}
-      <span className="truncate max-w-40 font-medium text-gray-700">
-        {place.tags.name || 'Sitio sin nombre'}
-      </span>
+
+      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-[#efe4d2]">
+        {image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={image}
+            className="h-full w-full object-cover"
+            alt={`Vista previa de ${place.tags.name ?? 'la parada'}`}
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#eadbc6] via-[#f8f2ea] to-[#d9ccb7] text-xs font-semibold text-artis-primary/60">
+            Sin foto
+          </div>
+        )}
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-artis-primary/45">
+          {getPlaceTypeLabel(place)}
+        </p>
+        <h4 className="mt-1 truncate font-semibold text-artis-primary">
+          {place.tags.name || 'Sitio sin nombre'}
+        </h4>
+        <p className="mt-1 truncate text-sm text-gray-500">
+          {place.tags.addr_street ||
+            place.tags.city ||
+            place.tags.town ||
+            place.tags.village ||
+            'Parada anadida al recorrido'}
+        </p>
+      </div>
+
+      <div className="hidden items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-artis-primary/35 md:flex">
+        <IconChevronRight size={14} />
+        Ruta
+      </div>
+
       <button
         onClick={() => onDelete(place.id)}
-        className="ml-auto text-gray-300 hover:text-red-500 transition-colors p-1"
+        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[#eadfce] bg-white text-gray-400 transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
         title="Eliminar sitio"
       >
         <IconTrash size={18} />

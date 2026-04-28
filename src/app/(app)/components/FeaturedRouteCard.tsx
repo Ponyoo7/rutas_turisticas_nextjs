@@ -1,7 +1,6 @@
 'use client'
 
 import { formatDuration, getRouteStats } from '@/lib/utils'
-import { locationsService } from '@/shared/services/locations.service'
 import { Route } from '@/shared/types/routes'
 import { useRouter } from 'next/navigation'
 import { FavoriteRouteButton } from './FavoriteRouteButton'
@@ -26,7 +25,7 @@ export function FeaturedRouteCard({
   const router = useRouter()
   const stats = getRouteStats(route.places)
   const previewPlaces = route.places.slice(0, 2)
-  const image = locationsService.toRenderableImageUrl(route.image)
+  const image = route.image || null
 
   const navigateToRoute = () => {
     if (!href) return
@@ -93,6 +92,11 @@ export function FeaturedRouteCard({
           <h3 className="mt-2 font-serif text-xl font-bold text-artis-primary">
             {route.name}
           </h3>
+          {route.description && (
+            <p className="mt-2 line-clamp-2 text-sm leading-6 text-gray-600">
+              {route.description}
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-3 gap-2">

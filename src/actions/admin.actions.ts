@@ -1,13 +1,22 @@
 'use server'
 
+import {
+  normalizeRouteDescription,
+  normalizeRouteImageReviewStatus,
+} from '@/lib/route-images'
 import { verifyToken } from '@/actions/user.actions'
 import { canAccessAdmin } from '@/lib/auth'
 import { locationsService } from '@/shared/services/locations.service'
 import { OSMElement } from '@/shared/types/locations'
+import { RouteImage, RouteImageReviewStatus } from '@/shared/types/routes'
 import { UserRole } from '@/shared/types/user'
 import { neon } from '@neondatabase/serverless'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
+
+const createSql = () => neon(`${process.env.DATABASE_URL}`)
+
+type SqlClient = ReturnType<typeof createSql>
 
 type AdminUserRow = {
   id: string | number
@@ -20,10 +29,29 @@ type AdminUserRow = {
 type AdminRouteRow = {
   id: number
   name: string
+  description?: string | null
   image?: string | null
   places?: unknown
   featured?: unknown
   user_id: string | number
+  owner_fullname: string
+  owner_email: string
+  contributed_images_count?: number | string | null
+  pending_images_count?: number | string | null
+  rejected_images_count?: number | string | null
+  approved_images_count?: number | string | null
+}
+
+type AdminRouteImageRow = {
+  id: number | string
+  route_id: number | string
+  route_name: string
+  route_description?: string | null
+  route_image?: string | null
+  image: string
+  review_status?: unknown
+  selected_for_cover?: unknown
+  created_at?: Date | string | null
   owner_fullname: string
   owner_email: string
 }
@@ -34,6 +62,13 @@ type AdminUserVerificationRow = {
 
 type AdminRouteFeaturedRow = {
   id: number
+}
+
+type AdminRouteImageModerationRow = {
+  id: number | string
+  route_id: number | string
+  image: string
+  selected_for_cover?: unknown
 }
 
 export interface AdminUserListItem {
@@ -47,22 +82,47 @@ export interface AdminUserListItem {
 export interface AdminRouteListItem {
   id: number
   name: string
+  description: string
   image: string | null
   featured: boolean
   userId: string
   ownerFullname: string
   ownerEmail: string
+  contributedImagesCount: number
+  pendingImagesCount: number
+  rejectedImagesCount: number
+  approvedImagesCount: number
 }
 
 export interface AdminRouteDetail {
   id: number
   name: string
+  description: string
   image: string | null
   featured: boolean
   userId: string
   ownerFullname: string
   ownerEmail: string
   places: OSMElement[]
+  contributedImages: RouteImage[]
+  contributedImagesCount: number
+  pendingImagesCount: number
+  rejectedImagesCount: number
+  approvedImagesCount: number
+}
+
+export interface AdminRouteImageQueueItem {
+  imageId: number
+  routeId: number
+  routeName: string
+  routeDescription: string
+  image: string
+  currentCoverImage: string | null
+  reviewStatus: RouteImageReviewStatus
+  selectedForCover: boolean
+  createdAt: string
+  ownerFullname: string
+  ownerEmail: string
 }
 
 type UpdateUserVerifiedResult =
@@ -83,6 +143,15 @@ type UpdateRouteFeaturedResult =
       error: string
     }
 
+type ReviewRouteImageResult =
+  | {
+      ok: true
+    }
+  | {
+      ok: false
+      error: string
+    }
+
 const normalizeRole = (role: unknown): UserRole => {
   if (role === 'admin' || role === 'master') return role
 
@@ -92,6 +161,12 @@ const normalizeRole = (role: unknown): UserRole => {
 const normalizeVerified = (verified: unknown) => verified === true
 
 const normalizeFeatured = (featured: unknown) => featured === true
+
+const normalizeCount = (value: unknown) => {
+  const nextValue = Number(value)
+
+  return Number.isFinite(nextValue) ? nextValue : 0
+}
 
 const normalizePlaces = (places: unknown): OSMElement[] => {
   if (Array.isArray(places)) return places as OSMElement[]
@@ -108,12 +183,76 @@ const normalizePlaces = (places: unknown): OSMElement[] => {
   return []
 }
 
+const normalizePositiveInteger = (value: unknown): number | null => {
+  const normalizedValue =
+    typeof value === 'string' || typeof value === 'number'
+      ? Number(value)
+      : Number.NaN
+
+  return Number.isInteger(normalizedValue) && normalizedValue > 0
+    ? normalizedValue
+    : null
+}
+
+const normalizeAdminRouteImage = (image: AdminRouteImageRow): RouteImage => ({
+  id: Number(image.id),
+  image: locationsService.toRenderableImageUrl(image.image) ?? '',
+  reviewStatus: normalizeRouteImageReviewStatus(image.review_status),
+  selectedForCover: image.selected_for_cover === true,
+  createdAt: image.created_at
+    ? new Date(image.created_at).toISOString()
+    : new Date(0).toISOString(),
+})
+
 const hasAdminAccess = async () => {
   const cookieStore = await cookies()
   const authToken = cookieStore.get('auth')
   const user = await verifyToken(authToken?.value)
 
   return canAccessAdmin(user)
+}
+
+const buildAdminRouteBaseQuery = (normalizedSearch: string) => {
+  if (normalizedSearch) {
+    return {
+      searchClause: true as const,
+      searchValue: `%${normalizedSearch}%`,
+    }
+  }
+
+  return {
+    searchClause: false as const,
+    searchValue: '',
+  }
+}
+
+const revalidateAdminRouteSurfaces = (routeId?: number) => {
+  revalidatePath('/')
+  revalidatePath('/perfil')
+  revalidatePath('/admin')
+  revalidatePath('/admin/rutas')
+  revalidatePath('/admin/imagenes')
+  revalidatePath('/ciudad/[name]', 'page')
+
+  if (routeId) {
+    revalidatePath(`/admin/rutas/${routeId}`)
+    revalidatePath(`/rutas/${routeId}`)
+    revalidatePath(`/rutas/destacadas/${routeId}`)
+  }
+}
+
+const getRouteImagesByRouteId = async (
+  sql: SqlClient,
+  routeId: number,
+): Promise<RouteImage[]> => {
+  const data = (await sql`
+    SELECT id, route_id, image, review_status, selected_for_cover, created_at
+    FROM route_images
+    WHERE route_id = ${routeId}
+    ORDER BY selected_for_cover DESC, created_at DESC, id DESC
+  `) as AdminRouteImageRow[]
+
+  return data.map((image) => normalizeAdminRouteImage(image))
 }
 
 export const getAdminUsers = async (
@@ -123,7 +262,7 @@ export const getAdminUsers = async (
 
   if (!allowed) return []
 
-  const sql = neon(`${process.env.DATABASE_URL}`)
+  const sql = createSql()
   const normalizedSearch = search.trim()
 
   const data = normalizedSearch
@@ -160,36 +299,65 @@ export const getAdminRoutes = async (
 
   if (!allowed) return []
 
-  const sql = neon(`${process.env.DATABASE_URL}`)
+  const sql = createSql()
   const normalizedSearch = search.trim()
+  const { searchClause, searchValue } = buildAdminRouteBaseQuery(normalizedSearch)
 
-  const data = normalizedSearch
+  const data = searchClause
     ? await sql`
         SELECT
           routes.id,
           routes.name,
+          routes.description,
           routes.image,
           routes.featured,
           routes.user_id,
           users.fullname AS owner_fullname,
-          users.email AS owner_email
+          users.email AS owner_email,
+          COALESCE(image_stats.total_count, 0) AS contributed_images_count,
+          COALESCE(image_stats.pending_count, 0) AS pending_images_count,
+          COALESCE(image_stats.rejected_count, 0) AS rejected_images_count,
+          COALESCE(image_stats.approved_count, 0) AS approved_images_count
         FROM routes
         INNER JOIN users ON users.id = routes.user_id
-        WHERE routes.name ILIKE ${`%${normalizedSearch}%`}
-          OR users.fullname ILIKE ${`%${normalizedSearch}%`}
+        LEFT JOIN LATERAL (
+          SELECT
+            COUNT(*)::int AS total_count,
+            COUNT(*) FILTER (WHERE review_status = 'pending')::int AS pending_count,
+            COUNT(*) FILTER (WHERE review_status = 'rejected')::int AS rejected_count,
+            COUNT(*) FILTER (WHERE review_status = 'approved')::int AS approved_count
+          FROM route_images
+          WHERE route_images.route_id = routes.id
+        ) AS image_stats ON TRUE
+        WHERE routes.name ILIKE ${searchValue}
+          OR users.fullname ILIKE ${searchValue}
         ORDER BY routes.id DESC
       `
     : await sql`
         SELECT
           routes.id,
           routes.name,
+          routes.description,
           routes.image,
           routes.featured,
           routes.user_id,
           users.fullname AS owner_fullname,
-          users.email AS owner_email
+          users.email AS owner_email,
+          COALESCE(image_stats.total_count, 0) AS contributed_images_count,
+          COALESCE(image_stats.pending_count, 0) AS pending_images_count,
+          COALESCE(image_stats.rejected_count, 0) AS rejected_images_count,
+          COALESCE(image_stats.approved_count, 0) AS approved_images_count
         FROM routes
         INNER JOIN users ON users.id = routes.user_id
+        LEFT JOIN LATERAL (
+          SELECT
+            COUNT(*)::int AS total_count,
+            COUNT(*) FILTER (WHERE review_status = 'pending')::int AS pending_count,
+            COUNT(*) FILTER (WHERE review_status = 'rejected')::int AS rejected_count,
+            COUNT(*) FILTER (WHERE review_status = 'approved')::int AS approved_count
+          FROM route_images
+          WHERE route_images.route_id = routes.id
+        ) AS image_stats ON TRUE
         ORDER BY routes.id DESC
       `
 
@@ -199,11 +367,16 @@ export const getAdminRoutes = async (
     return {
       id: row.id,
       name: row.name,
+      description: normalizeRouteDescription(row.description),
       image: locationsService.toRenderableImageUrl(row.image),
       featured: normalizeFeatured(row.featured),
       userId: String(row.user_id),
       ownerFullname: row.owner_fullname,
       ownerEmail: row.owner_email,
+      contributedImagesCount: normalizeCount(row.contributed_images_count),
+      pendingImagesCount: normalizeCount(row.pending_images_count),
+      rejectedImagesCount: normalizeCount(row.rejected_images_count),
+      approvedImagesCount: normalizeCount(row.approved_images_count),
     }
   })
 }
@@ -217,20 +390,34 @@ export const getAdminRouteById = async (
 
   if (!Number.isInteger(routeId) || routeId <= 0) return null
 
-  const sql = neon(`${process.env.DATABASE_URL}`)
+  const sql = createSql()
 
   const data = await sql`
     SELECT
       routes.id,
       routes.name,
+      routes.description,
       routes.image,
       routes.places,
       routes.featured,
       routes.user_id,
       users.fullname AS owner_fullname,
-      users.email AS owner_email
+      users.email AS owner_email,
+      COALESCE(image_stats.total_count, 0) AS contributed_images_count,
+      COALESCE(image_stats.pending_count, 0) AS pending_images_count,
+      COALESCE(image_stats.rejected_count, 0) AS rejected_images_count,
+      COALESCE(image_stats.approved_count, 0) AS approved_images_count
     FROM routes
     INNER JOIN users ON users.id = routes.user_id
+    LEFT JOIN LATERAL (
+      SELECT
+        COUNT(*)::int AS total_count,
+        COUNT(*) FILTER (WHERE review_status = 'pending')::int AS pending_count,
+        COUNT(*) FILTER (WHERE review_status = 'rejected')::int AS rejected_count,
+        COUNT(*) FILTER (WHERE review_status = 'approved')::int AS approved_count
+      FROM route_images
+      WHERE route_images.route_id = routes.id
+    ) AS image_stats ON TRUE
     WHERE routes.id = ${routeId}
     LIMIT 1
   `
@@ -238,17 +425,81 @@ export const getAdminRouteById = async (
   if (data.length === 0) return null
 
   const row = data[0] as AdminRouteRow
+  const contributedImages = await getRouteImagesByRouteId(sql, routeId)
 
   return {
     id: row.id,
     name: row.name,
+    description: normalizeRouteDescription(row.description),
     image: locationsService.toRenderableImageUrl(row.image),
     places: normalizePlaces(row.places),
     featured: normalizeFeatured(row.featured),
     userId: String(row.user_id),
     ownerFullname: row.owner_fullname,
     ownerEmail: row.owner_email,
+    contributedImages,
+    contributedImagesCount: normalizeCount(row.contributed_images_count),
+    pendingImagesCount: normalizeCount(row.pending_images_count),
+    rejectedImagesCount: normalizeCount(row.rejected_images_count),
+    approvedImagesCount: normalizeCount(row.approved_images_count),
   }
+}
+
+export const getAdminRouteImageQueue = async (): Promise<
+  AdminRouteImageQueueItem[]
+> => {
+  const allowed = await hasAdminAccess()
+
+  if (!allowed) return []
+
+  const sql = createSql()
+
+  const data = await sql`
+    SELECT
+      route_images.id,
+      route_images.route_id,
+      route_images.image,
+      route_images.review_status,
+      route_images.selected_for_cover,
+      route_images.created_at,
+      routes.name AS route_name,
+      routes.description AS route_description,
+      routes.image AS route_image,
+      users.fullname AS owner_fullname,
+      users.email AS owner_email
+    FROM route_images
+    INNER JOIN routes ON routes.id = route_images.route_id
+    INNER JOIN users ON users.id = routes.user_id
+    WHERE route_images.review_status IN ('pending', 'rejected')
+    ORDER BY
+      CASE route_images.review_status
+        WHEN 'pending' THEN 0
+        WHEN 'rejected' THEN 1
+        ELSE 2
+      END,
+      route_images.created_at DESC,
+      route_images.id DESC
+  `
+
+  return data.map((image) => {
+    const row = image as AdminRouteImageRow
+
+    return {
+      imageId: Number(row.id),
+      routeId: Number(row.route_id),
+      routeName: row.route_name,
+      routeDescription: normalizeRouteDescription(row.route_description),
+      image: locationsService.toRenderableImageUrl(row.image) ?? '',
+      currentCoverImage: locationsService.toRenderableImageUrl(row.route_image),
+      reviewStatus: normalizeRouteImageReviewStatus(row.review_status),
+      selectedForCover: row.selected_for_cover === true,
+      createdAt: row.created_at
+        ? new Date(row.created_at).toISOString()
+        : new Date(0).toISOString(),
+      ownerFullname: row.owner_fullname,
+      ownerEmail: row.owner_email,
+    }
+  })
 }
 
 export const updateUserVerified = async (
@@ -271,7 +522,7 @@ export const updateUserVerified = async (
     }
   }
 
-  const sql = neon(`${process.env.DATABASE_URL}`)
+  const sql = createSql()
 
   const userData = await sql`
     SELECT role
@@ -330,7 +581,7 @@ export const updateRouteFeatured = async (
     }
   }
 
-  const sql = neon(`${process.env.DATABASE_URL}`)
+  const sql = createSql()
 
   const routeData = await sql`
     SELECT id
@@ -354,12 +605,135 @@ export const updateRouteFeatured = async (
     WHERE id = ${route.id}
   `
 
-  revalidatePath('/admin/rutas')
-  revalidatePath('/admin')
-  revalidatePath('/')
-  revalidatePath('/ciudad/[name]', 'page')
-  revalidatePath(`/rutas/destacadas/${routeId}`)
-  revalidatePath('/perfil')
+  revalidateAdminRouteSurfaces(routeId)
+
+  return {
+    ok: true,
+  }
+}
+
+export const approveRouteImage = async (
+  imageId: number | string,
+): Promise<ReviewRouteImageResult> => {
+  const allowed = await hasAdminAccess()
+
+  if (!allowed) {
+    return {
+      ok: false,
+      error: 'No tienes permisos para realizar esta accion.',
+    }
+  }
+
+  const normalizedImageId = normalizePositiveInteger(imageId)
+
+  if (normalizedImageId === null) {
+    return {
+      ok: false,
+      error: 'Imagen no valida.',
+    }
+  }
+
+  const sql = createSql()
+
+  const imageData = await sql`
+    SELECT id, route_id, image, selected_for_cover
+    FROM route_images
+    WHERE id = ${normalizedImageId}
+    LIMIT 1
+  `
+
+  if (imageData.length === 0) {
+    return {
+      ok: false,
+      error: 'Imagen no encontrada.',
+    }
+  }
+
+  const image = imageData[0] as AdminRouteImageModerationRow
+  const normalizedRouteId = normalizePositiveInteger(image.route_id)
+
+  if (normalizedRouteId === null) {
+    return {
+      ok: false,
+      error: 'Ruta no valida.',
+    }
+  }
+
+  await sql`
+    UPDATE route_images
+    SET review_status = 'approved'
+    WHERE id = ${image.id}
+  `
+
+  if (image.selected_for_cover === true) {
+    await sql`
+      UPDATE routes
+      SET image = ${image.image}
+      WHERE id = ${normalizedRouteId}
+    `
+  }
+
+  revalidateAdminRouteSurfaces(normalizedRouteId)
+
+  return {
+    ok: true,
+  }
+}
+
+export const rejectRouteImage = async (
+  imageId: number | string,
+): Promise<ReviewRouteImageResult> => {
+  const allowed = await hasAdminAccess()
+
+  if (!allowed) {
+    return {
+      ok: false,
+      error: 'No tienes permisos para realizar esta accion.',
+    }
+  }
+
+  const normalizedImageId = normalizePositiveInteger(imageId)
+
+  if (normalizedImageId === null) {
+    return {
+      ok: false,
+      error: 'Imagen no valida.',
+    }
+  }
+
+  const sql = createSql()
+
+  const imageData = await sql`
+    SELECT id, route_id
+    FROM route_images
+    WHERE id = ${normalizedImageId}
+    LIMIT 1
+  `
+
+  if (imageData.length === 0) {
+    return {
+      ok: false,
+      error: 'Imagen no encontrada.',
+    }
+  }
+
+  const image = imageData[0] as AdminRouteImageModerationRow
+  const normalizedRouteId = normalizePositiveInteger(image.route_id)
+
+  if (normalizedRouteId === null) {
+    return {
+      ok: false,
+      error: 'Ruta no valida.',
+    }
+  }
+
+  await sql`
+    UPDATE route_images
+    SET review_status = 'rejected'
+    WHERE id = ${image.id}
+  `
+
+  revalidateAdminRouteSurfaces(normalizedRouteId)
 
   return {
     ok: true,

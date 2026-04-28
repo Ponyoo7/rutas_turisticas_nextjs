@@ -184,6 +184,9 @@ export function AdminRoutesCatalog({
                   <th className="px-4 py-4 text-left text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/55">
                     Featured
                   </th>
+                  <th className="px-4 py-4 text-left text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/55">
+                    Galeria
+                  </th>
                   <th className="px-4 py-4 text-right text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/55">
                     Acciones
                   </th>
@@ -192,10 +195,7 @@ export function AdminRoutesCatalog({
 
               <tbody className="divide-y divide-artis-primary/10">
                 {routes.map((route) => (
-                  <tr
-                    key={route.id}
-                    className="align-top transition-colors hover:bg-[#fcfaf7]"
-                  >
+                  <tr key={route.id} className="align-top transition-colors hover:bg-[#fcfaf7]">
                     <td className="px-4 py-4 text-sm font-medium text-gray-500">
                       <span className="rounded-full bg-[#f8f5f0] px-3 py-1 font-mono text-xs text-artis-primary">
                         {route.id}
@@ -209,6 +209,11 @@ export function AdminRoutesCatalog({
                       >
                         {route.name}
                       </Link>
+                      {route.description && (
+                        <p className="mt-2 max-w-md text-sm leading-6 text-gray-600">
+                          {route.description}
+                        </p>
+                      )}
                       <p className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-artis-primary/45">
                         Abrir detalle
                       </p>
@@ -233,6 +238,17 @@ export function AdminRoutesCatalog({
                       >
                         {route.featured ? 'Destacada' : 'No destacada'}
                       </span>
+                    </td>
+
+                    <td className="px-4 py-4">
+                      <p className="text-sm font-semibold text-artis-primary">
+                        {route.contributedImagesCount} imagenes
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {route.approvedImagesCount} aprobadas,{' '}
+                        {route.pendingImagesCount} pendientes,{' '}
+                        {route.rejectedImagesCount} rechazadas
+                      </p>
                     </td>
 
                     <td className="px-4 py-4">

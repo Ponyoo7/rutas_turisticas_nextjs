@@ -7,9 +7,10 @@ import {
 } from '../types/locations'
 
 const OVERPASS_ENDPOINTS = [
-  'https://overpass-api.de/api/interpreter',
-  'https://lz4.overpass-api.de/api/interpreter',
-  'https://overpass.private.coffee/api/interpreter',
+   "https://overpass-api.de/api/interpreter",
+   "https://lz4.overpass-api.de/api/interpreter",
+   "https://z.overpass-api.de/api/interpreter",
+   "https://overpass.osm.ch/api/interpreter",
 ]
 
 const OVERPASS_RADIUS_METERS = 2000
@@ -26,7 +27,7 @@ const IMAGE_EXTENSION_REGEX =
 const COMMONS_FILE_PATH_PREFIX =
   'https://commons.wikimedia.org/wiki/Special:FilePath/'
 const WIKI_IMAGE_PROXY_PATH = '/api/wiki-image'
-const ROUTECRAFT_USER_AGENT = 'RouteCraft/1.0 (contacto: cqc1999@gmail.com)'
+const ROUTECRAFT_USER_AGENT = 'RouteCraft/1.0 (https://rutas-turisticas-nextjs.vercel.app; cqc1999@gmail.com)'
 const ROUTECRAFT_REFERER = 'https://rutas-turisticas-nextjs.vercel.app/'
 
 interface WikiSummaryResponse {
@@ -65,7 +66,7 @@ const buildApiHeaders = (options?: { includeFormContentType?: boolean }) => {
 
   if (typeof window === 'undefined') {
     headers.set('User-Agent', ROUTECRAFT_USER_AGENT)
-    headers.set('Referer', ROUTECRAFT_REFERER)
+    // headers.set('Referer', ROUTECRAFT_REFERER)
   }
 
   return headers

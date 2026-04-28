@@ -1,7 +1,12 @@
+import {
+  getRouteImageReviewDescription,
+  getRouteImageReviewLabel,
+  getRouteImageReviewTone,
+} from '@/lib/route-images'
 import { getAdminRouteById } from '@/actions/admin.actions'
 import { getPlaceCoords, getPlaceTypeLabel } from '@/lib/utils'
-import { locationsService } from '@/shared/services/locations.service'
 import { Button } from '@/shared/components/ui/button'
+import { IconStar } from '@tabler/icons-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -19,8 +24,6 @@ export default async function Page({ params }: PageProps) {
 
   if (!route) notFound()
 
-  const image = locationsService.toRenderableImageUrl(route.image)
-
   return (
     <section className="flex flex-col gap-6">
       <div className="rounded-[28px] border border-artis-primary/10 bg-white p-6 shadow-sm md:p-8">
@@ -33,36 +36,44 @@ export default async function Page({ params }: PageProps) {
               {route.name}
             </h1>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-gray-600 md:text-base">
-              Detalle editorial de la ruta, con su autoria, imagen principal,
-              lugares guardados y estado de destacado.
+              Detalle editorial de la ruta, con su autoria, descripcion,
+              portada actual, galeria aportada y estado de destacado.
             </p>
           </div>
 
-          <Button
-            asChild
-            variant="outline"
-            className="rounded-xl border-artis-primary/15 bg-white text-artis-primary hover:bg-[#f8f5f0]"
-          >
-            <Link href="/admin/rutas">Volver al listado</Link>
-          </Button>
+          <div className="flex flex-wrap gap-3">
+            <Button
+              asChild
+              variant="outline"
+              className="rounded-xl border-artis-primary/15 bg-white text-artis-primary hover:bg-[#f8f5f0]"
+            >
+              <Link href="/admin/rutas">Volver al listado</Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="rounded-xl border-artis-primary/15 bg-white text-artis-primary hover:bg-[#f8f5f0]"
+            >
+              <Link href="/admin/imagenes">Gestion de imagenes</Link>
+            </Button>
+          </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,1fr)]">
-          <div className="overflow-hidden rounded-[24px] border border-artis-primary/10 bg-[#f7f1e8]">
-            {image ? (
-              // Route images can come from external dynamic URLs not covered by next/image config.
+        <div className="mt-8 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
+          <article className="overflow-hidden rounded-[24px] border border-artis-primary/10 bg-[#f7f1e8]">
+            {route.image ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={image}
+                src={route.image}
                 alt={`Imagen principal de ${route.name}`}
-                className="h-full min-h-[280px] w-full object-cover"
+                className="h-full min-h-[320px] w-full object-cover"
               />
             ) : (
-              <div className="flex min-h-[280px] items-center justify-center px-6 text-center text-sm font-medium text-gray-500">
+              <div className="flex min-h-[320px] items-center justify-center px-6 text-center text-sm font-medium text-gray-500">
                 Esta ruta no tiene imagen principal asignada.
               </div>
             )}
-          </div>
+          </article>
 
           <div className="flex flex-col gap-4">
             <article className="rounded-[24px] border border-artis-primary/10 bg-[#fcfaf7] p-5">
@@ -99,7 +110,28 @@ export default async function Page({ params }: PageProps) {
 
             <article className="rounded-[24px] border border-artis-primary/10 bg-[#fcfaf7] p-5">
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
-                Resumen
+                Descripcion
+              </p>
+              <p className="mt-3 text-sm leading-7 text-gray-600">
+                {route.description ||
+                  'La ruta todavia no tiene descripcion escrita por su autor.'}
+              </p>
+            </article>
+
+            <article className="rounded-[24px] border border-artis-primary/10 bg-[#fcfaf7] p-5">
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
+                Resumen visual
+              </p>
+              <p className="mt-3 text-sm leading-7 text-gray-600">
+                {route.contributedImagesCount} imagenes aportadas: {route.approvedImagesCount}{' '}
+                aprobadas, {route.pendingImagesCount} pendientes y{' '}
+                {route.rejectedImagesCount} rechazadas.
+              </p>
+            </article>
+
+            <article className="rounded-[24px] border border-artis-primary/10 bg-[#fcfaf7] p-5">
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
+                Resumen del itinerario
               </p>
               <p className="mt-3 text-sm leading-7 text-gray-600">
                 Esta ruta contiene {route.places.length}{' '}
@@ -109,6 +141,69 @@ export default async function Page({ params }: PageProps) {
           </div>
         </div>
       </div>
+
+      {route.contributedImages.length > 0 && (
+        <div className="rounded-[28px] border border-artis-primary/10 bg-white p-6 shadow-sm md:p-8">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.35em] text-artis-primary/50">
+                Galeria
+              </p>
+              <h2 className="mt-3 font-serif text-3xl font-bold text-artis-primary">
+                Imagenes aportadas
+              </h2>
+            </div>
+            <span className="text-sm font-medium text-gray-500">
+              {route.contributedImages.length} imagenes
+            </span>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {route.contributedImages.map((image) => {
+              const reviewTone = getRouteImageReviewTone(image.reviewStatus)
+
+              return (
+                <article
+                  key={image.id}
+                  className="overflow-hidden rounded-[24px] border border-artis-primary/10 bg-[#fcfaf7]"
+                >
+                  <div className="relative h-52 bg-[#efe4d2]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={image.image}
+                      alt={`Imagen aportada a ${route.name}`}
+                      className="h-full w-full object-cover"
+                    />
+                    {image.selectedForCover && (
+                      <span className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-artis-primary">
+                        <IconStar size={14} />
+                        Candidata a portada
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col gap-3 p-4">
+                    <span
+                      className={`inline-flex w-fit rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] ${
+                        reviewTone === 'approved'
+                          ? 'bg-emerald-50 text-emerald-700'
+                          : reviewTone === 'rejected'
+                            ? 'bg-rose-50 text-rose-700'
+                            : 'bg-amber-50 text-amber-700'
+                      }`}
+                    >
+                      {getRouteImageReviewLabel(image.reviewStatus)}
+                    </span>
+                    <p className="text-sm leading-6 text-gray-600">
+                      {getRouteImageReviewDescription(image.reviewStatus)}
+                    </p>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="rounded-[28px] border border-artis-primary/10 bg-white p-6 shadow-sm md:p-8">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">

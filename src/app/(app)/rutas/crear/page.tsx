@@ -85,44 +85,50 @@ export default async function CrearRutaPage({
     heroPlace?.tags.wikipedia
       ? await locationsService.getWikiInfo(heroPlace.tags.wikipedia)
       : null
+  const selectedContributedCover = routeToEdit?.contributedImages.find(
+    (image) => image.selectedForCover,
+  )
   const heroImage =
+    selectedContributedCover?.image ||
     locationsService.toRenderableImageUrl(routeToEdit?.image) ||
     (heroPlace ? locationsService.getPlaceImage(heroPlace, heroWikiInfo) : null)
 
   return (
-    <main className="w-full h-full p-4">
-      <div>
-        <div
-          className="relative flex min-h-[300px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-start justify-end px-6 pb-12 rounded-xl overflow-hidden"
+    <main className="min-h-screen bg-[#fbf7f1] px-4 py-4 md:px-6 md:py-6">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <section
+          className="relative overflow-hidden rounded-[34px] border border-white/40 bg-cover bg-center bg-no-repeat px-6 pb-10 pt-24 shadow-[0_28px_90px_-42px_rgba(0,0,0,0.45)] md:px-10 md:pt-28"
           style={{
-            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 100%), url("${heroImage || '/museo_placeholder.jpg'}")`,
+            backgroundImage: `linear-gradient(135deg, rgba(28, 18, 10, 0.25) 0%, rgba(28, 18, 10, 0.68) 65%), url("${heroImage || '/museo_placeholder.jpg'}")`,
           }}
         >
-          <div className="flex flex-col gap-3 text-left z-10">
-            <span className="text-white/80 uppercase tracking-widest text-xs font-bold">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.22),transparent_38%)]" />
+
+          <div className="relative flex max-w-3xl flex-col gap-4 text-left">
+            <span className="inline-flex w-fit rounded-full bg-white/14 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.28em] text-white backdrop-blur-sm">
               {isEditMode ? 'Ajusta tu aventura' : 'Disena tu aventura'}
             </span>
-            <h1 className="text-white text-5xl font-black leading-[1.1] tracking-tight font-serif">
+            <h1 className="font-serif text-4xl font-bold leading-[1.05] text-white md:text-6xl">
               {isEditMode ? 'Editor de Rutas' : 'Creador de Rutas'}
             </h1>
-            <h2 className="text-white/90 text-base font-normal leading-relaxed max-w-[400px]">
+            <p className="max-w-xl text-sm leading-7 text-white/90 md:text-base">
               {isEditMode
-                ? 'Modifica paradas y orden para mejorar tu recorrido.'
-                : 'Selecciona los mejores lugares y crea una experiencia inolvidable.'}
-            </h2>
+                ? 'Modifica paradas, descripcion y galeria para mejorar la experiencia final del recorrido.'
+                : 'Selecciona los mejores lugares y construye una experiencia visual y bien organizada desde el primer momento.'}
+            </p>
           </div>
-        </div>
-      </div>
+        </section>
 
-      <div className="flex flex-col gap-4">
         <AddToRouteMap
           places={mapPlaces}
           coords={mapCoords}
           city={cityResult?.city}
           routeId={routeToEdit?.id}
           initialRouteName={routeToEdit?.name}
+          initialRouteDescription={routeToEdit?.description}
           initialRoutePlaces={routeToEdit?.places}
           initialImage={routeToEdit?.image}
+          initialRouteImages={routeToEdit?.contributedImages}
         />
       </div>
     </main>

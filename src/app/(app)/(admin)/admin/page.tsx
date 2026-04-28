@@ -2,6 +2,14 @@ import { getAdminRoutes, getAdminUsers } from '@/actions/admin.actions'
 
 export default async function Page() {
   const [users, routes] = await Promise.all([getAdminUsers(), getAdminRoutes()])
+  const pendingImages = routes.reduce(
+    (total, route) => total + route.pendingImagesCount,
+    0,
+  )
+  const rejectedImages = routes.reduce(
+    (total, route) => total + route.rejectedImagesCount,
+    0,
+  )
 
   return (
     <section className="rounded-[28px] border border-artis-primary/10 bg-white p-6 shadow-sm md:p-8">
@@ -48,11 +56,11 @@ export default async function Page() {
             Estado de imagenes
           </p>
           <p className="mt-4 font-serif text-2xl font-bold text-artis-primary">
-            Sin moderacion activa
+            {pendingImages} pendientes / {rejectedImages} rechazadas
           </p>
           <p className="mt-3 text-sm leading-6 text-gray-600">
-            La revision editorial de imagenes sigue pendiente para una proxima
-            iteracion del panel.
+            Las imagenes aportadas por usuarios ya se moderan desde Gestion de
+            imagenes antes de publicarse o convertirse en portada.
           </p>
         </article>
       </div>

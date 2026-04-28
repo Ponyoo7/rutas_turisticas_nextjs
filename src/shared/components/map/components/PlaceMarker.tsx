@@ -12,10 +12,10 @@ interface PlaceMarkerProps {
 
 export const PlaceMarker = ({ place, onClick }: PlaceMarkerProps) => {
   const map = useMap()
-  const lat = place.lat ?? place.center?.lat
-  const lon = place.lon ?? place.center?.lon
+  const lat = place.lat || place.center?.lat
+  const lon = place.lon || place.center?.lon
 
-  if (lat == null || lon == null) return null
+  if (!lat || !lon) return null
 
   const handlePlaceClick = (place: OSMElement) => {
     if (onClick) onClick(place)

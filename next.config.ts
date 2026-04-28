@@ -1,13 +1,8 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  /* config options here */
   images: {
-    qualities: [75, 92],
-    localPatterns: [
-      {
-        pathname: '/api/wiki-image',
-      },
-    ],
     remotePatterns: [new URL('https://upload.wikimedia.org/**')],
   },
 }

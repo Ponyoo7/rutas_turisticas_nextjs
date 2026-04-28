@@ -1,0 +1,287 @@
+@startuml
+title Route Craft - Diagrama de clases
+
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+package "Dominio" {
+  enum UserRole {
+    user
+    admin
+    master
+  }
+
+  interface User {
+    +id: string
+    +fullname: string
+    +email: string
+    +image: string
+    +role: UserRole
+    +verified: boolean
+  }
+
+  interface UserRegister <<DTO>> {
+    +fullname: string
+    +email: string
+    +password: string
+    +image: string
+  }
+
+  interface UserCredentials <<DTO>> {
+    +email: string
+    +password: string
+  }
+
+  enum RouteImageReviewStatus {
+    approved
+    pending
+    rejected
+  }
+
+  interface RouteImageInput <<DTO>> {
+    +id?: number
+    +image: string
+    +selectedForCover: boolean
+  }
+
+  interface RouteImage {
+    +id: number
+    +image: string
+    +reviewStatus: RouteImageReviewStatus
+    +selectedForCover: boolean
+    +createdAt: string
+  }
+
+  interface CreateRoute <<DTO>> {
+    +name: string
+    +description: string
+    +places: OSMElement[]
+    +image?: string
+    +contributedImages?: RouteImageInput[]
+  }
+
+  interface UpdateRoute <<DTO>> {
+    +id: number
+    +name: string
+    +description: string
+    +places: OSMElement[]
+    +contributedImages?: RouteImageInput[]
+  }
+
+  interface Route {
+    +id: number
+    +user_id: string
+    +name: string
+    +description: string
+    +places: OSMElement[]
+    +image: string
+    +contributedImages: RouteImage[]
+    +featured: boolean
+  }
+
+  interface OSMAddress {
+    +place_id: number
+    +osm_type: "node" | "way" | "relation"
+    +osm_id: number
+    +lat: string
+    +lon: string
+    +display_name: string
+    +name: string
+    +importance: number
+  }
+
+  interface OSMElement {
+    +id: number
+    +type: "node" | "way" | "relation"
+    +lat?: number
+    +lon?: number
+    +center?: {lat, lon}
+    +tags: Record<string, any>
+  }
+
+  class WikiThumbnail {
+    +source: string
+    +width: number
+    +height: number
+  }
+
+  interface WikiData {
+    +title: string
+    +extract: string
+    +thumbnail?: WikiThumbnail
+  }
+}
+
+package "Estado y Autenticacion" {
+  class UserStore <<store>> {
+    +user: User | null
+    +isLoading: boolean
+    +setUser(user: User | null): void
+    +setIsLoading(isLoading: boolean): void
+  }
+
+  class AuthPolicy <<utility>> {
+    +isMaster(user): boolean
+    +isAdmin(user): boolean
+    +canAccessAdmin(user): boolean
+  }
+
+  class UserActions <<service>> {
+    +createUser(user: UserRegister)
+    +login(credentials: UserCredentials)
+    +verifyToken(token: string | undefined)
+    +logout()
+  }
+}
+
+package "Exploracion y Rutas" {
+  class LocationsService <<service>> {
+    +getCitiesByName(name: string, limit = 8)
+    +getCityByName(name: string)
+    +getCoordsByCity(city: OSMAddress)
+    +getInterestPlaces(coords: number[])
+    +getInterestPlacesByName(name: string)
+    +getWikiInfo(wikiTag: string)
+    +getWikiInfoByTitle(title: string, lang = "es")
+    +getPlaceImage(place: OSMElement, wikiInfo?: WikiData)
+    +normalizeCanonicalImageUrl(source?: string)
+    +toRenderableImageUrl(source?: string)
+  }
+
+  class RouteActions <<service>> {
+    +saveRoute(createRoute: CreateRoute)
+    +updateRoute(updateRoute: UpdateRoute)
+    +deleteRoute(id: number)
+    +getMyRoutes()
+    +getMyRouteById(id: number)
+    +getFeaturedRoutesByCityPlaces(cityPlaces: OSMElement[])
+    +getFeaturedRouteById(routeId: number)
+    +getMyFavoriteRouteIds()
+    +getMyFavoriteRoutes()
+    +toggleFavoriteRoute(routeId: number)
+  }
+}
+
+package "Administracion" {
+  interface AdminUserListItem {
+    +id: string
+    +fullname: string
+    +email: string
+    +role: UserRole
+    +verified: boolean
+  }
+
+  interface AdminRouteListItem {
+    +id: number
+    +name: string
+    +description: string
+    +image: string | null
+    +featured: boolean
+    +userId: string
+    +ownerFullname: string
+    +ownerEmail: string
+    +contributedImagesCount: number
+    +pendingImagesCount: number
+    +rejectedImagesCount: number
+    +approvedImagesCount: number
+  }
+
+  interface AdminRouteDetail {
+    +id: number
+    +name: string
+    +description: string
+    +image: string | null
+    +featured: boolean
+    +userId: string
+    +ownerFullname: string
+    +ownerEmail: string
+    +places: OSMElement[]
+    +contributedImages: RouteImage[]
+  }
+
+  interface AdminRouteImageQueueItem {
+    +imageId: number
+    +routeId: number
+    +routeName: string
+    +routeDescription: string
+    +image: string
+    +currentCoverImage: string | null
+    +reviewStatus: RouteImageReviewStatus
+    +selectedForCover: boolean
+    +createdAt: string
+    +ownerFullname: string
+    +ownerEmail: string
+  }
+
+  class AdminActions <<service>> {
+    +getAdminUsers(search = "")
+    +getAdminRoutes(search = "")
+    +getAdminRouteById(routeId: number)
+    +getAdminRouteImageQueue()
+    +updateUserVerified(userId: string, verified: boolean)
+    +updateRouteFeatured(routeId: number, featured: boolean)
+    +approveRouteImage(imageId: number | string)
+    +rejectRouteImage(imageId: number | string)
+  }
+}
+
+User --> UserRole
+RouteImage --> RouteImageReviewStatus
+WikiData *-- WikiThumbnail
+
+UserStore o-- User
+AuthPolicy ..> User
+UserActions ..> User
+UserActions ..> UserRegister
+UserActions ..> UserCredentials
+
+LocationsService ..> OSMAddress
+LocationsService ..> OSMElement
+LocationsService ..> WikiData
+
+RouteActions ..> CreateRoute
+RouteActions ..> UpdateRoute
+RouteActions ..> Route
+RouteActions ..> RouteImageInput
+RouteActions ..> OSMElement
+RouteActions ..> UserActions : verifyToken()
+RouteActions ..> LocationsService
+
+AdminActions ..> AuthPolicy
+AdminActions ..> UserActions : verifyToken()
+AdminActions ..> LocationsService
+AdminActions ..> AdminUserListItem
+AdminActions ..> AdminRouteListItem
+AdminActions ..> AdminRouteDetail
+AdminActions ..> AdminRouteImageQueueItem
+
+User "1" -- "0..*" Route : crea >
+User "0..*" -- "0..*" Route : guarda en favoritos >
+Route "1" o-- "0..*" RouteImage : galeria >
+Route "1" o-- "1..*" OSMElement : itinerario >
+AdminRouteDetail o-- "0..*" RouteImage
+AdminRouteDetail o-- "1..*" OSMElement
+AdminRouteImageQueueItem --> RouteImageReviewStatus
+
+note right of AuthPolicy
+  Un usuario puede acceder al panel admin si:
+  - role = admin o master
+  - verified = true
+end note
+
+note bottom of Route
+  featured = true permite que la ruta
+  aparezca en superficies publicas
+  y pueda guardarse en favoritos.
+end note
+
+note bottom of RouteImage
+  Las imagenes aportadas por usuarios
+  pasan por revision administrativa antes
+  de mostrarse como aprobadas.
+end note
+
+@enduml

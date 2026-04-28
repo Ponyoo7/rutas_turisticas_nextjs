@@ -9,8 +9,9 @@ import {
 const OVERPASS_ENDPOINTS = [
    "https://overpass-api.de/api/interpreter",
    "https://lz4.overpass-api.de/api/interpreter",
-   "https://z.overpass-api.de/api/interpreter",
-   "https://overpass.osm.ch/api/interpreter",
+  "https://z.overpass-api.de/api/interpreter",
+    "https://overpass.osm.ch/api/interpreter",
+  "https://overpass.private.coffee/api/interpreter"
 ]
 
 const OVERPASS_RADIUS_METERS = 2000

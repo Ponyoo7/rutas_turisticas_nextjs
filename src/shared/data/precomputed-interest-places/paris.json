@@ -1,0 +1,291 @@
+{
+  "city": "Paris",
+  "aliases": [
+    "paris"
+  ],
+  "coords": [
+    48.8534951,
+    2.3483915
+  ],
+  "places": [
+    {
+      "type": "node",
+      "id": 3422228195,
+      "lat": 48.8462871,
+      "lon": 2.346069,
+      "tags": {
+        "direction": "150",
+        "historic": "memorial",
+        "image": "http://upload.wikimedia.org/wikipedia/commons/9/98/Monument_a_Denis_Diderot-DSC_1963w.jpg",
+        "indoor": "yes",
+        "level": "0",
+        "material": "stone",
+        "memorial": "statue",
+        "name": "Monument à Denis Diderot"
+      }
+    },
+    {
+      "type": "node",
+      "id": 3422228207,
+      "lat": 48.8461467,
+      "lon": 2.346006,
+      "tags": {
+        "artist_name": "Albert Bartholomé",
+        "description": "Groupe central : la philosophie entre la nature et la vérité; à gauche, la musique, à droite la gloire. Commandé en 1907",
+        "direction": "60",
+        "historic": "memorial",
+        "image": "http://upload.wikimedia.org/wikipedia/commons/6/63/Pantheon_3%2C_Paris_May_11%2C_2013.jpg",
+        "indoor": "yes",
+        "level": "0",
+        "material": "marble;stone",
+        "memorial": "statue",
+        "name": "Monument à Jean-Jacques Rousseau",
+        "start_date": "1912-06-28"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4547863835,
+      "lat": 48.8467162,
+      "lon": 2.3457996,
+      "tags": {
+        "artist_name": "Gabriel Rispal",
+        "artwork_type": "sculpture",
+        "historic": "memorial",
+        "inscription": "P. CORNEILLE;1606 - 1684",
+        "memorial": "statue",
+        "name": "Pierre Corneille",
+        "start_date": "1952",
+        "subject:wikidata": "Q18180816",
+        "tourism": "artwork"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4838731645,
+      "lat": 48.8463624,
+      "lon": 2.3423168,
+      "tags": {
+        "name": "Galerie Marches à Suivre",
+        "tourism": "gallery",
+        "website": "https://marchesasuivre.blogspot.com/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 5362078866,
+      "lat": 48.8459079,
+      "lon": 2.3454003,
+      "tags": {
+        "historic": "memorial",
+        "memorial": "statue",
+        "name": "J.J. Rousseau",
+        "wikidata": "Q18180817"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10017125288,
+      "lat": 48.8452204,
+      "lon": 2.3452509,
+      "tags": {
+        "fee": "no",
+        "name": "Galerie du Panthéon",
+        "tourism": "gallery"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10844713782,
+      "lat": 48.8461929,
+      "lon": 2.3461361,
+      "tags": {
+        "indoor": "yes",
+        "name": "Pendule de Foucault",
+        "tourism": "attraction",
+        "wheelchair": "yes",
+        "wikidata": "Q178841",
+        "wikipedia": "fr:Pendule de Foucault"
+      }
+    },
+    {
+      "type": "node",
+      "id": 11090136327,
+      "lat": 48.8467277,
+      "lon": 2.3453357,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "ICI;a été tué;pour la libération;le 19 aout 1944;le gardien de la paix;Alexandre MASSIANI",
+        "memorial": "plaque",
+        "name": "Alexandre Massiani",
+        "support": "wall_mounted",
+        "survey:date": "2023-07-23"
+      }
+    },
+    {
+      "type": "node",
+      "id": 11090136357,
+      "lat": 48.8467237,
+      "lon": 2.3453149,
+      "tags": {
+        "historic": "memorial",
+        "memorial": "plaque",
+        "name": "Ancienne Église Sainte-Geneviève"
+      }
+    },
+    {
+      "type": "node",
+      "id": 11134957161,
+      "lat": 48.8463067,
+      "lon": 2.3460183,
+      "tags": {
+        "artist_name": "Jules Desbois",
+        "artwork_type": "sculpture",
+        "description": "Monument célébrant la victoire de Valmy sur les Prussiens, le 20 septembre 1792",
+        "exhibit": "artwork",
+        "historic": "memorial",
+        "indoor": "yes",
+        "inscription": "VALMY-1792",
+        "level": "0",
+        "material": "stone",
+        "memorial": "sculpture",
+        "name": "Valmy",
+        "start_date": "1913"
+      }
+    },
+    {
+      "type": "node",
+      "id": 11134959909,
+      "lat": 48.8461507,
+      "lon": 2.3459405,
+      "tags": {
+        "artist_name": "Ernest Dubois",
+        "artwork_type": "sculpture",
+        "description": "Groupe Le Vengeur, commémorant la bataille du 13 prairial an II, par Ernest Dubois (1863-1930), marbre, 1908,",
+        "exhibit": "artwork",
+        "historic": "memorial",
+        "indoor": "yes",
+        "level": "0",
+        "material": "marble",
+        "memorial": "sculpture",
+        "name": "Le Vengeur",
+        "start_date": "1908",
+        "wikimedia_commons": "File:Le_Vengeur.JPG"
+      }
+    },
+    {
+      "type": "node",
+      "id": 11144345727,
+      "lat": 48.8462375,
+      "lon": 2.3456876,
+      "tags": {
+        "historic": "memorial",
+        "indoor": "yes",
+        "inscription": "Poète,dramaturge, homme politique martiniquais (1913-2008);Député de la Martinique (1945-1993) et maire de Fort-de-France (1945-2001)",
+        "inscription:2": "Inlassable artisan de la décolonisation, bâtisseur;d'une \"négritude\" fondée sur l'universalité des droits;de l'Homme \"Bouche des malheurs qui n'ont point de;bouche\", il a voulu donner au monde, pas ses écrits et;son action, \"La force de regarder demain\".",
+        "inscription:3": "\"J'habite une blessure sacrée;J'habite des ancêtres imaginaires;J'habite un vouloir obscur;J'habite un long silence;J'habite une soif irrémédiable\"",
+        "level": "-1",
+        "memorial": "plaque",
+        "name": "Aimé CESAIRE",
+        "source": "survey 2023",
+        "start_date": "2011-04",
+        "support": "wall_mounted",
+        "wikimedia_commons": "File:Panthéon_hommage_à_Aimé_Césaire.JPG"
+      }
+    },
+    {
+      "type": "node",
+      "id": 11144355208,
+      "lat": 48.8463195,
+      "lon": 2.3461293,
+      "tags": {
+        "historic": "memorial",
+        "indoor": "yes",
+        "inscription": "Sous la chape de haine et de nuit tombée sur la France dans les années;d’occupation, des lumières,par milliers, refusèrent de s’éteindre.;Nommés Justes parmi les Nations ou restés anonymes, des femmes;",
+        "inscription:2": "et des hommes de toutes origines et de toutes conditions ont sauvé;des Juifs des persécutions antisémites et des camps d’extermination.;Bravant les risques encourus, ils ont incarné l’honneur de;",
+        "inscription:3": "la France, ses valeurs de justice, de tolérance et d’humanité.",
+        "level": "-1",
+        "memorial": "plaque",
+        "name": "Hommage de la nation aux Justes de France",
+        "start_date": "2020-08-20",
+        "support": "wall_mounted",
+        "wikimedia_commons": "File:Panthéon_Justes_de_France.JPG"
+      }
+    },
+    {
+      "type": "node",
+      "id": 782601793,
+      "lat": 48.8480587,
+      "lon": 2.3392944,
+      "tags": {
+        "alt_name": "Fontaine de Médicis",
+        "amenity": "fountain",
+        "fountain:type": "backed",
+        "heritage": "2",
+        "heritage:operator": "mhs",
+        "heritage:ref": "PA00088519",
+        "historic": "shieling",
+        "mapillary": "144890350863505",
+        "name": "Fontaine Médicis",
+        "survey:date": "2018-05-13",
+        "tourism": "attraction",
+        "website": "https://www.senat.fr/visite/jardin/fontaine_medicis/le_senat_restaure_la_fontaine_medicis.html",
+        "wheelchair": "yes",
+        "wikidata": "Q3076041",
+        "wikipedia": "fr:Fontaine Médicis"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1426093837,
+      "lat": 48.8522269,
+      "lon": 2.335005,
+      "tags": {
+        "addr:housenumber": "10",
+        "addr:street": "Rue Mabillon",
+        "fee": "no",
+        "name": "Musée-Librairie du Compagnonnage",
+        "opening_hours": "Tu-Fr 14:00-18:00",
+        "phone": "+33 1 43 26 25 03",
+        "tourism": "museum",
+        "website": "http://www.compagnons.org",
+        "wikidata": "Q3329030"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4986604521,
+      "lat": 48.8515298,
+      "lon": 2.3372487,
+      "tags": {
+        "name": "Japanesque",
+        "opening_hours": "Tu-Sa 11:00-19:00",
+        "phone": "+33 7 49 40 05 98",
+        "tourism": "gallery",
+        "website": "https://kyoto-muse.jp/paris/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 5077321892,
+      "lat": 48.8524282,
+      "lon": 2.3368245,
+      "tags": {
+        "level": "0",
+        "name": "Paul Prouté",
+        "tourism": "gallery"
+      }
+    },
+    {
+      "type": "node",
+      "id": 8121110478,
+      "lat": 48.8517038,
+      "lon": 2.337846,
+      "tags": {
+        "historic": "memorial",
+        "memorial": "plaque",
+        "name": "Marcel Raoul"
+      }
+    }
+  ]
+}

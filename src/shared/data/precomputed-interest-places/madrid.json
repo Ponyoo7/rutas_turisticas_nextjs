@@ -1,0 +1,253 @@
+{
+  "city": "Madrid",
+  "aliases": [
+    "madrid"
+  ],
+  "coords": [
+    40.416782,
+    -3.703507
+  ],
+  "places": [
+    {
+      "type": "node",
+      "id": 4637387790,
+      "lat": 40.4116055,
+      "lon": -3.7100887,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "En esta plaza murió en la horca, el 7 de noviembre del 1823, el general Rafael del Riego, símbolo liberal contra el absolutismo.",
+        "memorial": "plaque",
+        "name": "Rafael del Riego",
+        "source": "Ayuntamiento de Madrid"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4650903489,
+      "lat": 40.4124918,
+      "lon": -3.7115931,
+      "tags": {
+        "alt_name": "Capilla del Obispo",
+        "name": "Capilla de Nuestra Señora y de san Juan de Letrán",
+        "tourism": "attraction",
+        "wheelchair": "no",
+        "wikidata": "Q3656832",
+        "wikimedia_commons": "Category:Capilla del Obispo, Madrid",
+        "wikipedia": "es:Capilla del Obispo (Madrid)"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4729795273,
+      "lat": 40.4118869,
+      "lon": -3.7106536,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "Junto a este lugar se emplazó hasta mediados del siglo XVII la puerta de Moros, entrada de la muralla medieval de la Villa",
+        "memorial": "plaque",
+        "name": "Puerta de Moros"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4944158161,
+      "lat": 40.4115799,
+      "lon": -3.7100061,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "En esta casa nació y vivió ALONSO ZAMORA VICENTE (1916 – 2006) escritor, filólogo y académico.",
+        "memorial": "plaque",
+        "name": "Alonso Zamora Vicente",
+        "website": "https://especiales.memoriademadrid.es/index/verficha/idpk/247542/id/8/obj/A/idag/25"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4944158167,
+      "lat": 40.4105715,
+      "lon": -3.7104676,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "En torno a este lugar vivió durante su estancia en Madrid Agustina Zaragoza Doménech AGUSTINA DE ARAGÓN, heroína durante la Guerra de la Independencia (1786 - 1858)",
+        "memorial": "plaque",
+        "name": "Agustina de Aragón",
+        "website": "https://especiales.memoriademadrid.es/index/verficha/idpk/58267/id/8/obj/A/idag/25"
+      }
+    },
+    {
+      "type": "node",
+      "id": 5064694123,
+      "lat": 40.4124658,
+      "lon": -3.7116803,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "Esta capilla de Santa María y San Juan de Letrán fue concluida por el obispo GUTIERRE DE VARGAS CARVAJAL aquí enterrado en 1559",
+        "memorial": "plaque",
+        "name": "Gutierre Vargas Carvajal"
+      }
+    },
+    {
+      "type": "node",
+      "id": 5322417132,
+      "lat": 40.4113692,
+      "lon": -3.7110308,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "Junto a este lugar se emplazó hasta mediados del siglo XVII la PUERTA DE MOROS entrada de la muralla medieval de la Villa",
+        "memorial": "plaque",
+        "name": "Puerta de Moros",
+        "source": "Ayuntamiento de Madrid"
+      }
+    },
+    {
+      "type": "node",
+      "id": 5322417138,
+      "lat": 40.4115999,
+      "lon": -3.7120337,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "Aquí vivió el poeta PEDRO SALINAS (1891-1951) gran parte de su juventud.",
+        "memorial": "plaque",
+        "name": "Pedro Salinas",
+        "source": "Ayuntamiento de Madrid"
+      }
+    },
+    {
+      "type": "node",
+      "id": 5322517813,
+      "lat": 40.4125971,
+      "lon": -3.7118641,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "En este lugar estuvo el Palacio de Lasso de Castilla, alojamiento preferido de los REYES CATÓLICOS durante sus estancias en Madrid desde 1477",
+        "memorial": "plaque",
+        "name": "Reyes Católicos",
+        "source": "Ayuntamiento de Madrid"
+      }
+    },
+    {
+      "type": "node",
+      "id": 5324288205,
+      "lat": 40.4121046,
+      "lon": -3.7108707,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "Aquí vivió y murió hacia 1172 SAN ISIDRO LABRADOR y aquí se halla el pozo milagroso",
+        "memorial": "plaque",
+        "name": "San Isidro Labrador",
+        "source": "Ayuntamiento de Madrid"
+      }
+    },
+    {
+      "type": "node",
+      "id": 5329727675,
+      "lat": 40.4102764,
+      "lon": -3.7104028,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "En este lugar vivió el arquitecto de Felipe V TEODORO ARDEMANS Maestro Mayor del Ayuntamiento de Madrid",
+        "memorial": "plaque",
+        "name": "Teodoro Ardemans",
+        "source": "Ayuntamiento de Madrid"
+      }
+    },
+    {
+      "type": "node",
+      "id": 2971949909,
+      "lat": 40.4080585,
+      "lon": -3.7035185,
+      "tags": {
+        "artist:wikidata": "Q5904973",
+        "artist_name": "Humberto Peraza",
+        "artwork_type": "statue",
+        "historic": "memorial",
+        "memorial": "statue",
+        "name": "Estatua Agustín Lara",
+        "start_date": "1975",
+        "tourism": "artwork",
+        "wikidata": "Q52084184",
+        "wikimedia_commons": "Category:Monument to Agustín Lara, Madrid"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4637356680,
+      "lat": 40.4117682,
+      "lon": -3.7046368,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "En esta casa nació la poeta Gloria Fuertes (1917-1998)",
+        "memorial": "plaque",
+        "name": "Gloria Fuertes",
+        "source": "Ayuntamiento de Madrid"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4637363093,
+      "lat": 40.4118116,
+      "lon": -3.7053343,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "En esta casa nació el 21 de marzo de 1665 el arquitecto José Benito de Churriguera autor de numerosas obras en Madrid",
+        "memorial": "plaque",
+        "name": "José Benito de Churriguera",
+        "source": "Ayuntamiento de Madrid"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4637376470,
+      "lat": 40.4104224,
+      "lon": -3.7089935,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "En este lugar estuvo desde 1857 el Teatro Novedades, uno de los foros más populares de Madrid que fue destruido por un incendio en 1928",
+        "memorial": "plaque",
+        "name": "Teatro Novedades",
+        "source": "Ayuntamiento de Madrid"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4671470491,
+      "lat": 40.4127068,
+      "lon": -3.7073883,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "En este lugar estuvo el Colegio Imperial y otros centros de enseñanza donde desde el siglo XVI estuvieron grandes figuras e ingenios españoles",
+        "memorial": "plaque",
+        "name": "Colegio Imperial",
+        "source": "Ayuntamiento de Madrid"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4749365101,
+      "lat": 40.4096823,
+      "lon": -3.7077476,
+      "tags": {
+        "artist_name": "RODRÍGUEZ BONOME, Santiago",
+        "historic": "memorial",
+        "inscription": "ESTA LAPIDA FUE ESCULPIDA GRATUITAMENTE POR BONOME Y SUS MATERIALES FUERON COSTEADOS POR SUSCRIPCIÓN POPULAR EN 1927",
+        "memorial": "plaque",
+        "name": "Antonio Zozaya",
+        "source": "Ayto. Madrid",
+        "start_date": "1927",
+        "wikidata": "Q110746453"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4957138051,
+      "lat": 40.4116054,
+      "lon": -3.7083204,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "En este lugar BEATRIZ GALINDO y FRANCISCO RAMÍREZ fundaron en 1499 el Monasterio de La Concepción y el Hospital de La latina",
+        "memorial": "plaque",
+        "name": "Beatriz Galindo y Francisco Ramírez"
+      }
+    }
+  ]
+}

@@ -1,26 +1,69 @@
-import { locationsService } from '@/shared/services/locations.service'
-import { OSMElement } from '@/shared/types/locations'
-import { ExpandableText } from './ExpandableText'
+'use client'
+
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { locationsService } from '@/shared/services/locations.service'
+import { OSMElement, WikiData } from '@/shared/types/locations'
+import { ExpandableText } from './ExpandableText'
 
 interface Props {
   place: OSMElement
 }
 
-/**
- * Tarjeta individual para presentar un lugar de interés en la vista de ciudad.
- * Hace fetch a Wikipedia asíncronamente para intentar obtener una imagen y descripción detallada,
- * empleando una imagen de relleno (`museo_placeholder.jpg`) si no encuentra resultados.
- */
-export const PlaceCard = async ({ place }: Props) => {
-  const res = await locationsService.getWikiInfo(place.tags.wikipedia)
+export const PlaceCard = ({ place }: Props) => {
+  const wikiTag = place.tags.wikipedia
+  const [wikiState, setWikiState] = useState<{
+    data: WikiData | null
+    wikiTag: string | null
+  }>({
+    data: null,
+    wikiTag: null,
+  })
+
+  useEffect(() => {
+    let isActive = true
+
+    if (!wikiTag) {
+      return () => {
+        isActive = false
+      }
+    }
+
+    locationsService
+      .getWikiInfo(wikiTag)
+      .then((result) => {
+        if (!isActive) return
+
+        setWikiState({
+          data: result,
+          wikiTag,
+        })
+      })
+      .catch(() => {
+        if (!isActive) return
+
+        setWikiState({
+          data: null,
+          wikiTag,
+        })
+      })
+
+    return () => {
+      isActive = false
+    }
+  }, [wikiTag])
+
+  const placeInfo = wikiState.wikiTag === wikiTag ? wikiState.data : null
+  const isLoading = Boolean(wikiTag) && wikiState.wikiTag !== wikiTag
+
   const imageUrl =
-    locationsService.getPlaceImage(place, res) || '/museo_placeholder.jpg'
+    locationsService.getPlaceImage(place, placeInfo) || '/museo_placeholder.jpg'
+  const description =
+    placeInfo?.extract || place.tags.description || 'Sin descripcion disponible.'
 
   return (
-    <div className="flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow overflow-hidden group h-full">
+    <div className="group flex h-full flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md">
       <div className="relative h-48 w-full overflow-hidden">
-        {/* Placeholder or image */}
         <div
           className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
           style={{
@@ -29,25 +72,30 @@ export const PlaceCard = async ({ place }: Props) => {
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent opacity-60"></div>
         <div className="absolute bottom-3 left-3 right-3 text-white">
-          <h3 className="text-lg font-bold font-serif leading-tight text-shadow-sm">
-            {res?.title || place.tags.name}
+          <h3 className="font-serif text-lg font-bold leading-tight text-shadow-sm">
+            {placeInfo?.title || place.tags.name}
           </h3>
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 p-4 flex-1">
-        <div className="text-gray-600 text-sm leading-relaxed flex-1">
-          <ExpandableText
-            text={res?.extract || 'No description available.'}
-            limit={50}
-          />
+      <div className="flex flex-1 flex-col gap-3 p-4">
+        <div className="flex-1 text-sm leading-relaxed text-gray-600">
+          {isLoading ? (
+            <div className="space-y-2">
+              <div className="h-4 animate-pulse rounded-full bg-gray-100" />
+              <div className="h-4 animate-pulse rounded-full bg-gray-100" />
+              <div className="h-4 w-3/4 animate-pulse rounded-full bg-gray-100" />
+            </div>
+          ) : (
+            <ExpandableText text={description} limit={50} />
+          )}
         </div>
 
         {place.tags.website && (
           <Link
             href={place.tags.website}
             target="_blank"
-            className="text-artis-primary text-xs font-bold uppercase tracking-wider hover:underline mt-auto pt-2"
+            className="mt-auto pt-2 text-xs font-bold uppercase tracking-wider text-artis-primary hover:underline"
           >
             Visitar web
           </Link>

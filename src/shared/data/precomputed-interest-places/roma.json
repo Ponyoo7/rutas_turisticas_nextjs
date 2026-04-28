@@ -1,0 +1,353 @@
+{
+  "city": "Roma",
+  "aliases": [
+    "rome"
+  ],
+  "coords": [
+    41.8933203,
+    12.4829321
+  ],
+  "places": [
+    {
+      "type": "node",
+      "id": 656532697,
+      "lat": 41.8938866,
+      "lon": 12.4722011,
+      "tags": {
+        "addr:city": "Roma",
+        "addr:housenumber": "13",
+        "addr:postcode": "00186",
+        "addr:street": "Piazza Capo di Ferro",
+        "email": "palazzospada@gebart.it",
+        "fee": "yes",
+        "name": "Galleria Spada",
+        "name:ko": "스파다 궁",
+        "name:ru": "Галерея Спада",
+        "opening_hours": "We-Mo 08:30-19:30; Tu off; May 1 off; Dec 25 off",
+        "phone": "+ 39 06 6832409",
+        "tourism": "museum",
+        "website": "https://galleriaspada.beniculturali.it/index.php?it/1/home",
+        "wikidata": "Q3757699",
+        "wikimedia_commons": "Category:Galleria Spada (Rome)",
+        "wikipedia": "it:Galleria Spada"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1553116334,
+      "lat": 41.8932906,
+      "lon": 12.4773895,
+      "tags": {
+        "addr:city": "Roma",
+        "addr:country": "IT",
+        "addr:housenumber": "12",
+        "addr:postcode": "00186",
+        "addr:street": "Via della Reginella",
+        "culture": "art_gallery",
+        "email": "info@fadroom.it",
+        "gallery": "art",
+        "name": "F.A.D. room",
+        "operator": "HANASI design;Veronica Montanino;franjipani",
+        "phone": "+39 06 6833795",
+        "tourism": "gallery",
+        "website": "http://www.fadroom.it/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 2249937204,
+      "lat": 41.893806,
+      "lon": 12.477811,
+      "tags": {
+        "historic": "memorial",
+        "name": "Ghetto ebraico",
+        "name:en": "Jewish Ghetto"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4470099910,
+      "lat": 41.8919593,
+      "lon": 12.4779863,
+      "tags": {
+        "addr:street": "Largo Stefano Gaj Tachè",
+        "check_date": "2024-07-28",
+        "fee": "yes",
+        "name": "Museo Ebraico di Roma",
+        "name:en": "Jewish Museum of Rome",
+        "name:fr": "Musée Juif de Rome",
+        "name:he": "מוזיאון יהודי ברומא",
+        "name:ru": "еврейский музей Рима",
+        "opening_hours": "Apr 18-20 off; Apr 25-26 off; Aug 15 off; Aug 09 off; Fr 09:00-13:15; Jan 01 off; Jun 08-09 off; Mar 20 off; May 10 off; Oct 13-14 off; Oct 19-21 off; Oct 07-08 off; Sa off; Sep 29-30 off; Su-Tu 10:00-16:15",
+        "payment:cash": "yes",
+        "payment:maestro": "yes",
+        "payment:mastercard": "yes",
+        "payment:visa": "yes",
+        "start_date": "1960",
+        "tourism": "museum",
+        "wheelchair": "limited",
+        "wikidata": "Q6756984",
+        "wikimedia_commons": "Category:Jewish museum (Rome)",
+        "wikipedia": "it:Museo ebraico (Roma)"
+      }
+    },
+    {
+      "type": "node",
+      "id": 6802315285,
+      "lat": 41.8935364,
+      "lon": 12.4730019,
+      "tags": {
+        "name": "Lorcan O'Neill Gallery",
+        "tourism": "gallery"
+      }
+    },
+    {
+      "type": "node",
+      "id": 8793015803,
+      "lat": 41.8900232,
+      "lon": 12.4772489,
+      "tags": {
+        "historic": "memorial",
+        "memorial": "plaque",
+        "name": "Iscrizione del ponte Cestio"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10128006356,
+      "lat": 41.893352,
+      "lon": 12.4773192,
+      "tags": {
+        "addr:city": "Roma",
+        "addr:housenumber": "25",
+        "addr:postcode": "00186",
+        "addr:street": "Via della Reginella",
+        "check_date:currency:XBT": "2023-03-04",
+        "currency:XBT": "yes",
+        "email": "midbar@hotmail.com",
+        "name": "ALEFBET - the hebrew letters art gallery",
+        "payment:lightning": "yes",
+        "payment:lightning_contactless": "no",
+        "payment:onchain": "yes",
+        "phone": "+39 3473464296",
+        "survey:date": "2022-10-25",
+        "tourism": "gallery",
+        "website": "https://gabrielelevy.com/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10313412962,
+      "lat": 41.8881806,
+      "lon": 12.4731551,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "Roma / Ricorda / che in una Casa / Esistente / in Questa Area / il 20 Novembre 1781 / Nacque / Bartolomeo / Pinelli / er Pittore de Trastevere / 20 Novembre 1958",
+        "material": "metal",
+        "memorial": "bust",
+        "name": "Bartolomeo Pinelli",
+        "start_date": "1958",
+        "subject": "Bartolomeo Pinelli",
+        "subject:wikidata": "Q809510",
+        "subject:wikipedia": "it:Bartolomeo Pinelli"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10313607340,
+      "lat": 41.8904965,
+      "lon": 12.4742812,
+      "tags": {
+        "historic": "memorial",
+        "inscription": "... Se la Rivoluzione d'Ottobre / Fosse Stata di Maggio / Se Tu Vivessi Ancora / Se Io non Fossi Impotente Davanti al Tuo Assassinio / Se la Mia Penna Fosse un'Arma Vincente / Se la Mia Paura Esplodesse nelle Piazze / Coraggio Nato dalla Rabbia Strozzata",
+        "memorial": "plaque",
+        "name": "Giorgiana Masi",
+        "subject": "Giorgiana Masi",
+        "subject:wikidata": "Q3765228",
+        "subject:wikipedia": "it:Omicidio di Giorgiana Masi"
+      }
+    },
+    {
+      "type": "node",
+      "id": 259576441,
+      "lat": 41.8984018,
+      "lon": 12.4742019,
+      "tags": {
+        "amenity": "fountain",
+        "capacity": "3",
+        "description": "Artistic fountain in the wall",
+        "drinking_water": "yes",
+        "fountain": "decorative",
+        "name": "Fontana dei Libri",
+        "name:it": "Fontana dei Libri",
+        "name:ru": "фонтан Книг",
+        "tourism": "attraction",
+        "wheelchair": "limited",
+        "wikidata": "Q76941085",
+        "wikimedia_commons": "File:Fontana dei Libri in Via degli Staderari, Roma.jpeg"
+      }
+    },
+    {
+      "type": "node",
+      "id": 656829698,
+      "lat": 41.8972775,
+      "lon": 12.4727772,
+      "tags": {
+        "addr:city": "Roma",
+        "addr:housenumber": "10",
+        "addr:postcode": "00186",
+        "addr:street": "Piazza di San Pantaleo",
+        "email": "museodiroma@comune.roma.it",
+        "fee": "yes",
+        "museum": "art",
+        "name": "Museo di Roma",
+        "name:it": "Museo di Roma",
+        "name:zh": "罗马博物馆",
+        "opening_hours": "Tu-Su 10:00-19:00; Jan 01 11:00-19:30; Dec 24,31 10:00-14:00; Jan 01 off; Mo off; May 01 off; Dec 25 off",
+        "phone": "+39 06 0608",
+        "tourism": "museum",
+        "website": "https://www.museodiroma.it/",
+        "wheelchair": "yes",
+        "wikidata": "Q3868175",
+        "wikimedia_commons": "Category:Museo di Roma a Palazzo Braschi",
+        "wikipedia": "it:Museo di Roma a palazzo Braschi"
+      }
+    },
+    {
+      "type": "node",
+      "id": 1340656195,
+      "lat": 41.8979741,
+      "lon": 12.4775597,
+      "tags": {
+        "alt_name": "Pulcin della Minerva",
+        "artwork_type": "sculpture",
+        "historic": "monument",
+        "historic:civilization": "ancient_egyptian",
+        "historic:era": "Psamtik_II",
+        "historic:period": "late_period",
+        "man_made": "obelisk",
+        "name": "Obelisco della Minerva",
+        "name:en": "Elephant and Obelisk",
+        "name:it": "Obelisco della Minerva",
+        "obelisk:height": "5.47",
+        "obelisk:material": "red_granite",
+        "obelisk:size": "monumental",
+        "wikidata": "Q826635",
+        "wikimedia_commons": "Category:Pulcino della Minerva",
+        "wikipedia": "it:Obelisco della Minerva"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4798313725,
+      "lat": 41.8949726,
+      "lon": 12.4766282,
+      "tags": {
+        "addr:city": "Roma",
+        "addr:postcode": "00186",
+        "addr:street": "Via Arenula",
+        "alt_name": "Santuario dei Gatti",
+        "amenity": "animal_shelter",
+        "animal_shelter": "cat",
+        "email": "torreargentina@catsdb.com",
+        "name": "Colonia felina di Torre Argentina",
+        "name:en": "Torre Argentina Cat Sanctuary",
+        "name:pl": "Kocie sanktuarium przy Torre Argentina",
+        "opening_hours": "Mo-Su 12:00-16:30",
+        "tourism": "attraction",
+        "url": "https://www.gattidiroma.net/",
+        "wheelchair": "no"
+      }
+    },
+    {
+      "type": "node",
+      "id": 5826726788,
+      "lat": 41.8989305,
+      "lon": 12.4735024,
+      "tags": {
+        "addr:city": "Roma",
+        "addr:housenumber": "90",
+        "addr:postcode": "00186",
+        "addr:street": "Piazza Navona",
+        "charge": "12.00 EUR",
+        "email": "info@gladiatormuseum.com",
+        "fee": "yes",
+        "name": "Gladiator Museum",
+        "opening_hours": "Mo-Su 10:00-19:30",
+        "phone": "+39 06 6889 1777",
+        "tourism": "museum",
+        "website": "http://www.gladiatormuseum.com/",
+        "wheelchair": "no"
+      }
+    },
+    {
+      "type": "node",
+      "id": 6404538385,
+      "lat": 41.895479,
+      "lon": 12.4739812,
+      "tags": {
+        "access": "yes",
+        "addr:street": "Largo del Pallaro",
+        "archaeological_site": "theatre",
+        "historic": "archaeological_site",
+        "historic:civilization": "ancient_roman",
+        "name": "Teatro di Pompeo",
+        "name:fr": "Théâtre de Pompée",
+        "wikidata": "Q944814",
+        "wikimedia_commons": "File:IMAGE_2025-01-18_12-45-40_AM.jpg",
+        "wikipedia": "it:Teatro di Pompeo"
+      }
+    },
+    {
+      "type": "node",
+      "id": 9329571853,
+      "lat": 41.8951559,
+      "lon": 12.4742642,
+      "tags": {
+        "addr:housenumber": "7",
+        "addr:street": "Via dei Chiavari",
+        "name": "Musja",
+        "tourism": "gallery",
+        "website": "https://musja.it"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10074889581,
+      "lat": 41.8967967,
+      "lon": 12.4725923,
+      "tags": {
+        "alt_name": "Museo Barracco",
+        "contact:housenumber": "166a",
+        "contact:street": "Corso Vittorio Emanuele Secondo",
+        "email": "info.museobarracco@comune.roma.it",
+        "entrance": "yes",
+        "fee": "no",
+        "name": "Museo di scultura antica Giovanni Barracco",
+        "opening_hours": "Oct-May: Tu-Su 10:00-16:00; Dec 24,31 09:00-14:00; Jun-Sep: Tu-Su 13:00-19:00, Mo off; Mo off; Jan 01 off; May 01 off; Dec 25 off",
+        "phone": "+39 06 0608",
+        "tourism": "museum",
+        "website": "https://www.museobarracco.it/",
+        "wikidata": "Q2729588",
+        "wikimedia_commons": "Category:Museo Barracco",
+        "wikipedia": "it:Museo Barracco"
+      }
+    },
+    {
+      "type": "node",
+      "id": 11233802634,
+      "lat": 41.8946455,
+      "lon": 12.4775492,
+      "tags": {
+        "addr:city": "Roma",
+        "addr:postcode": "00186",
+        "addr:street": "Piazza dell'Enciclopedia Italiana",
+        "name": "Spazio Treccani Arte",
+        "operator": "Istituto della Enciclopedia Italiana",
+        "source": "https://www.finestresullarte.info/arte-contemporanea/apre-a-roma-spazio-treccani-arte",
+        "start_date": "2023-10-03",
+        "tourism": "gallery"
+      }
+    }
+  ]
+}

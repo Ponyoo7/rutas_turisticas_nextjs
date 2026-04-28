@@ -1,0 +1,247 @@
+{
+  "city": "Barcelona",
+  "aliases": [
+    "barcelona"
+  ],
+  "coords": [
+    41.3825802,
+    2.177073
+  ],
+  "places": [
+    {
+      "type": "node",
+      "id": 4691937190,
+      "lat": 41.3783414,
+      "lon": 2.1681808,
+      "tags": {
+        "name": "Cubic",
+        "name:es": "Cubic",
+        "tourism": "attraction"
+      }
+    },
+    {
+      "type": "node",
+      "id": 7523391883,
+      "lat": 41.3791633,
+      "lon": 2.1664828,
+      "tags": {
+        "addr:housenumber": "10",
+        "addr:postcode": "08001",
+        "addr:street": "Carrer de la Cera",
+        "name": "EcoMuseu Urbà Gitano de Barcelona",
+        "tourism": "museum"
+      }
+    },
+    {
+      "type": "node",
+      "id": 8201678227,
+      "lat": 41.378548,
+      "lon": 2.1677577,
+      "tags": {
+        "historic": "memorial",
+        "memorial": "plaque",
+        "name": "La Sal Bar-bilioteca feminista i edicions de les dones"
+      }
+    },
+    {
+      "type": "node",
+      "id": 9080785018,
+      "lat": 41.3819264,
+      "lon": 2.1679388,
+      "tags": {
+        "addr:housenumber": "4",
+        "addr:street": "Carrer del Peu de la Creu",
+        "name": "Memrorial Democràtic",
+        "opening_hours": "Su 10:00-14:00",
+        "tourism": "museum"
+      }
+    },
+    {
+      "type": "node",
+      "id": 10758452606,
+      "lat": 41.3813048,
+      "lon": 2.1682183,
+      "tags": {
+        "historic": "memorial",
+        "memorial": "plaque",
+        "name": "En memòria de les víctimes dels bombardejos comesos per l'aviació feixista italiana, aliada de l'exércit franquista, al març de 1938 a Barcelona"
+      }
+    },
+    {
+      "type": "node",
+      "id": 11734805060,
+      "lat": 41.3825267,
+      "lon": 2.1692171,
+      "tags": {
+        "addr:city": "Barcelona",
+        "addr:housenumber": "27",
+        "addr:postcode": "08001",
+        "addr:street": "Carrer del Pintor Fortuny",
+        "addr:unit": "bajo",
+        "name": "àngels barcelona",
+        "opening_hours": "Mo-Fr 10:30-19:00",
+        "tourism": "gallery",
+        "website": "https://www.angelsbarcelona.com/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 12627994101,
+      "lat": 41.3824587,
+      "lon": 2.1688094,
+      "tags": {
+        "historic": "memorial",
+        "memorial": "plaque",
+        "name": "Marià Manent i Cisa"
+      }
+    },
+    {
+      "type": "node",
+      "id": 12690385001,
+      "lat": 41.3789584,
+      "lon": 2.1684139,
+      "tags": {
+        "historic": "memorial",
+        "memorial": "plaque",
+        "name": "Lluis Gassó i Carbonell"
+      }
+    },
+    {
+      "type": "node",
+      "id": 12690385002,
+      "lat": 41.3816267,
+      "lon": 2.1674922,
+      "tags": {
+        "historic": "memorial",
+        "memorial": "plaque",
+        "name": "Josep Anselm Clavé"
+      }
+    },
+    {
+      "type": "node",
+      "id": 12690388902,
+      "lat": 41.382058,
+      "lon": 2.1676313,
+      "tags": {
+        "historic": "memorial",
+        "memorial": "plaque",
+        "name": "En memòria de les víctimes de la Guerra Civil"
+      }
+    },
+    {
+      "type": "node",
+      "id": 12894334301,
+      "lat": 41.3795064,
+      "lon": 2.1661802,
+      "tags": {
+        "historic": "memorial",
+        "name": "En commemoració del Dia Internacional de la Llengua Materna.    Shaheed Minar o Monument dels Màrtirs."
+      }
+    },
+    {
+      "type": "node",
+      "id": 671914513,
+      "lat": 41.3815258,
+      "lon": 2.1726713,
+      "tags": {
+        "addr:housenumber": "546",
+        "addr:postcode": "08011",
+        "addr:street": "Gran Via de les Corts Catalanes",
+        "name": "Pastelería Escribá Rambla De Les Flors",
+        "name:ru": "кондитерская Escriba",
+        "opening_hours": "Mo-Su 09:00-22:00",
+        "payment:credit_cards": "yes",
+        "payment:debit_cards": "yes",
+        "phone": "+34 934547535",
+        "shop": "confectionery",
+        "tourism": "attraction",
+        "website": "http://escriba.es/es/#_=_",
+        "wheelchair": "no"
+      }
+    },
+    {
+      "type": "node",
+      "id": 4724329201,
+      "lat": 41.382243,
+      "lon": 2.1725665,
+      "tags": {
+        "fee": "yes",
+        "name": "Museu Eròtic de Barcelona",
+        "name:ca": "Museu Eròtic de Barcelona",
+        "name:en": "Erotic Museum",
+        "name:es": "museo erótico de Barcelona",
+        "name:ru": "Музей эротики",
+        "tourism": "museum",
+        "website": "http://www.erotica-museum.com/",
+        "wikidata": "Q3329871",
+        "wikimedia_commons": "Category:Erotic Museum of Barcelona",
+        "wikipedia": "es:Museo de la Erótica de Barcelona"
+      }
+    },
+    {
+      "type": "node",
+      "id": 5558687722,
+      "lat": 41.3808292,
+      "lon": 2.170673,
+      "tags": {
+        "name": "Jardín de los gatos",
+        "name:ca": "El jardí dels gats",
+        "name:de": "Garten der Kätzen",
+        "name:en": "The garden of cats",
+        "name:es": "El jardín de los gatos",
+        "name:ru": "Сад кошек",
+        "tourism": "attraction"
+      }
+    },
+    {
+      "type": "node",
+      "id": 5825986620,
+      "lat": 41.3816233,
+      "lon": 2.1695844,
+      "tags": {
+        "historic": "memorial",
+        "memorial": "bust",
+        "name": "Barcelona a Sir Alexander Fleming"
+      }
+    },
+    {
+      "type": "node",
+      "id": 6055453723,
+      "lat": 41.3825661,
+      "lon": 2.1753677,
+      "tags": {
+        "addr:housenumber": "3",
+        "addr:postcode": "08002",
+        "addr:street": "Placeta de Manuel Ribé",
+        "check_date": "2023-09-28",
+        "name": "MUHBA El Call",
+        "tourism": "museum"
+      }
+    },
+    {
+      "type": "node",
+      "id": 6316973178,
+      "lat": 41.3810576,
+      "lon": 2.1733875,
+      "tags": {
+        "historic": "memorial",
+        "name": "Memorial homenatge a les víctimes del 17A"
+      }
+    },
+    {
+      "type": "node",
+      "id": 6430323047,
+      "lat": 41.382628,
+      "lon": 2.1732303,
+      "tags": {
+        "addr:city": "Barcelona",
+        "addr:housenumber": "4",
+        "addr:postcode": "08002",
+        "addr:street": "Carrer de Petritxol",
+        "name": "Bcn art/fussion",
+        "tourism": "gallery",
+        "website": "http://www.bcnartdiffusion.com/"
+      }
+    }
+  ]
+}

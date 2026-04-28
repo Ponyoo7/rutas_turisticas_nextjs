@@ -1,10 +1,14 @@
 'use client'
 
+import { OSMElement } from '@/shared/types/locations'
+
 interface MapSearchProps {
   search: string
   onSearchChange: (value: string) => void
-  filteredPlaces: any[]
-  onSelectPlace: (place: any) => void
+  filteredPlaces: OSMElement[]
+  onSelectPlace: (place: OSMElement) => void
+  disabled?: boolean
+  placeholder?: string
 }
 
 export const MapSearch = ({
@@ -12,19 +16,21 @@ export const MapSearch = ({
   onSearchChange,
   filteredPlaces,
   onSelectPlace,
+  disabled = false,
+  placeholder = 'Buscar lugar de interes...',
 }: MapSearchProps) => {
   return (
-    <div className="flex flex-col relative mb-4 w-full gap-4">
+    <div className="relative mb-4 flex w-full flex-col gap-4">
       <div className="flex items-center gap-4">
-        <h2 className="text-artis-primary dark:text-gray-100 text-3xl font-bold tracking-tight font-serif">
-          Busca tu próximo destino...
+        <h2 className="font-serif text-3xl font-bold tracking-tight text-artis-primary dark:text-gray-100">
+          Busca tu proximo destino...
         </h2>
-        <div className="h-px w-full bg-gray-200 flex-1"></div>
+        <div className="h-px flex-1 bg-gray-200"></div>
       </div>
 
       <div className="relative m-2">
         <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+          className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -41,24 +47,24 @@ export const MapSearch = ({
         <input
           type="text"
           value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Buscar lugar de interés..."
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-artis-primary focus:border-transparent transition-all text-sm"
+          onChange={(event) => onSearchChange(event.target.value)}
+          placeholder={placeholder}
+          disabled={disabled}
+          className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm shadow-sm transition-all focus:border-transparent focus:outline-none focus:ring-2 focus:ring-artis-primary disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400"
         />
       </div>
 
-      {/* Resultados del buscador */}
-      {search.trim() && filteredPlaces.length > 0 && (
-        <ul className="absolute z-[9999] w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+      {!disabled && search.trim() && filteredPlaces.length > 0 && (
+        <ul className="absolute z-[9999] mt-1 max-h-60 w-full overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-lg">
           {filteredPlaces.map((place) => (
             <li
-              key={place.id}
+              key={`${place.type}-${place.id}`}
               onClick={() => onSelectPlace(place)}
-              className="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors border-b border-gray-100 last:border-b-0 flex items-center gap-3"
+              className="flex cursor-pointer items-center gap-3 border-b border-gray-100 px-4 py-3 transition-colors last:border-b-0 hover:bg-blue-50"
             >
               <span className="text-artis-primary">
                 <svg
-                  className="w-4 h-4"
+                  className="h-4 w-4"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -83,7 +89,7 @@ export const MapSearch = ({
                 </p>
                 <p className="text-xs text-gray-400">
                   {place.tags?.historic === 'archaeological_site'
-                    ? 'Sitio Arqueológico'
+                    ? 'Sitio arqueologico'
                     : 'Turismo'}
                 </p>
               </div>
@@ -92,8 +98,8 @@ export const MapSearch = ({
         </ul>
       )}
 
-      {search.trim() && filteredPlaces.length === 0 && (
-        <div className="absolute z-[9999] w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg px-4 py-3">
+      {!disabled && search.trim() && filteredPlaces.length === 0 && (
+        <div className="absolute z-[9999] mt-1 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-lg">
           <p className="text-sm text-gray-400">No se encontraron resultados</p>
         </div>
       )}

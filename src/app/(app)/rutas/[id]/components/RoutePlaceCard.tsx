@@ -10,21 +10,18 @@ interface RoutePlaceCardProps {
   index: number
 }
 
-/**
- * Tarjeta vertical compacta para presentar una parada individual del itinerario de la ruta.
- * Solicita dinámicamente las imágenes correspondientes a la API de Wikipedia
- * apoyándose en la etiqueta de identificación guardada en Base de Datos.
- */
 export const RoutePlaceCard = ({ place, index }: RoutePlaceCardProps) => {
-  const [placeInfo, setPlaceInfo] = useState<WikiData | null>(null)
+  const [placeInfo, setPlaceInfo] = useState<WikiData | null>(
+    place.wikiInfo ?? null,
+  )
 
   useEffect(() => {
-    if (!place.tags.wikipedia) return
+    if (placeInfo || !place.tags.wikipedia) return
 
     locationsService.getWikiInfo(place.tags.wikipedia).then((res) => {
       setPlaceInfo(res)
     })
-  }, [place.tags.wikipedia])
+  }, [place.tags.wikipedia, placeInfo])
 
   const image =
     locationsService.getPlaceImage(place, placeInfo) || '/museo_placeholder.jpg'

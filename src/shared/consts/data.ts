@@ -1,45 +1,10 @@
 import 'server-only'
 
-import { unstable_cache } from 'next/cache'
-import { locationsService } from '../services/locations.service'
+import defaultCitiesData from '../data/default-cities.json'
 import { WikiData } from '../types/locations'
 
-export const defaultCityNames = [
-  'Berlín',
-  'Londres',
-  'Nueva York',
-  'Tokio',
-  'Lisboa',
-  'Roma',
-  'Paris',
-  'Estambul',
-  'Madrid',
-  'Valencia',
-]
+const defaultCities = defaultCitiesData as WikiData[]
 
-const FALLBACK_EXTRACT = 'Sin descripcion disponible.'
-const fallbackCity = (name: string): WikiData => ({
-  title: name,
-  extract: FALLBACK_EXTRACT,
-})
+export const defaultCityNames = defaultCities.map((city) => city.title)
 
-const getDefaultCitiesUncached = async (): Promise<WikiData[]> => {
-  const cities = await Promise.all(
-    defaultCityNames.map((cityName) =>
-      locationsService.getWikiInfoByTitle(cityName, 'es'),
-    ),
-  )
-
-  return cities.map(
-    (city, index) => city ?? fallbackCity(defaultCityNames[index]),
-  )
-}
-
-export const getDefaultCities = unstable_cache(
-  getDefaultCitiesUncached,
-  ['default-cities-v2'],
-  {
-    revalidate: 60 * 60 * 24,
-    tags: ['default-cities-v2'],
-  },
-)
+export const getDefaultCities = async (): Promise<WikiData[]> => defaultCities

@@ -1,0 +1,94 @@
+@startuml
+title Route Craft - Diagrama Entidad Relacion
+
+hide circle
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+entity "users" as users {
+  * id : uuid <<PK>>
+  --
+  fullname : text
+  email : text <<UK>>
+  password : text
+  image : text
+  role : text
+  verified : boolean
+}
+
+entity "routes" as routes {
+  * id : integer/bigint <<PK>>
+  --
+  user_id : uuid <<FK>>
+  name : text
+  description : text
+  places : json/jsonb
+  image : text
+  featured : boolean
+}
+
+entity "route_images" as route_images {
+  * id : bigserial <<PK>>
+  --
+  route_id : bigint <<FK>>
+  image : text
+  review_status : text
+  selected_for_cover : boolean
+  created_at : timestamptz
+}
+
+entity "user_favorite_routes" as user_favorite_routes {
+  * user_id : uuid <<PK, FK>>
+  * route_id : integer <<PK, FK>>
+  --
+  created_at : timestamptz
+}
+
+users ||--o{ routes : crea
+routes ||--o{ route_images : contiene
+users ||--o{ user_favorite_routes : guarda
+routes ||--o{ user_favorite_routes : puede\ ser\ favorita
+
+note right of users
+  Tabla inferida desde user.actions.ts
+  y uso en autenticacion.
+
+  Restricciones observadas:
+  - email unico
+  - role puede ser user, admin o master
+end note
+
+note right of routes
+  Tabla inferida desde routes.actions.ts
+  y migraciones.
+
+  Claves funcionales:
+  - pertenece a un usuario
+  - featured = publica la ruta
+  - places guarda el itinerario completo
+    como JSON, no existe tabla places
+end note
+
+note right of route_images
+  Definida en migracion
+  2026-04-28_route-descriptions-and-image-review.sql
+
+  Restricciones observadas:
+  - review_status in
+    ('approved','pending','rejected')
+  - maximo una imagen con
+    selected_for_cover = true por ruta
+end note
+
+note right of user_favorite_routes
+  Definida en migracion
+  2026-03-24_user-favorite-routes.sql
+
+  Restricciones observadas:
+  - PK compuesta (user_id, route_id)
+  - resuelve la relacion N:M
+    entre users y routes
+end note
+
+@enduml

@@ -1,17 +1,19 @@
 import { wait } from '@/lib/utils'
 import {
+  InterestPlacesByNameResult,
   OSMAddress,
   OSMElement,
   OverpassResponse,
   WikiData,
 } from '../types/locations'
+import { searchCitiesWithNominatim } from './nominatim.service'
 
 const OVERPASS_ENDPOINTS = [
-   "https://overpass-api.de/api/interpreter",
-   "https://lz4.overpass-api.de/api/interpreter",
-  "https://z.overpass-api.de/api/interpreter",
-    "https://overpass.osm.ch/api/interpreter",
-  "https://overpass.private.coffee/api/interpreter"
+  'https://overpass-api.de/api/interpreter',
+  'https://lz4.overpass-api.de/api/interpreter',
+  'https://z.overpass-api.de/api/interpreter',
+  'https://overpass.osm.ch/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter',
 ]
 
 const OVERPASS_RADIUS_METERS = 2000
@@ -28,8 +30,8 @@ const IMAGE_EXTENSION_REGEX =
 const COMMONS_FILE_PATH_PREFIX =
   'https://commons.wikimedia.org/wiki/Special:FilePath/'
 const WIKI_IMAGE_PROXY_PATH = '/api/wiki-image'
-const ROUTECRAFT_USER_AGENT = 'RouteCraft/1.0 (https://rutas-turisticas-nextjs.vercel.app; cqc1999@gmail.com)'
-const ROUTECRAFT_REFERER = 'https://rutas-turisticas-nextjs.vercel.app/'
+const ROUTECRAFT_USER_AGENT =
+  'RouteCraft/1.0 (https://rutas-turisticas-nextjs.vercel.app; cqc1999@gmail.com)'
 
 interface WikiSummaryResponse {
   title?: string
@@ -312,25 +314,7 @@ const splitWikiTag = (wikiTag: string) => {
 const getCitiesByName = async (
   name: string,
   limit = 8,
-): Promise<OSMAddress[]> => {
-  try {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-        name,
-      )}&limit=${limit}&accept-language=es`,
-      {
-        headers: buildApiHeaders(),
-      },
-    )
-    const dataJson = await res.json()
-
-    return Array.isArray(dataJson) ? dataJson : []
-  } catch (e) {
-    console.log(e)
-
-    return []
-  }
-}
+): Promise<OSMAddress[]> => searchCitiesWithNominatim(name, limit)
 
 const getCityByName = async (name: string): Promise<OSMAddress | null> => {
   const cities = await getCitiesByName(name, 1)
@@ -338,7 +322,7 @@ const getCityByName = async (name: string): Promise<OSMAddress | null> => {
   return cities[0] ?? null
 }
 
-const getCoordsByCity = (city: OSMAddress): number[] => {
+const getCoordsByCity = (city: OSMAddress): [number, number] => {
   return [parseFloat(city.lat), parseFloat(city.lon)]
 }
 
@@ -447,7 +431,9 @@ const getInterestPlaces = async (coords: number[]) => {
   return []
 }
 
-const getInterestPlacesByName = async (name: string) => {
+const getInterestPlacesByName = async (
+  name: string,
+): Promise<InterestPlacesByNameResult | null> => {
   const city = await getCityByName(name)
   if (!city) return null
 
@@ -523,11 +509,12 @@ const getSpanishTitle = async (
 }
 
 const getPlaceImage = (
-  place: Pick<OSMElement, 'tags'>,
+  place: Pick<OSMElement, 'tags' | 'wikiInfo'>,
   wikiInfo?: WikiData | null,
 ) => {
+  const resolvedWikiInfo = wikiInfo ?? place.wikiInfo
   const candidates = [
-    wikiInfo?.thumbnail?.source,
+    resolvedWikiInfo?.thumbnail?.source,
     place.tags.wikipedia_image,
     place.tags.image,
     place.tags['wikimedia_commons:path'],

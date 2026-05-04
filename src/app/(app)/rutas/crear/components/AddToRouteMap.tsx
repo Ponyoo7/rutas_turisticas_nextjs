@@ -19,7 +19,7 @@ import {
   ROUTE_IMAGE_ACCEPT,
 } from '@/shared/consts/routes'
 import { locationsService } from '@/shared/services/locations.service'
-import { OSMAddress, OSMElement } from '@/shared/types/locations'
+import { OSMAddress, OSMElement, WikiData } from '@/shared/types/locations'
 import { RouteImage, RouteImageReviewStatus } from '@/shared/types/routes'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -38,6 +38,7 @@ interface Props {
   places: OSMElement[]
   coords: number[]
   city?: OSMAddress
+  cityInfo?: WikiData | null
   routeId?: number
   initialRouteName?: string
   initialRouteDescription?: string
@@ -78,6 +79,7 @@ export const AddToRouteMap = ({
   places,
   coords,
   city,
+  cityInfo,
   routeId,
   initialRouteName = '',
   initialRouteDescription = '',
@@ -182,9 +184,9 @@ export const AddToRouteMap = ({
         return
       }
 
-      const wikiCity = city
-        ? await locationsService.getWikiInfo(`es:${city.name}`)
-        : null
+      const wikiCity =
+        cityInfo ??
+        (city ? await locationsService.getWikiInfo(`es:${city.name}`) : null)
 
       const createdRouteId = await saveRoute({
         name: routeName,

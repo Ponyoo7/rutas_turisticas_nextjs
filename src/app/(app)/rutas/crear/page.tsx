@@ -82,9 +82,10 @@ export default async function CrearRutaPage({
     (place) => locationsService.getPlaceImage(place) || place.tags.wikipedia,
   )
   const heroWikiInfo =
-    heroPlace?.tags.wikipedia
+    heroPlace?.wikiInfo ??
+    (heroPlace?.tags.wikipedia
       ? await locationsService.getWikiInfo(heroPlace.tags.wikipedia)
-      : null
+      : null)
   const selectedContributedCover = routeToEdit?.contributedImages.find(
     (image) => image.selectedForCover,
   )
@@ -123,6 +124,7 @@ export default async function CrearRutaPage({
           places={mapPlaces}
           coords={mapCoords}
           city={cityResult?.city}
+          cityInfo={cityResult?.cityInfo}
           routeId={routeToEdit?.id}
           initialRouteName={routeToEdit?.name}
           initialRouteDescription={routeToEdit?.description}

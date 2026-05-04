@@ -1,7 +1,6 @@
-﻿'use client'
+'use client'
 
-import { locationsService } from '@/shared/services/locations.service'
-import { WikiData } from '@/shared/types/locations'
+import { OSMAddress, WikiData } from '@/shared/types/locations'
 import {
   createContext,
   type Dispatch,
@@ -27,12 +26,19 @@ type CitySearchProviderProps = {
   cities: WikiData[]
 }
 
-const mapOSMToWikiData = (displayName: string): WikiData => {
-  const normalizedName = displayName.split(',')[0]?.trim() || displayName
+const SEARCH_DEBOUNCE_MS = 700
+const REMOTE_SEARCH_LIMIT = 6
+const MIN_REMOTE_QUERY_LENGTH = 3
+
+const mapOSMToWikiData = (city: OSMAddress): WikiData => {
+  const normalizedName =
+    city.name?.trim() ||
+    city.display_name.split(',')[0]?.trim() ||
+    city.display_name
 
   return {
     title: normalizedName,
-    extract: displayName,
+    extract: city.display_name,
   }
 }
 
@@ -57,12 +63,6 @@ const getSimilarityScore = (title: string, query: string) => {
   return 0
 }
 
-/**
- * Proveedor de contexto para la búsqueda de ciudades.
- * Mantiene el estado de la búsqueda (`query`) y combina las ciudades inyectadas por defecto
- * con resultados dinámicos obtenidos desde la API de OpenStreetMap realizando peticiones diferidas (debounced).
- * Calcula una puntuación de similitud para ordenar y filtrar los resultados mostrados.
- */
 export const CitySearchProvider = ({
   children,
   cities,
@@ -73,18 +73,29 @@ export const CitySearchProvider = ({
   useEffect(() => {
     const normalizedQuery = query.trim()
 
-    if (!normalizedQuery) {
+    if (normalizedQuery.length < MIN_REMOTE_QUERY_LENGTH) {
+      setRemoteCities([])
       return
     }
 
     let isCancelled = false
+    const controller = new AbortController()
 
     const timeoutId = setTimeout(async () => {
       try {
-        const matches = await locationsService.getCitiesByName(
-          normalizedQuery,
-          10,
-        )
+        const searchParams = new URLSearchParams({
+          q: normalizedQuery,
+          limit: String(REMOTE_SEARCH_LIMIT),
+        })
+        const response = await fetch(`/api/cities/search?${searchParams}`, {
+          signal: controller.signal,
+        })
+
+        if (!response.ok) {
+          throw new Error(`Search request failed with ${response.status}`)
+        }
+
+        const matches = (await response.json()) as OSMAddress[]
 
         if (isCancelled) {
           return
@@ -93,8 +104,8 @@ export const CitySearchProvider = ({
         const uniqueByTitle = new Map<string, WikiData>()
 
         for (const match of matches) {
-          const city = mapOSMToWikiData(match.display_name)
-          const key = city.title.toLowerCase()
+          const city = mapOSMToWikiData(match)
+          const key = normalizeText(city.title)
 
           if (!uniqueByTitle.has(key)) {
             uniqueByTitle.set(key, city)
@@ -107,10 +118,11 @@ export const CitySearchProvider = ({
           setRemoteCities([])
         }
       }
-    }, 350)
+    }, SEARCH_DEBOUNCE_MS)
 
     return () => {
       isCancelled = true
+      controller.abort()
       clearTimeout(timeoutId)
     }
   }, [query])
@@ -138,7 +150,11 @@ export const CitySearchProvider = ({
     }
 
     for (const city of remoteCities) {
-      combined.set(normalizeText(city.title), city)
+      const key = normalizeText(city.title)
+
+      if (!combined.has(key)) {
+        combined.set(key, city)
+      }
     }
 
     return Array.from(combined.values())
@@ -161,7 +177,6 @@ export const CitySearchProvider = ({
   )
 }
 
-/** Hook personalizado para consumir de forma segura el estado de búsqueda de ciudades. */
 export const useCitySearch = () => {
   const context = useContext(CitySearchContext)
 

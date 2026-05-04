@@ -1,0 +1,102 @@
+[
+  {
+    "title": "Berlín",
+    "extract": "Berlín es la capital de Alemania y uno de los dieciséis estados federados alemanes. Se localiza al noreste de Alemania. Por la ciudad fluyen los ríos Spree, Havel, Panke, Dahme y Wuhle.",
+    "thumbnail": {
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Siegessaeule_Aussicht_10-13_img4_Tiergarten.jpg/330px-Siegessaeule_Aussicht_10-13_img4_Tiergarten.jpg",
+      "width": 330,
+      "height": 220
+    },
+    "isMainCity": true
+  },
+  {
+    "title": "Londres",
+    "extract": "Londres es la capital y la mayor ciudad de Inglaterra y de Reino Unido. Ubicada a orillas del río Támesis, Londres ha sido un importante asentamiento humano desde que fue fundada por los romanos con el nombre de Londinium hace casi dos milenios. El núcleo antiguo de la urbe, la City de Londres, conserva básicamente su perímetro medieval de una milla cuadrada. Desde el siglo XIX el nombre «Londres» también hace referencia a toda la metrópolis desarrollada alrededor de este núcleo. El grueso de esta conurbación constituye la región de Londres y el área administrativa del Gran Londres, gobernado por el alcalde y la asamblea de Londres.",
+    "thumbnail": {
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/London_Skyline_%28125508655%29.jpeg/330px-London_Skyline_%28125508655%29.jpeg",
+      "width": 330,
+      "height": 186
+    },
+    "isMainCity": true
+  },
+  {
+    "title": "Nueva York",
+    "extract": "Nueva York, a menudo llamada Ciudad de Nueva York, es la ciudad más poblada y visitada de los Estados Unidos y una de las más densamente pobladas a nivel mundial. Desde finales del siglo xix es uno de los centros de la política y la economía mundial, albergando la sede de la Organización de las Naciones Unidas y de numerosas empresas e instituciones financieras de importancia global, entre ellas Wall Street. Nueva York es considerada una ciudad global, debido a que ejerce influencia a escala mundial en los medios de comunicación, la política, la educación, la arquitectura, el entretenimiento, las artes y la moda. Por todo ello, se considera una de las ciudades más globalizadas del planeta, con una gran diversidad cultural.",
+    "thumbnail": {
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/View_of_Empire_State_Building_from_Rockefeller_Center_New_York_City_dllu.jpg/330px-View_of_Empire_State_Building_from_Rockefeller_Center_New_York_City_dllu.jpg",
+      "width": 330,
+      "height": 248
+    },
+    "isMainCity": true
+  },
+  {
+    "title": "Tokio",
+    "extract": "Tokio , oficialmente Metrópolis de Tokio, es la capital de facto de Japón, ubicada en el centro este de la isla de Honshu, concretamente en la región de Kantō. Es la ciudad más poblada del mundo, en conjunto es una de las 47 prefecturas de Japón. Es el centro de la política, economía, educación, comunicación y cultura del país. Cuenta también con la mayor concentración de sedes corporativas, instituciones financieras, universidades y colegios, museos, teatros, establecimientos comerciales y de entretenimiento de todo Japón.",
+    "thumbnail": {
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Shinjuku_central_park_southwest.jpg/330px-Shinjuku_central_park_southwest.jpg",
+      "width": 330,
+      "height": 212
+    },
+    "isMainCity": true
+  },
+  {
+    "title": "Lisboa",
+    "extract": "Lisboa es la capital y mayor ciudad de Portugal. Situada en la desembocadura del río Tajo, es la capital del país, capital del distrito de Lisboa, de la región de Lisboa, del área metropolitana de Lisboa, y es también el principal centro de la subregión de la Gran Lisboa. La ciudad tiene una población de 547 773 habitantes, y su área metropolitana se sitúa en los 2 810 923 en una superficie de 2.921,90 km². Esta área contiene el 26% de la población del país. Lisboa es la ciudad más rica de Portugal.",
+    "thumbnail": {
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Lisbon_%2836831596786%29_%28cropped%29.jpg/330px-Lisbon_%2836831596786%29_%28cropped%29.jpg",
+      "width": 330,
+      "height": 171
+    },
+    "isMainCity": true
+  },
+  {
+    "title": "Roma",
+    "extract": "Roma es una ciudad, capital de la región del Lacio y de Italia. Con una población de 2 857 321 habitantes, es el municipio más poblado de Italia y la tercera ciudad más poblada de la Unión Europea. Por antonomasia, se le conoce desde la Antigüedad como la Urbe (Urbs). También es llamada «La Ciudad Eterna».",
+    "thumbnail": {
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Rome_Montage_2017.png/330px-Rome_Montage_2017.png",
+      "width": 330,
+      "height": 462
+    },
+    "isMainCity": true
+  },
+  {
+    "title": "París",
+    "extract": "París es la capital de Francia y de la región de Isla de Francia. Es la ciudad más poblada del país y el único departamento unicomunal de Francia. Su área metropolitana es la más grande en población de toda la Unión Europea.",
+    "thumbnail": {
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg/330px-La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg",
+      "width": 330,
+      "height": 206
+    },
+    "isMainCity": true
+  },
+  {
+    "title": "Estambul",
+    "extract": "Estambul, antiguamente conocida como Bizancio y Constantinopla, es la ciudad más poblada de Turquía y el centro histórico, cultural y económico del país. Es una ciudad transcontinental, ubicada en el estrecho del Bósforo, que separa Europa y Asia, entre el mar de Mármara y el mar Negro. Con más de 15 millones de habitantes, es una de las ciudades más pobladas del mundo y la más poblada de Europa. La mayor parte de la población es de religión musulmana, si bien existen minorías de cristianos (68 000) y judíos (22 000).",
+    "thumbnail": {
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Bosphorus_Bridge_%28235499411%29.jpeg/330px-Bosphorus_Bridge_%28235499411%29.jpeg",
+      "width": 330,
+      "height": 170
+    },
+    "isMainCity": true
+  },
+  {
+    "title": "Madrid",
+    "extract": "Madrid es un municipio y una ciudad de España. La localidad, con categoría histórica de villa, es la capital del Estado y de la Comunidad de Madrid. En su término municipal, el más poblado de España, su población es de 3 506 730 habitantes, constituyéndose como la segunda ciudad más poblada de la Unión Europea, así como su área metropolitana, con 6 779 888 habitantes empadronados.",
+    "thumbnail": {
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Bandera_de_la_ciudad_de_Madrid.svg/langes-330px-Bandera_de_la_ciudad_de_Madrid.svg.png",
+      "width": 330,
+      "height": 220
+    },
+    "isMainCity": true
+  },
+  {
+    "title": "Valencia",
+    "extract": "Valencia es un municipio y una ciudad de España, capital de la provincia homónima y de la Comunidad Valenciana. Su población es de 840 792 habitantes, alcanzando los 1 615 223 habitantes si se incluye su espacio urbano. Es la tercera ciudad y área metropolitana más poblada de España, por detrás de Madrid y Barcelona.",
+    "thumbnail": {
+      "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Flag_of_the_Valencian_Community_%282x3%29.svg/langes-330px-Flag_of_the_Valencian_Community_%282x3%29.svg.png",
+      "width": 330,
+      "height": 219
+    },
+    "isMainCity": true
+  }
+]

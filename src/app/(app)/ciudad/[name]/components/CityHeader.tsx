@@ -13,9 +13,10 @@ export const CityHeader = async ({ places, name }: Props) => {
     (place) => locationsService.getPlaceImage(place) || place.tags.wikipedia,
   )
   const heroWikiInfo =
-    heroPlace?.tags.wikipedia
+    heroPlace?.wikiInfo ??
+    (heroPlace?.tags.wikipedia
       ? await locationsService.getWikiInfo(heroPlace.tags.wikipedia)
-      : null
+      : null)
   const heroImage = heroPlace
     ? locationsService.getPlaceImage(heroPlace, heroWikiInfo)
     : null

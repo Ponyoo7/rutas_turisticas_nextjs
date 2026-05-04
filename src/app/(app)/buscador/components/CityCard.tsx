@@ -11,19 +11,23 @@ interface Props {
   city: WikiData
 }
 
-/**
- * Tarjeta individual para mostrar información de una ciudad.
- * Hace peticiones a Wikipedia de forma asíncrona para cargar la imagen y descripción pertinentes.
- * Incluye botones de acción para explorar la ciudad o crear una ruta en la misma.
- */
 export const CityCard = ({ city }: Props) => {
   const [cityInfo, setCityInfo] = useState<WikiData>(city)
   const [isHovering, setIsHovering] = useState<boolean>(false)
+  const cityName = cityInfo.title || city.title
   const image =
     locationsService.toRenderableImageUrl(cityInfo.thumbnail?.source) ??
     '/museo_placeholder.jpg'
 
   useEffect(() => {
+    setCityInfo(city)
+  }, [city])
+
+  useEffect(() => {
+    if (city.isMainCity) {
+      return
+    }
+
     let cancelled = false
 
     const loadCityInfo = async () => {
@@ -45,7 +49,7 @@ export const CityCard = ({ city }: Props) => {
     return () => {
       cancelled = true
     }
-  }, [city.title])
+  }, [city.isMainCity, city.title])
 
   return (
     <div
@@ -74,25 +78,22 @@ export const CityCard = ({ city }: Props) => {
             className="w-32 bg-white text-artis-primary hover:bg-gray-100 font-bold shadow-lg"
             asChild
           >
-            <Link href={`/ciudad/${city.title}`}>Explora</Link>
+            <Link href={`/ciudad/${cityName}`}>Explora</Link>
           </Button>
           <Button
             className="w-32 bg-artis-primary text-white hover:bg-artis-primary/90 font-bold shadow-lg border-none"
             asChild
           >
-            <Link href={`/rutas/crear?city=${city.title}`}>Crear ruta</Link>
+            <Link href={`/rutas/crear?city=${cityName}`}>Crear ruta</Link>
           </Button>
         </div>
       </div>
-      <Link
-        href={`/ciudad/${cityInfo.title}`}
-        className="px-1 flex flex-col gap-1"
-      >
+      <Link href={`/ciudad/${cityName}`} className="px-1 flex flex-col gap-1">
         <p className="text-artis-primary dark:text-gray-100 text-xl font-bold font-serif group-hover:text-artis-primary/80 transition-colors">
-          {cityInfo.title}
+          {cityName}
         </p>
         <p className="text-gray-500 text-sm font-medium line-clamp-2 leading-relaxed">
-          {cityInfo.extract || 'Sin descripción disponible.'}
+          {cityInfo.extract || 'Sin descripcion disponible.'}
         </p>
       </Link>
     </div>

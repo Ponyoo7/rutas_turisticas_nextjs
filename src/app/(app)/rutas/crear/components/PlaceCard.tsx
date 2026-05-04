@@ -12,22 +12,19 @@ interface Props {
   onDelete: (placeId: number) => void
 }
 
-/**
- * Tarjeta visual para una parada ya incluida en la ruta.
- * Mantiene la miniatura del lugar, su orden dentro del itinerario y la accion
- * de eliminarla del recorrido.
- */
 export const PlaceCard = ({ place, index, onDelete }: Props) => {
-  const [placeInfo, setPlaceInfo] = useState<WikiData | null>(null)
+  const [placeInfo, setPlaceInfo] = useState<WikiData | null>(
+    place.wikiInfo ?? null,
+  )
   const image = locationsService.getPlaceImage(place, placeInfo)
 
   useEffect(() => {
-    if (!place.tags.wikipedia) return
+    if (placeInfo || !place.tags.wikipedia) return
 
     locationsService.getWikiInfo(place.tags.wikipedia).then((res) => {
       setPlaceInfo(res)
     })
-  }, [place.tags.wikipedia])
+  }, [place.tags.wikipedia, placeInfo])
 
   return (
     <div className="group flex items-center gap-4 rounded-[24px] border border-[#eadfce] bg-[#fffdf9] p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-artis-primary/25 hover:shadow-md">

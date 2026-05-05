@@ -86,11 +86,11 @@ export default async function CrearRutaPage({
     (heroPlace?.tags.wikipedia
       ? await locationsService.getWikiInfo(heroPlace.tags.wikipedia)
       : null)
-  const selectedContributedCover = routeToEdit?.contributedImages.find(
-    (image) => image.selectedForCover,
+  const selectedApprovedContributedCover = routeToEdit?.contributedImages.find(
+    (image) => image.selectedForCover && image.reviewStatus === 'approved',
   )
   const heroImage =
-    selectedContributedCover?.image ||
+    selectedApprovedContributedCover?.image ||
     locationsService.toRenderableImageUrl(routeToEdit?.image) ||
     (heroPlace ? locationsService.getPlaceImage(heroPlace, heroWikiInfo) : null)
 

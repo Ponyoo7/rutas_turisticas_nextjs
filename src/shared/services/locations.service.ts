@@ -1,3 +1,4 @@
+import { isRouteInlineImageDataUrl } from '@/lib/route-images'
 import { wait } from '@/lib/utils'
 import {
   InterestPlacesByNameResult,
@@ -184,6 +185,7 @@ const normalizeCanonicalImageUrl = (source?: string | null) => {
   const trimmedSource = source.trim()
 
   if (!trimmedSource || /^Category:/i.test(trimmedSource)) return null
+  if (isRouteInlineImageDataUrl(trimmedSource)) return trimmedSource
 
   const proxiedSource = extractProxyImageUrl(trimmedSource)
 

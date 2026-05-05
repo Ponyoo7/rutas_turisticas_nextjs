@@ -27,12 +27,12 @@ export const PlaceCard = ({ place, index, onDelete }: Props) => {
   }, [place.tags.wikipedia, placeInfo])
 
   return (
-    <div className="group flex items-center gap-4 rounded-[24px] border border-[#eadfce] bg-[#fffdf9] p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-artis-primary/25 hover:shadow-md">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-artis-primary text-sm font-bold text-white shadow-sm">
+    <div className="group flex items-center gap-4 rounded-[28px] bg-[#fbfcfd] p-4 shadow-[0_16px_35px_-28px_rgba(15,23,42,0.5)] transition-all hover:-translate-y-0.5 hover:shadow-[0_22px_45px_-28px_rgba(15,23,42,0.45)]">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] bg-artis-primary text-sm font-bold text-white shadow-sm">
         {index}
       </div>
 
-      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-[#efe4d2]">
+      <div className="h-[4.5rem] w-[4.5rem] shrink-0 overflow-hidden rounded-[20px] bg-[#eef2f6]">
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -41,7 +41,7 @@ export const PlaceCard = ({ place, index, onDelete }: Props) => {
             alt={`Vista previa de ${place.tags.name ?? 'la parada'}`}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#eadbc6] via-[#f8f2ea] to-[#d9ccb7] text-xs font-semibold text-artis-primary/60">
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#eef2f6] via-[#fafbfd] to-[#dfe7ef] text-xs font-semibold text-artis-primary/60">
             Sin foto
           </div>
         )}
@@ -70,7 +70,7 @@ export const PlaceCard = ({ place, index, onDelete }: Props) => {
 
       <button
         onClick={() => onDelete(place.id)}
-        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[#eadfce] bg-white text-gray-400 transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px] bg-white text-gray-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
         title="Eliminar sitio"
       >
         <IconTrash size={18} />

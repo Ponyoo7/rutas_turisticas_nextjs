@@ -30,13 +30,13 @@ export default function Map({
     .filter((position): position is [number, number] => position !== null)
 
   return (
-    <div className="relative w-full h-[600px]">
+    <div className="relative h-[420px] w-full md:h-[520px]">
       <MapLegend />
       {places.length > 0 && (
         <MapContainer
           center={coords as [number, number]}
           zoom={zoom}
-          className="w-full h-full rounded-xl shadow-inner"
+          className="h-full w-full shadow-inner"
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           <FlyToLocation coords={flyTo} />

@@ -32,7 +32,7 @@ export const MapWrapper = ({ places, coords, onClick, routePlaces }: Props) => {
   const routeStats = getRouteStats(routePlaces ?? [])
 
   return (
-    <div className="relative mt-4">
+    <div className="relative flex flex-col gap-4">
       <MapSearch
         search={search}
         onSearchChange={(val) => {
@@ -45,7 +45,7 @@ export const MapWrapper = ({ places, coords, onClick, routePlaces }: Props) => {
 
       <div className="relative">
         {routePlaces && routePlaces.length > 1 && (
-          <div className="absolute top-2 right-2 z-1000 px-4 py-3 flex flex-col  gap-4 text-sm font-medium text-gray-500 bg-gray-50 rounded-lg w-fit">
+          <div className="absolute right-4 top-4 z-[1000] flex w-fit flex-col gap-3 rounded-[20px] bg-white/95 px-4 py-3 text-sm font-medium text-gray-500 shadow-lg backdrop-blur">
             <span className="flex items-center gap-1">
               <IconWalk /> {routeStats.totalDistanceKm} km
             </span>

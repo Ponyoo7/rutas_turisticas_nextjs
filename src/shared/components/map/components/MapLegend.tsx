@@ -9,7 +9,7 @@ export function MapLegend() {
         {legendItems.map((item) => (
           <li key={item.label} className="flex items-center gap-3 group">
             <div
-              className={`flex items-center justify-center w-7 h-7 rounded-full ${item.color} shadow-sm border border-white transition-transform group-hover:scale-110`}
+              className={`flex items-center justify-center w-7 h-7 rounded-full ${item.color} shadow-sm transition-transform group-hover:scale-110`}
             >
               <item.icon size={16} color="white" stroke={2} />
             </div>

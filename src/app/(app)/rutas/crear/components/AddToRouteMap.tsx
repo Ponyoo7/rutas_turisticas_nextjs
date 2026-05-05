@@ -15,7 +15,6 @@ import { Textarea } from '@/shared/components/ui/textarea'
 import {
   MAX_ROUTE_CONTRIBUTED_IMAGES,
   MAX_ROUTE_DESCRIPTION_LENGTH,
-  MAX_ROUTE_IMAGE_UPLOAD_BYTES,
   ROUTE_IMAGE_ACCEPT,
 } from '@/shared/consts/routes'
 import { locationsService } from '@/shared/services/locations.service'
@@ -59,22 +58,6 @@ type EditableRouteImage = {
 const createClientId = () =>
   `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
 
-const getCoverSelectionMessage = (image?: EditableRouteImage) => {
-  if (!image) {
-    return 'La portada seguira siendo la actual hasta que selecciones una imagen de la galeria.'
-  }
-
-  if (image.reviewStatus === 'approved') {
-    return 'Esta imagen ya esta aprobada y pasara a ser la portada al guardar la ruta.'
-  }
-
-  if (image.reviewStatus === 'rejected') {
-    return 'Esta imagen esta marcada como portada, pero fue rechazada por el administrador.'
-  }
-
-  return 'Esta imagen esta marcada como portada candidata y se aplicara cuando el administrador la apruebe.'
-}
-
 export const AddToRouteMap = ({
   places,
   coords,
@@ -112,7 +95,12 @@ export const AddToRouteMap = ({
 
   const selectedCoverImage =
     routeImages.find((image) => image.selectedForCover) ?? null
-  const previewImage = selectedCoverImage?.image || initialImage
+  const previewImage =
+    selectedCoverImage?.image ||
+    initialImage ||
+    locationsService.toRenderableImageUrl(cityInfo?.thumbnail?.source)
+  const routeHeading =
+    routeName.trim() || city?.name || (isEditMode ? 'Ruta en edicion' : 'Nueva ruta')
   const canUploadMoreImages =
     routeImages.length < MAX_ROUTE_CONTRIBUTED_IMAGES && !isPreparingImage
   const canSaveRoute =
@@ -284,37 +272,28 @@ export const AddToRouteMap = ({
   }
 
   return (
-    <div className="flex flex-col gap-6 pb-8">
-      <section className="overflow-hidden rounded-[30px] border border-[#eadfce] bg-white p-4 shadow-[0_24px_70px_-48px_rgba(92,58,14,0.45)] md:p-5">
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+    <div className="flex flex-col gap-8 pb-10">
+      <section className="overflow-hidden bg-white p-4 md:p-6">
+        <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
-            <span className="inline-flex w-fit rounded-full bg-[#fff7ed] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.26em] text-artis-primary/70">
-              Diseno de recorrido
+            <span className="inline-flex w-fit bg-[#faf8f4] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.26em] text-artis-primary/70">
+              Explorador de paradas
             </span>
-            <div>
-              <h2 className="font-serif text-2xl font-bold text-artis-primary md:text-3xl">
-                Construye la ruta en el mapa
-              </h2>
-              <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-600">
-                Toca lugares para anadirlos al itinerario y luego ajusta el
-                orden, la descripcion y las imagenes para dejarlo todo listo.
-              </p>
-            </div>
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#eadfce] bg-[#fffaf4] px-4 py-2 text-sm font-semibold text-artis-primary">
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#f5f6f8] px-4 py-2 text-sm font-semibold text-artis-primary shadow-sm">
               <IconMapPin size={16} />
               {places.length} lugares en el mapa
             </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#eadfce] bg-[#fffaf4] px-4 py-2 text-sm font-semibold text-artis-primary">
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#f5f6f8] px-4 py-2 text-sm font-semibold text-artis-primary shadow-sm">
               <IconRoute2 size={16} />
               {routePlaces.length} en tu ruta
             </span>
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-[24px] border border-[#eee3d4] bg-[#f9f4ec] p-1">
+        <div className="overflow-hidden  bg-white p-3 md:p-4">
           <MapWrapper
             places={places}
             coords={coords}
@@ -322,67 +301,72 @@ export const AddToRouteMap = ({
             routePlaces={routePlaces}
           />
         </div>
+
+        <div className="mt-4 flex flex-col gap-3 rounded-[24px] bg-[#faf8f4] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-[16px] bg-white text-artis-primary shadow-[0_14px_28px_-24px_rgba(83,61,45,0.45)]">
+              <IconRoute2 size={20} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-artis-primary">
+                Organiza tu ruta
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-end gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <span className="inline-flex w-fit rounded-full bg-white px-4 py-2 text-sm font-semibold text-artis-primary shadow-sm">
+              {routePlaces.length} parada{routePlaces.length === 1 ? '' : 's'}
+            </span>
+            {routePlaces.length > 1 && (
+              <Button
+                type="button"
+                onClick={reorganizeRoute}
+                variant="outline"
+                className="h-11 rounded-[16px] border border-[#dfd2c3] bg-white px-5 font-semibold text-artis-primary shadow-[0_14px_28px_-24px_rgba(83,61,45,0.55)] hover:border-[#c9b49e] hover:bg-[#faf8f4]"
+              >
+                Reorganizar por proximidad
+              </Button>
+            )}
+          </div>
+        </div>
       </section>
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(360px,0.95fr)]">
-        <section className="flex min-w-0 flex-col gap-6">
-          <article className="rounded-[30px] border border-[#eadfce] bg-white p-6 shadow-[0_24px_70px_-48px_rgba(92,58,14,0.45)] md:p-7">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)]">
+        <section className="min-w-0">
+          <article className="rounded-[30px] border border-[#ece4d7] bg-white p-6 shadow-[0_20px_45px_-36px_rgba(83,61,45,0.24)] md:p-7">
             <div className="flex flex-col gap-6">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="space-y-2">
                 <div className="space-y-2">
-                  <span className="inline-flex w-fit rounded-full bg-[#fff7ed] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.26em] text-artis-primary/70">
+                  <span className="inline-flex w-fit rounded-full bg-[#faf8f4] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.26em] text-artis-primary/70">
                     Identidad de la ruta
                   </span>
                   <div>
                     <h3 className="font-serif text-2xl font-bold text-artis-primary">
                       {isEditMode ? 'Actualiza los detalles' : 'Presenta tu ruta'}
                     </h3>
-                    <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-600">
-                      Define un nombre claro y una descripcion que explique el
-                      estilo del recorrido y lo que la gente encontrara en el
-                      camino.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 sm:w-fit sm:grid-cols-3">
-                  <div className="rounded-2xl bg-[#fcfaf7] p-3">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-artis-primary/45">
-                      Estado
-                    </p>
-                    <p className="mt-1 text-sm font-bold text-artis-primary">
-                      {isEditMode ? 'Edicion' : 'Nueva'}
-                    </p>
-                  </div>
-                  <div className="rounded-2xl bg-[#fcfaf7] p-3">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-artis-primary/45">
-                      Paradas
-                    </p>
-                    <p className="mt-1 text-sm font-bold text-artis-primary">
-                      {routePlaces.length}
-                    </p>
-                  </div>
-                  <div className="rounded-2xl bg-[#fcfaf7] p-3 col-span-2 sm:col-span-1">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-artis-primary/45">
-                      Galeria
-                    </p>
-                    <p className="mt-1 text-sm font-bold text-artis-primary">
-                      {routeImages.length}/{MAX_ROUTE_CONTRIBUTED_IMAGES}
-                    </p>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-5">
+              <div className="flex flex-col gap-4">
                 <div className="space-y-2">
-                  <label className="text-[11px] font-bold uppercase tracking-[0.24em] text-artis-primary/55">
-                    Nombre de la ruta
-                  </label>
+                 <div className="flex items-center justify-between gap-3">
+                    <label className="text-[11px] font-bold uppercase tracking-[0.24em] text-artis-primary/55">
+                      Nombre de la ruta
+                    </label>
+                    <span
+                      aria-hidden="true"
+                      className="invisible text-xs font-medium"
+                    >
+                      000/000
+                    </span>
+                  </div>
                   <Input
                     placeholder="Ej. Paseo historico por el centro"
                     value={routeName}
                     onChange={(event) => setRouteName(event.target.value)}
-                    className="h-14 rounded-2xl border-[#dfcfba] bg-[#fffdf9] px-5 text-lg font-semibold text-artis-primary shadow-none focus-visible:border-artis-primary/40 focus-visible:ring-artis-primary/15"
+                    className="h-14 rounded-[22px] border border-[#d9dfe7] bg-[#f5f6f8] px-5 text-lg font-semibold text-artis-primary shadow-none focus-visible:border-artis-primary/35 focus-visible:ring-2 focus-visible:ring-artis-primary/12"
                   />
                 </div>
 
@@ -400,329 +384,289 @@ export const AddToRouteMap = ({
                     value={routeDescription}
                     onChange={(event) =>
                       setRouteDescription(
-                        event.target.value.slice(0, MAX_ROUTE_DESCRIPTION_LENGTH),
+                        event.target.value.slice(
+                          0,
+                          MAX_ROUTE_DESCRIPTION_LENGTH,
+                        ),
                       )
                     }
-                    className="min-h-40 rounded-[24px] border-[#e7d9c6] bg-[#fcfaf7] px-5 py-4 text-sm leading-7 text-gray-700 shadow-none focus-visible:border-artis-primary/35 focus-visible:ring-artis-primary/15"
+                    className="min-h-40 rounded-[24px] border border-[#d9dfe7] bg-[#f5f6f8] px-5 py-4 text-sm leading-7 text-gray-700 shadow-none focus-visible:border-artis-primary/35 focus-visible:ring-2 focus-visible:ring-artis-primary/12"
                   />
-                  <p className="text-xs leading-5 text-gray-500">
-                    Esta descripcion se mostrara en el detalle publico y en el
-                    perfil del autor.
-                  </p>
                 </div>
+
               </div>
 
-              <div className="flex flex-col gap-3 rounded-[24px] border border-[#eee3d4] bg-[#fffaf4] p-4 md:flex-row md:items-center md:justify-between">
-                <div className="flex flex-wrap gap-2">
-                  {routePlaces.length > 1 && (
-                    <Button
-                      onClick={reorganizeRoute}
-                      variant="outline"
-                      className="rounded-full border-[#d9c8b2] bg-white px-5 font-semibold text-artis-primary shadow-none hover:bg-[#fff2df]"
-                    >
-                      Reorganizar por proximidad
-                    </Button>
-                  )}
-                </div>
+              <div className="rounded-[26px] bg-[#fbfcfd] p-4 md:p-5">
+                <div className="flex flex-col gap-4">
+                  <div className="grid gap-4 xl:grid-cols-[minmax(280px,0.92fr)_320px] xl:items-start">
+                    <div className="max-w-[460px] overflow-hidden rounded-[24px] bg-white shadow-[0_14px_30px_-24px_rgba(83,61,45,0.24)]">
+                      <div className="relative h-56 bg-[#edf1f5] md:h-60">
+                        {previewImage ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={previewImage}
+                            alt="Vista previa de la portada de la ruta"
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#eef2f6] via-[#fafbfd] to-[#dfe7ef] text-artis-primary/60">
+                            <IconPhoto size={48} />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#1f2937]/86 via-[#1f2937]/18 to-transparent" />
 
-                <Button
-                  onClick={handleSave}
-                  disabled={!canSaveRoute}
-                  className="rounded-full bg-artis-primary px-6 font-bold text-white shadow-lg transition-colors hover:bg-artis-primary/90 disabled:bg-gray-300"
-                >
-                  {isSaving ? (
-                    <>
-                      <IconLoader2 className="animate-spin" />
-                      Guardando...
-                    </>
-                  ) : isEditMode ? (
-                    'Actualizar ruta'
+                        <div className="absolute inset-x-0 bottom-0 flex items-end gap-3 p-5 text-white">
+                          <div>
+                            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/75">
+                              Portada
+                            </p>
+                            <p className="mt-2 max-w-[18rem] text-lg font-semibold leading-6">
+                              {routeHeading}
+                            </p>
+                            <p className="mt-1 max-w-[18rem] text-sm leading-6 text-white/80">
+                              {selectedCoverImage
+                                ? 'Portada candidata'
+                                : previewImage
+                                  ? 'Portada provisional'
+                                  : 'Todavia sin portada'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-4">
+                      <div>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-artis-primary/55">
+                          Galeria
+                        </p>
+                        <h4 className="mt-2 text-lg font-semibold text-artis-primary">
+                          Imagenes aportadas durante la ruta
+                        </h4>
+                      </div>
+
+                      <div className="flex flex-col gap-2.5">
+                        <label
+                          className={`inline-flex items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-white transition-colors ${
+                            canUploadMoreImages
+                              ? 'cursor-pointer bg-artis-primary hover:bg-artis-primary/90'
+                              : 'cursor-not-allowed bg-gray-300'
+                          }`}
+                        >
+                          {isPreparingImage ? (
+                            <>
+                              <IconLoader2 className="animate-spin" size={18} />
+                              Preparando imagenes...
+                            </>
+                          ) : (
+                            <>
+                              <IconUpload size={18} />
+                              Subir imagenes
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept={ROUTE_IMAGE_ACCEPT}
+                            multiple
+                            className="sr-only"
+                            onChange={handleImageChange}
+                            disabled={!canUploadMoreImages || isSaving}
+                          />
+                        </label>
+
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={clearCoverSelection}
+                          disabled={routeImages.every((image) => !image.selectedForCover)}
+                          className="rounded-full border-0 bg-white text-artis-primary shadow-none hover:bg-[#eef2f6]"
+                        >
+            
+                        </Button>
+                      </div>
+
+                      {imageError && (
+                        <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">
+                          {imageError}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {routeImages.length === 0 ? (
+                    <div className="rounded-[22px] bg-white px-4 py-8 text-center text-sm text-gray-500">
+                      Aun no has anadido imagenes.
+                    </div>
                   ) : (
-                    'Guardar ruta'
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                      {routeImages.map((image) => {
+                        const reviewTone = getRouteImageReviewTone(
+                          image.reviewStatus,
+                        )
+
+                        return (
+                          <article
+                            key={image.clientId}
+                            className="overflow-hidden rounded-[24px] bg-white"
+                          >
+                            <div className="relative h-40 bg-[#edf1f5]">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={image.image}
+                                alt="Imagen aportada por la ruta"
+                                className="h-full w-full object-cover"
+                              />
+                              {image.selectedForCover && (
+                                <span className="absolute left-3 top-3 inline-flex rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-artis-primary">
+                                  Portada
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex flex-col gap-3 p-4">
+                              <div className="flex flex-col gap-2">
+                                <span
+                                  className={`inline-flex w-fit rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] ${
+                                    reviewTone === 'approved'
+                                      ? 'bg-emerald-50 text-emerald-700'
+                                      : reviewTone === 'rejected'
+                                        ? 'bg-rose-50 text-rose-700'
+                                        : 'bg-amber-50 text-amber-700'
+                                  }`}
+                                >
+                                  {image.persisted
+                                    ? getRouteImageReviewLabel(image.reviewStatus)
+                                    : 'Pendiente de guardar'}
+                                </span>
+                                <p className="text-xs leading-5 text-gray-500">
+                                  {image.persisted
+                                    ? getRouteImageReviewDescription(
+                                        image.reviewStatus,
+                                      )
+                                    : 'Se enviara a revision cuando guardes la ruta.'}
+                                </p>
+                              </div>
+
+                              <div className="flex flex-col gap-2">
+                                <Button
+                                  type="button"
+                                  variant={
+                                    image.selectedForCover ? 'default' : 'outline'
+                                  }
+                                  onClick={() =>
+                                    toggleCoverSelection(image.clientId)
+                                  }
+                                  className={
+                                    image.selectedForCover
+                                      ? 'rounded-full bg-artis-primary text-white hover:bg-artis-primary/90'
+                                      : 'rounded-full border-0 bg-[#f5f6f8] text-artis-primary shadow-none hover:bg-[#eef2f6]'
+                                  }
+                                >
+                                  <IconStar size={16} />
+                                  {image.selectedForCover
+                                    ? 'Quitar de portada'
+                                    : 'Usar como portada'}
+                                </Button>
+
+                                {!image.persisted && (
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() =>
+                                      removeUnsavedImage(image.clientId)
+                                    }
+                                    className="rounded-full border-0 bg-rose-50 text-rose-700 shadow-none hover:bg-rose-100"
+                                  >
+                                    <IconTrash size={16} />
+                                    Eliminar
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </article>
+                        )
+                      })}
+                    </div>
                   )}
-                </Button>
+                </div>
               </div>
 
-              {saveError && (
-                <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                  {saveError}
-                </p>
-              )}
+              <div className="flex flex-col items-center gap-3 border-t border-[#ece4d7] pt-5">
+                <div className="w-full max-w-sm">
+                  <Button
+                    onClick={handleSave}
+                    disabled={!canSaveRoute}
+                    className="h-14 w-full rounded-[22px] bg-artis-primary px-6 text-base font-bold text-white shadow-[0_18px_30px_-18px_rgba(83,61,45,0.7)] transition-colors hover:bg-artis-primary/90 disabled:bg-gray-300"
+                  >
+                    {isSaving ? (
+                      <>
+                        <IconLoader2 className="animate-spin" />
+                        Guardando...
+                      </>
+                    ) : isEditMode ? (
+                      'Actualizar ruta'
+                    ) : (
+                      'Guardar ruta'
+                    )}
+                  </Button>
+                </div>
+
+                {saveError && (
+                  <p className="w-full rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {saveError}
+                  </p>
+                )}
+              </div>
             </div>
           </article>
+        </section>
 
-          <article className="rounded-[30px] border border-[#eadfce] bg-white p-6 shadow-[0_24px_70px_-48px_rgba(92,58,14,0.45)] md:p-7">
-            <div className="flex flex-col gap-5">
-              <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-                <div className="space-y-2">
-                  <span className="inline-flex w-fit rounded-full bg-[#fff7ed] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.26em] text-artis-primary/70">
+        <aside className="self-start xl:sticky xl:top-6">
+          <div className="flex flex-col gap-5">
+            <section className="rounded-[30px] border border-[#ece4d7] bg-white p-5 shadow-[0_20px_45px_-36px_rgba(83,61,45,0.24)]">
+              <div className="flex flex-col gap-5">
+                <div className="flex flex-col gap-3">
+                  <span className="inline-flex w-fit rounded-full bg-[#faf8f4] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.26em] text-artis-primary/70">
                     Itinerario
                   </span>
                   <div>
                     <h3 className="font-serif text-2xl font-bold text-artis-primary">
                       Paradas seleccionadas
                     </h3>
-                    <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-600">
-                      Revisa el recorrido final y elimina las paradas que no
-                      encajen. El orden se refleja en el detalle de la ruta.
+            
+                  </div>
+                </div>
+
+                {routePlaces.length === 0 ? (
+                  <div className="rounded-[28px] border border-dashed border-[#d9dfe7] bg-[linear-gradient(180deg,#fbfcfd_0%,#f8f2e8_100%)] px-6 py-12 text-center">
+                    <span className="inline-flex rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-artis-primary/60 shadow-sm">
+                      Empieza en el mapa
+                    </span>
+                    <div className="mx-auto mt-5 flex h-16 w-16 items-center justify-center rounded-full bg-white text-artis-primary shadow-sm">
+                      <IconMapPin size={28} />
+                    </div>
+                    <p className="mt-5 font-serif text-3xl font-bold text-artis-primary">
+                      Empieza a construir la ruta
+                    </p>
+                    <p className="mx-auto mt-3 max-w-sm text-sm leading-7 text-gray-600">
+                      Toca lugares en el mapa para empezar el itinerario.
                     </p>
                   </div>
-                </div>
-
-                <span className="inline-flex w-fit rounded-full border border-[#eadfce] bg-[#fffaf4] px-4 py-2 text-sm font-semibold text-artis-primary">
-                  {routePlaces.length} parada{routePlaces.length === 1 ? '' : 's'}
-                </span>
-              </div>
-
-              {routePlaces.length === 0 ? (
-                <div className="rounded-[26px] border border-dashed border-[#dfcfba] bg-[#fcfaf7] px-6 py-16 text-center">
-                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#fff2df] text-artis-primary">
-                    <IconMapPin size={24} />
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    {routePlaces.map((routePlace, index) => (
+                      <PlaceCard
+                        key={routePlace.id}
+                        place={routePlace}
+                        index={index + 1}
+                        onDelete={removePlace}
+                      />
+                    ))}
                   </div>
-                  <p className="mt-4 font-serif text-2xl font-bold text-artis-primary">
-                    Empieza a construir la ruta
-                  </p>
-                  <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-gray-600">
-                    Toca sitios en el mapa para anadirlos a tu itinerario. Aqui
-                    apareceran ordenados y listos para revisarlos.
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-3">
-                  {routePlaces.map((routePlace, index) => (
-                    <PlaceCard
-                      key={routePlace.id}
-                      place={routePlace}
-                      index={index + 1}
-                      onDelete={removePlace}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          </article>
-        </section>
-
-        <aside className="self-start xl:sticky xl:top-6">
-          <div className="overflow-hidden rounded-[30px] border border-[#eadfce] bg-white shadow-[0_24px_70px_-48px_rgba(92,58,14,0.45)]">
-            <div className="relative h-64 bg-[#efe4d2]">
-              {previewImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={previewImage}
-                  alt="Vista previa de la portada de la ruta"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#eadbc6] via-[#f8f2ea] to-[#d9ccb7] text-artis-primary/60">
-                  <IconPhoto size={48} />
-                </div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#2f1707]/85 via-[#2f1707]/15 to-transparent" />
-
-              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-5 text-white">
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/75">
-                    Portada
-                  </p>
-                  <p className="mt-2 max-w-[18rem] text-sm font-semibold leading-6">
-                    {selectedCoverImage
-                      ? 'Vista previa de la candidata a portada'
-                      : previewImage
-                        ? 'Portada actual de la ruta'
-                        : 'Todavia no hay portada definida'}
-                  </p>
-                </div>
-                {selectedCoverImage ? (
-                  <span className="inline-flex rounded-full bg-amber-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-amber-700">
-                    Candidata
-                  </span>
-                ) : null}
+                )}
               </div>
-            </div>
+            </section>
 
-            <div className="flex flex-col gap-5 p-5">
-              <div className="grid grid-cols-3 gap-2">
-                <div className="rounded-2xl bg-[#fcfaf7] p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-artis-primary/45">
-                    Fotos
-                  </p>
-                  <p className="mt-1 text-sm font-bold text-artis-primary">
-                    {routeImages.length}
-                  </p>
-                </div>
-                <div className="rounded-2xl bg-[#fcfaf7] p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-artis-primary/45">
-                    Portada
-                  </p>
-                  <p className="mt-1 text-sm font-bold text-artis-primary">
-                    {selectedCoverImage ? 'Elegida' : 'Actual'}
-                  </p>
-                </div>
-                <div className="rounded-2xl bg-[#fcfaf7] p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-artis-primary/45">
-                    Limite
-                  </p>
-                  <p className="mt-1 text-sm font-bold text-artis-primary">
-                    {MAX_ROUTE_CONTRIBUTED_IMAGES}
-                  </p>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-lg font-semibold text-artis-primary">
-                  Imagenes aportadas durante la ruta
-                </p>
-                <p className="mt-2 text-sm leading-6 text-gray-600">
-                  Sube una o varias fotos tomadas durante la experiencia. El
-                  administrador las revisara desde Gestion de imagenes.
-                </p>
-                <p className="mt-2 text-xs leading-5 text-gray-500">
-                  {getCoverSelectionMessage(selectedCoverImage ?? undefined)}
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <label
-                  className={`inline-flex items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-white transition-colors ${
-                    canUploadMoreImages
-                      ? 'cursor-pointer bg-artis-primary hover:bg-artis-primary/90'
-                      : 'cursor-not-allowed bg-gray-300'
-                  }`}
-                >
-                  {isPreparingImage ? (
-                    <>
-                      <IconLoader2 className="animate-spin" size={18} />
-                      Preparando imagenes...
-                    </>
-                  ) : (
-                    <>
-                      <IconUpload size={18} />
-                      Subir imagenes
-                    </>
-                  )}
-                  <input
-                    type="file"
-                    accept={ROUTE_IMAGE_ACCEPT}
-                    multiple
-                    className="sr-only"
-                    onChange={handleImageChange}
-                    disabled={!canUploadMoreImages || isSaving}
-                  />
-                </label>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={clearCoverSelection}
-                  disabled={routeImages.every((image) => !image.selectedForCover)}
-                  className="rounded-full border-[#d9c8b2] bg-white text-artis-primary shadow-none hover:bg-[#fff2df]"
-                >
-                  Quitar seleccion de portada
-                </Button>
-              </div>
-
-              <p className="text-xs leading-5 text-gray-500">
-                JPG, PNG o WebP. Se optimizan automaticamente antes de
-                guardarse y cada una se limita a unos{' '}
-                {Math.round(MAX_ROUTE_IMAGE_UPLOAD_BYTES / 1024)} KB. Maximo:{' '}
-                {MAX_ROUTE_CONTRIBUTED_IMAGES} imagenes.
-              </p>
-
-              {imageError && (
-                <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                  {imageError}
-                </p>
-              )}
-
-              {routeImages.length === 0 ? (
-                <div className="rounded-[24px] border border-dashed border-[#dfcfba] bg-[#fcfaf7] px-4 py-10 text-center text-sm text-gray-500">
-                  Todavia no has anadido imagenes aportadas por la ruta.
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {routeImages.map((image) => {
-                    const reviewTone = getRouteImageReviewTone(image.reviewStatus)
-
-                    return (
-                      <article
-                        key={image.clientId}
-                        className="overflow-hidden rounded-[24px] border border-[#eadfce] bg-[#fcfaf7]"
-                      >
-                        <div className="relative h-40 bg-[#efe4d2]">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={image.image}
-                            alt="Imagen aportada por la ruta"
-                            className="h-full w-full object-cover"
-                          />
-                          {image.selectedForCover && (
-                            <span className="absolute left-3 top-3 inline-flex rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-artis-primary">
-                              Portada
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="flex flex-col gap-3 p-4">
-                          <div className="flex flex-col gap-2">
-                            <span
-                              className={`inline-flex w-fit rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] ${
-                                reviewTone === 'approved'
-                                  ? 'bg-emerald-50 text-emerald-700'
-                                  : reviewTone === 'rejected'
-                                    ? 'bg-rose-50 text-rose-700'
-                                    : 'bg-amber-50 text-amber-700'
-                              }`}
-                            >
-                              {image.persisted
-                                ? getRouteImageReviewLabel(image.reviewStatus)
-                                : 'Pendiente de guardar'}
-                            </span>
-                            <p className="text-xs leading-5 text-gray-500">
-                              {image.persisted
-                                ? getRouteImageReviewDescription(image.reviewStatus)
-                                : 'Se enviara a revision cuando guardes la ruta.'}
-                            </p>
-                          </div>
-
-                          <div className="flex flex-col gap-2">
-                            <Button
-                              type="button"
-                              variant={
-                                image.selectedForCover ? 'default' : 'outline'
-                              }
-                              onClick={() => toggleCoverSelection(image.clientId)}
-                              className={
-                                image.selectedForCover
-                                  ? 'rounded-full bg-artis-primary text-white hover:bg-artis-primary/90'
-                                  : 'rounded-full border-[#d9c8b2] bg-white text-artis-primary shadow-none hover:bg-[#fff2df]'
-                              }
-                            >
-                              <IconStar size={16} />
-                              {image.selectedForCover
-                                ? 'Quitar de portada'
-                                : 'Usar como portada'}
-                            </Button>
-
-                            {!image.persisted && (
-                              <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => removeUnsavedImage(image.clientId)}
-                                className="rounded-full border-rose-200 bg-white text-rose-700 shadow-none hover:bg-rose-50"
-                              >
-                                <IconTrash size={16} />
-                                Eliminar
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </article>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
           </div>
         </aside>
       </div>

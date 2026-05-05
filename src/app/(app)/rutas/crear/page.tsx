@@ -7,6 +7,7 @@ import {
 } from '@/shared/services/locations.cached.server'
 import { OSMElement } from '@/shared/types/locations'
 import { notFound } from 'next/navigation'
+import { IconMapPin, IconRoute2 } from '@tabler/icons-react'
 import { AddToRouteMap } from './components/AddToRouteMap'
 
 const mergePlaces = (basePlaces: OSMElement[], extraPlaces: OSMElement[]) => {
@@ -93,30 +94,46 @@ export default async function CrearRutaPage({
     selectedApprovedContributedCover?.image ||
     locationsService.toRenderableImageUrl(routeToEdit?.image) ||
     (heroPlace ? locationsService.getPlaceImage(heroPlace, heroWikiInfo) : null)
+  const heroTitle =
+    cityResult?.city.name || routeToEdit?.name || 'Creador de rutas'
+  const heroSubtitle = isEditMode
+    ? 'Reordena las paradas, actualiza la descripcion y deja la portada lista para publicar la mejor version del recorrido.'
+    : cityResult?.city.name
+      ? `Explora ${cityResult.city.name} y construye una ruta visual, clara y personalizada desde un entorno mucho mas limpio.`
+      : 'Selecciona lugares, organiza el itinerario y prepara una ruta que se entienda de un vistazo.'
 
   return (
-    <main className="min-h-screen bg-[#fbf7f1] px-4 py-4 md:px-6 md:py-6">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+    <main className="min-h-screen bg-white px-4 py-4 md:px-6 md:py-6">
+      <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-8">
         <section
-          className="relative overflow-hidden rounded-[34px] border border-white/40 bg-cover bg-center bg-no-repeat px-6 pb-10 pt-24 shadow-[0_28px_90px_-42px_rgba(0,0,0,0.45)] md:px-10 md:pt-28"
+          className="relative overflow-hidden rounded-[32px] border border-black/5 bg-cover bg-center bg-no-repeat px-6 py-16 shadow-[0_32px_80px_-48px_rgba(15,23,42,0.5)] md:min-h-[320px] md:px-10"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(28, 18, 10, 0.25) 0%, rgba(28, 18, 10, 0.68) 65%), url("${heroImage || '/museo_placeholder.jpg'}")`,
+            backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.24) 0%, rgba(15, 23, 42, 0.66) 100%), url("${heroImage || '/museo_placeholder.jpg'}")`,
           }}
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.22),transparent_38%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.22),transparent_42%)]" />
 
-          <div className="relative flex max-w-3xl flex-col gap-4 text-left">
-            <span className="inline-flex w-fit rounded-full bg-white/14 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.28em] text-white backdrop-blur-sm">
-              {isEditMode ? 'Ajusta tu aventura' : 'Disena tu aventura'}
+          <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-4 text-center">
+            <span className="inline-flex w-fit rounded-full bg-white/16 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.28em] text-white backdrop-blur-sm">
+              {isEditMode ? 'Editor de rutas' : 'Creador de rutas'}
             </span>
-            <h1 className="font-serif text-4xl font-bold leading-[1.05] text-white md:text-6xl">
-              {isEditMode ? 'Editor de Rutas' : 'Creador de Rutas'}
+            <h1 className="font-serif text-4xl font-black leading-[0.98] tracking-tight text-white md:text-6xl">
+              {heroTitle}
             </h1>
-            <p className="max-w-xl text-sm leading-7 text-white/90 md:text-base">
-              {isEditMode
-                ? 'Modifica paradas, descripcion y galeria para mejorar la experiencia final del recorrido.'
-                : 'Selecciona los mejores lugares y construye una experiencia visual y bien organizada desde el primer momento.'}
+            <p className="max-w-2xl text-sm leading-7 text-white/92 md:text-lg">
+              {heroSubtitle}
             </p>
+
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/14 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm">
+                <IconMapPin size={16} />
+                {mapPlaces.length} lugares disponibles
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/14 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm">
+                <IconRoute2 size={16} />
+                {routeToEdit?.places.length ?? 0} en la ruta
+              </span>
+            </div>
           </div>
         </section>
 

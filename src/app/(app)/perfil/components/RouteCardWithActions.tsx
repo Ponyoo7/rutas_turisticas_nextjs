@@ -7,7 +7,6 @@ import {
   IconArrowUpRight,
   IconEdit,
   IconLoader2,
-  IconMapPin,
   IconRoute2,
   IconTrash,
 } from '@tabler/icons-react'
@@ -47,7 +46,7 @@ export function RouteCardWithActions({
   }
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-[#eadfce] bg-white shadow-[0_18px_45px_-28px_rgba(92,58,14,0.38)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_55px_-28px_rgba(92,58,14,0.45)]">
+    <article className="group flex h-full flex-col overflow-hidden rounded-[28px] bg-white shadow-[0_18px_45px_-28px_rgba(92,58,14,0.24)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_55px_-28px_rgba(92,58,14,0.34)]">
       <Link
         href={`/rutas/${route.id}`}
         className="flex h-full flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-artis-primary/30 focus-visible:ring-offset-4"
@@ -88,7 +87,7 @@ export function RouteCardWithActions({
                   {route.name}
                 </h3>
               </div>
-              <span className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#eadfce] bg-[#fffaf4] text-artis-primary transition-transform duration-300 group-hover:-translate-y-0.5 md:inline-flex">
+              <span className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-artis-primary shadow-[0_14px_28px_-24px_rgba(92,58,14,0.38)] transition-transform duration-300 group-hover:-translate-y-0.5 md:inline-flex">
                 <IconArrowUpRight size={18} />
               </span>
             </div>
@@ -154,7 +153,7 @@ export function RouteCardWithActions({
                 ))}
               </div>
             ) : (
-              <div className="rounded-2xl border border-dashed border-[#eadfce] bg-[#fffaf4] px-4 py-3 text-sm text-gray-500">
+              <div className="rounded-2xl bg-[#faf8f4] px-4 py-3 text-sm text-gray-500">
                 Esta ruta todavia no tiene paradas visibles.
               </div>
             )}
@@ -162,16 +161,11 @@ export function RouteCardWithActions({
         </div>
       </Link>
 
-      <div className="flex items-center justify-between gap-3 border-t border-[#f0e7da] bg-[#fffaf4] px-5 py-4">
-        <div className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-artis-primary/55">
-          <IconMapPin size={14} />
-          Gestiona tu ruta
-        </div>
-
-        <div className="flex items-center gap-2">
+      <div className="flex justify-center bg-white px-5 py-4">
+        <div className="flex items-center justify-center gap-2">
           <Link
             href={`/rutas/crear?routeId=${route.id}`}
-            className="inline-flex items-center gap-2 rounded-full border border-[#eadfce] bg-white px-4 py-2 text-sm font-semibold text-artis-primary transition-colors hover:bg-[#fff2df]"
+            className="inline-flex items-center gap-2 rounded-full bg-[#faf8f4] px-4 py-2 text-sm font-semibold text-artis-primary transition-colors hover:bg-[#f3ede4]"
             title="Editar ruta"
           >
             <IconEdit size={16} />
@@ -181,7 +175,7 @@ export function RouteCardWithActions({
           <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex items-center gap-2 rounded-full bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-70"
             title="Eliminar ruta"
           >
             {isDeleting ? (

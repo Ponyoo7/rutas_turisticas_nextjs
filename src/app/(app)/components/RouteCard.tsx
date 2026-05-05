@@ -18,24 +18,26 @@ export const RouteCard = ({ route }: Props) => {
   return (
     <Link
       href={`/rutas/${route.id}`}
-      className="flex cursor-pointer overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+      className="grid h-full min-h-[160px] grid-cols-[128px_minmax(0,1fr)] overflow-hidden rounded-[22px] border border-gray-100 bg-white shadow-[0_16px_36px_-30px_rgba(15,23,42,0.32)] transition-shadow hover:shadow-[0_24px_44px_-30px_rgba(15,23,42,0.4)] dark:border-gray-700 dark:bg-gray-800 md:grid-cols-[148px_minmax(0,1fr)]"
     >
-      <div className="relative aspect-square w-1/3 bg-cover bg-center">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url("${image}")` }}
-        ></div>
+      <div className="relative h-full min-h-[160px] overflow-hidden bg-[#eef2f6]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={image}
+          alt={`Imagen de la ruta ${route.name}`}
+          className="h-full w-full object-cover"
+        />
       </div>
-      <div className="flex w-2/3 flex-col justify-center gap-2 p-4">
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 p-3.5">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-artis-secondary-blue">
           <span className="material-symbols-outlined text-xs">Duracion</span>
           {stats.totalMinutes} MINUTOS
         </div>
-        <h3 className="font-serif text-lg font-bold leading-tight text-artis-primary dark:text-gray-100">
+        <h3 className="font-serif text-base font-bold leading-tight text-artis-primary dark:text-gray-100">
           {route.name}
         </h3>
         {route.description ? (
-          <p className="line-clamp-2 text-xs text-gray-500">
+          <p className="line-clamp-1 text-xs text-gray-500">
             {route.description}
           </p>
         ) : null}

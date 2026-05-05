@@ -26,7 +26,10 @@ export const FeaturedCities = async () => {
         <Carousel className="w-full">
           <CarouselContent>
             {cities.map((city) => (
-              <CarouselItem key={city.title} className="basis-1/4.5">
+              <CarouselItem
+                key={city.title}
+                className="basis-[280px] md:basis-[320px] xl:basis-[360px]"
+              >
                 <FeaturedCityCard city={city} />
               </CarouselItem>
             ))}

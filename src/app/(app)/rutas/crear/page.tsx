@@ -7,7 +7,6 @@ import {
 } from '@/shared/services/locations.cached.server'
 import { OSMElement } from '@/shared/types/locations'
 import { notFound } from 'next/navigation'
-import { IconMapPin, IconRoute2 } from '@tabler/icons-react'
 import { AddToRouteMap } from './components/AddToRouteMap'
 
 const mergePlaces = (basePlaces: OSMElement[], extraPlaces: OSMElement[]) => {
@@ -103,7 +102,7 @@ export default async function CrearRutaPage({
       : 'Selecciona lugares, organiza el itinerario y prepara una ruta que se entienda de un vistazo.'
 
   return (
-    <main className="min-h-screen bg-white px-4 py-4 md:px-6 md:py-6">
+    <main className="min-h-full bg-white px-4 py-4 md:px-6 md:py-6">
       <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-8">
         <section
           className="relative overflow-hidden rounded-[32px] border border-black/5 bg-cover bg-center bg-no-repeat px-6 py-16 shadow-[0_32px_80px_-48px_rgba(15,23,42,0.5)] md:min-h-[320px] md:px-10"
@@ -114,26 +113,12 @@ export default async function CrearRutaPage({
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.22),transparent_42%)]" />
 
           <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-4 text-center">
-            <span className="inline-flex w-fit rounded-full bg-white/16 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.28em] text-white backdrop-blur-sm">
-              {isEditMode ? 'Editor de rutas' : 'Creador de rutas'}
-            </span>
             <h1 className="font-serif text-4xl font-black leading-[0.98] tracking-tight text-white md:text-6xl">
               {heroTitle}
             </h1>
             <p className="max-w-2xl text-sm leading-7 text-white/92 md:text-lg">
               {heroSubtitle}
             </p>
-
-            <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/14 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm">
-                <IconMapPin size={16} />
-                {mapPlaces.length} lugares disponibles
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/14 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm">
-                <IconRoute2 size={16} />
-                {routeToEdit?.places.length ?? 0} en la ruta
-              </span>
-            </div>
           </div>
         </section>
 

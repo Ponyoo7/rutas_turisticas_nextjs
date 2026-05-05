@@ -26,7 +26,7 @@ export const MyRoutes = () => {
         <div className="h-px w-full bg-gray-200 flex-1"></div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {myRoutes.length === 0 && (
           <div className="text-center py-8">
             <p className="text-gray-500 mb-4">No tienes ninguna ruta creada</p>

@@ -204,6 +204,23 @@ export const AddToRouteMap = ({
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    const input = event.currentTarget
+    const scrollContainer =
+      input.closest<HTMLElement>('[data-app-scroll-container]') ??
+      (document.scrollingElement instanceof HTMLElement
+        ? document.scrollingElement
+        : null)
+    const scrollTopBeforeUpload = scrollContainer?.scrollTop ?? 0
+    const restoreScrollPosition = () => {
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          if (scrollContainer) {
+            scrollContainer.scrollTop = scrollTopBeforeUpload
+          }
+          input.blur()
+        })
+      })
+    }
     const files = Array.from(event.target.files ?? [])
 
     if (files.length === 0) return
@@ -241,6 +258,7 @@ export const AddToRouteMap = ({
     } finally {
       event.target.value = ''
       setIsPreparingImage(false)
+      restoreScrollPosition()
     }
   }
 
@@ -469,7 +487,9 @@ export const AddToRouteMap = ({
                             accept={ROUTE_IMAGE_ACCEPT}
                             multiple
                             className="sr-only"
+                            tabIndex={-1}
                             onChange={handleImageChange}
+                            onFocus={(focusEvent) => focusEvent.currentTarget.blur()}
                             disabled={!canUploadMoreImages || isSaving}
                           />
                         </label>
@@ -481,7 +501,7 @@ export const AddToRouteMap = ({
                           disabled={routeImages.every((image) => !image.selectedForCover)}
                           className="rounded-full border-0 bg-white text-artis-primary shadow-none hover:bg-[#eef2f6]"
                         >
-            
+                          Quitar seleccion de portada
                         </Button>
                       </div>
 

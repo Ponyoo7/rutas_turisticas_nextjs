@@ -9,11 +9,11 @@ import { MyRoutes } from './components/MyRoutes'
  */
 export default function Page() {
   return (
-    <main className="min-h-screen dark:bg-artis-background-dark p-6 md:p-10">
+    <main className="min-h-screen bg-white p-6 md:p-10">
       <div className="max-w-6xl mx-auto flex flex-col gap-8">
         <ProfileHeader />
-        <FavoriteRoutes />
         <MyRoutes />
+        <FavoriteRoutes />
       </div>
     </main>
   )

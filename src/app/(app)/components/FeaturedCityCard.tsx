@@ -21,9 +21,9 @@ export const FeaturedCityCard = ({ city }: Props) => {
     '/museo_placeholder.jpg'
 
   return (
-    <div className="flex flex-col gap-3 shrink-0 w-64 group">
+    <div className="group flex w-full shrink-0 flex-col gap-4">
       <div
-        className="relative w-full aspect-4/5 rounded-xl shadow-md overflow-hidden"
+        className="relative aspect-[4/4.8] w-full overflow-hidden rounded-[24px] shadow-[0_24px_55px_-34px_rgba(15,23,42,0.42)]"
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
@@ -57,11 +57,11 @@ export const FeaturedCityCard = ({ city }: Props) => {
           </Button>
         </div>
       </div>
-      <div className="px-1">
-        <p className="text-artis-primary dark:text-gray-100 text-lg font-bold font-serif">
+      <div className="px-1.5">
+        <p className="font-serif text-xl font-bold text-artis-primary dark:text-gray-100">
           {city.title}
         </p>
-        <p className="text-gray-500 text-sm font-medium line-clamp-1">
+        <p className="line-clamp-2 text-sm font-medium leading-6 text-gray-500">
           {city.extract}
         </p>
       </div>

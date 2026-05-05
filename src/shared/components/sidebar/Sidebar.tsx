@@ -62,14 +62,14 @@ export const Sidebar = () => {
   const showAdminSection = !isLoading && canAccessAdmin(user)
   const isAdminArea = pathname.startsWith('/admin')
   const getItemClasses = (isActive: boolean) =>
-    `flex min-h-11 flex-1 flex-row items-center justify-center gap-2 rounded-xl px-3 py-2 transition-colors duration-200 md:justify-start ${
+    `flex min-h-12 flex-1 flex-row items-center justify-center gap-3 rounded-xl px-4 py-3 transition-colors duration-200 md:justify-start ${
       isActive
         ? 'bg-artis-primary/10 font-bold text-artis-primary'
         : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
     }`
 
   return (
-    <aside className="w-full px-4 py-3 backdrop-blur-sm md:h-full md:w-72 md:px-4 md:py-6">
+    <aside className="w-full px-4 py-3 backdrop-blur-sm md:h-full md:w-80 md:px-5 md:py-7">
       <div className="flex flex-col gap-4">
         <nav className="flex flex-wrap items-center gap-2 md:flex-col md:items-stretch">
           {baseItems.map((item) => {
@@ -81,8 +81,8 @@ export const Sidebar = () => {
                 href={item.href}
                 className={getItemClasses(isActive)}
               >
-                <item.icon size={22} />
-                <span className="text-base font-serif">{item.label}</span>
+                <item.icon size={24} />
+                <span className="text-[1.05rem] font-serif">{item.label}</span>
               </Link>
             )
           })}
@@ -111,8 +111,8 @@ export const Sidebar = () => {
                     href={item.href}
                     className={getItemClasses(isActive)}
                   >
-                    <item.icon size={22} />
-                    <span className="text-base font-serif">{item.label}</span>
+                    <item.icon size={24} />
+                    <span className="text-[1.05rem] font-serif">{item.label}</span>
                   </Link>
                 )
               })}

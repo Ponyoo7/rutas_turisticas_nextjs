@@ -85,42 +85,20 @@ export default async function Page() {
                 key={image.imageId}
                 className="overflow-hidden rounded-[28px] border border-artis-primary/10 bg-white shadow-sm"
               >
-                <div className="grid grid-cols-1 gap-0 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(340px,0.9fr)]">
-                  <div className="border-b border-artis-primary/10 bg-[#fcfaf7] xl:border-b-0 xl:border-r">
+                <div className="grid grid-cols-1 gap-0 xl:grid-cols-[minmax(280px,0.78fr)_minmax(360px,1.22fr)]">
+                  <div className="flex h-full flex-col border-b border-artis-primary/10 bg-[#fcfaf7] xl:border-b-0 xl:border-r">
                     <div className="border-b border-artis-primary/10 px-5 py-4">
                       <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
                         Imagen aportada
                       </p>
                     </div>
-                    <div className="flex min-h-[260px] items-center justify-center bg-[#efe4d2]">
+                    <div className="flex min-h-[220px] flex-1 items-center justify-center bg-[#efe4d2] p-4 xl:min-h-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={image.image}
                         alt={`Imagen aportada a la ruta ${image.routeName}`}
-                        className="h-full min-h-[260px] w-full object-cover"
+                        className="h-full w-full object-contain"
                       />
-                    </div>
-                  </div>
-
-                  <div className="border-b border-artis-primary/10 bg-white xl:border-b-0 xl:border-r">
-                    <div className="border-b border-artis-primary/10 px-5 py-4">
-                      <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
-                        Portada actual
-                      </p>
-                    </div>
-                    <div className="flex min-h-[260px] items-center justify-center bg-[#efe4d2]">
-                      {image.currentCoverImage ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={image.currentCoverImage}
-                          alt={`Portada actual de ${image.routeName}`}
-                          className="h-full min-h-[260px] w-full object-cover"
-                        />
-                      ) : (
-                        <p className="px-6 text-center text-sm text-gray-500">
-                          La ruta todavia no tiene una portada publicada.
-                        </p>
-                      )}
                     </div>
                   </div>
 

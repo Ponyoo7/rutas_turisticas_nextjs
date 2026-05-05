@@ -14,16 +14,18 @@ export const PlaceCard = async ({ place }: Props) => {
       ? await locationsService.getWikiInfo(place.tags.wikipedia)
       : null)
   const imageUrl =
-    locationsService.getPlaceImage(place, wikiInfo) || '/museo_placeholder.jpg'
+    locationsService.getPlaceImage(place, wikiInfo, {
+      preferredWidth: 1200,
+    }) || '/museo_placeholder.jpg'
 
   return (
     <div className="flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow overflow-hidden group h-full">
       <div className="relative h-48 w-full overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-          style={{
-            backgroundImage: `url("${imageUrl}")`,
-          }}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={imageUrl}
+          alt={wikiInfo?.title || place.tags.name || 'Imagen del lugar'}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent opacity-60"></div>
         <div className="absolute bottom-3 left-3 right-3 text-white">

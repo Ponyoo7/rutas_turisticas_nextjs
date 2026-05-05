@@ -179,6 +179,50 @@ const shouldProxyWikiImage = (urlLike: string) => {
   }
 }
 
+const upscaleWikimediaThumbnailUrl = (
+  source: string,
+  preferredWidth?: number,
+) => {
+  if (
+    !Number.isFinite(preferredWidth) ||
+    typeof preferredWidth !== 'number' ||
+    preferredWidth <= 0
+  ) {
+    return source
+  }
+
+  try {
+    const url = new URL(ensureHttps(source))
+
+    if (url.hostname !== 'upload.wikimedia.org') return source
+
+    const pathSegments = url.pathname.split('/').filter(Boolean)
+    const thumbIndex = pathSegments.indexOf('thumb')
+
+    if (thumbIndex === -1 || pathSegments.length === 0) return source
+
+    const lastSegment = pathSegments[pathSegments.length - 1]
+    const widthMatch = lastSegment.match(/^(.*?)(\d+)px-(.+)$/)
+
+    if (!widthMatch) return source
+
+    const [, prefix = '', currentWidthValue, suffix] = widthMatch
+    const currentWidth = Number(currentWidthValue)
+
+    if (!Number.isFinite(currentWidth) || currentWidth >= preferredWidth) {
+      return source
+    }
+
+    pathSegments[pathSegments.length - 1] =
+      `${prefix}${preferredWidth}px-${suffix}`
+    url.pathname = `/${pathSegments.join('/')}`
+
+    return url.toString()
+  } catch {
+    return source
+  }
+}
+
 const normalizeCanonicalImageUrl = (source?: string | null) => {
   if (typeof source !== 'string') return null
 
@@ -226,15 +270,23 @@ const normalizeCanonicalImageUrl = (source?: string | null) => {
   return null
 }
 
-const toRenderableImageUrl = (source?: string | null) => {
+const toRenderableImageUrl = (
+  source?: string | null,
+  options?: { preferredWidth?: number },
+) => {
   const canonicalSource = normalizeCanonicalImageUrl(source)
 
   if (!canonicalSource) return null
   if (canonicalSource.startsWith('/')) return canonicalSource
 
-  return shouldProxyWikiImage(canonicalSource)
-    ? `${WIKI_IMAGE_PROXY_PATH}?url=${encodeURIComponent(canonicalSource)}`
-    : canonicalSource
+  const preferredSource = upscaleWikimediaThumbnailUrl(
+    canonicalSource,
+    options?.preferredWidth,
+  )
+
+  return shouldProxyWikiImage(preferredSource)
+    ? `${WIKI_IMAGE_PROXY_PATH}?url=${encodeURIComponent(preferredSource)}`
+    : preferredSource
 }
 
 const getSummaryThumbnail = (
@@ -513,6 +565,7 @@ const getSpanishTitle = async (
 const getPlaceImage = (
   place: Pick<OSMElement, 'tags' | 'wikiInfo'>,
   wikiInfo?: WikiData | null,
+  options?: { preferredWidth?: number },
 ) => {
   const resolvedWikiInfo = wikiInfo ?? place.wikiInfo
   const candidates = [
@@ -524,7 +577,7 @@ const getPlaceImage = (
   ]
 
   for (const candidate of candidates) {
-    const renderableImage = toRenderableImageUrl(candidate)
+    const renderableImage = toRenderableImageUrl(candidate, options)
 
     if (renderableImage) return renderableImage
   }

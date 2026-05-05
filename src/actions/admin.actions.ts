@@ -117,7 +117,6 @@ export interface AdminRouteImageQueueItem {
   routeName: string
   routeDescription: string
   image: string
-  currentCoverImage: string | null
   reviewStatus: RouteImageReviewStatus
   selectedForCover: boolean
   createdAt: string
@@ -464,19 +463,13 @@ export const getAdminRouteImageQueue = async (): Promise<
       route_images.created_at,
       routes.name AS route_name,
       routes.description AS route_description,
-      routes.image AS route_image,
       users.fullname AS owner_fullname,
       users.email AS owner_email
     FROM route_images
     INNER JOIN routes ON routes.id = route_images.route_id
     INNER JOIN users ON users.id = routes.user_id
-    WHERE route_images.review_status IN ('pending', 'rejected')
+    WHERE route_images.review_status = 'pending'
     ORDER BY
-      CASE route_images.review_status
-        WHEN 'pending' THEN 0
-        WHEN 'rejected' THEN 1
-        ELSE 2
-      END,
       route_images.created_at DESC,
       route_images.id DESC
   `
@@ -490,7 +483,6 @@ export const getAdminRouteImageQueue = async (): Promise<
       routeName: row.route_name,
       routeDescription: normalizeRouteDescription(row.route_description),
       image: locationsService.toRenderableImageUrl(row.image) ?? '',
-      currentCoverImage: locationsService.toRenderableImageUrl(row.route_image),
       reviewStatus: normalizeRouteImageReviewStatus(row.review_status),
       selectedForCover: row.selected_for_cover === true,
       createdAt: row.created_at

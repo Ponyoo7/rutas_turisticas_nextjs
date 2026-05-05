@@ -9,13 +9,16 @@ import Link from 'next/link'
 export const MainImage = () => {
   return (
     <div className="p-0">
-      <div
-        className="relative flex min-h-[520px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-start justify-end px-6 pb-12 rounded-xl overflow-hidden"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(0, 0, 0, 0.0) 0%, rgba(0, 0, 0, 0.7) 100%), url("https://cdn-imgix.headout.com/media/images/66bb4cc2e114ddd6d0d9f99037768beb-Pantheon%20Rome%20The%20Altar%20of%20the%20Holy%20Spirit.jpg")',
-        }}
-      >
+      <div className="relative flex min-h-[520px] flex-col items-start justify-end gap-6 overflow-hidden rounded-xl px-6 pb-12">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://cdn-imgix.headout.com/media/images/66bb4cc2e114ddd6d0d9f99037768beb-Pantheon%20Rome%20The%20Altar%20of%20the%20Holy%20Spirit.jpg"
+          alt="Interior monumental de un edificio historico"
+          className="absolute inset-0 h-full w-full object-cover object-[center_14%] brightness-[0.76] saturate-[0.82] md:object-[center_18%]"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(17,12,8,0.56)_0%,rgba(17,12,8,0.24)_42%,rgba(17,12,8,0.58)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.12)_0%,rgba(0,0,0,0.72)_100%)]" />
+
         <div className="flex flex-col gap-3 text-left z-10">
           <span className="text-white/80 uppercase tracking-widest text-xs font-bold">
             El arte de viajar

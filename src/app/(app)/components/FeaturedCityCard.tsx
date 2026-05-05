@@ -17,7 +17,9 @@ interface Props {
 export const FeaturedCityCard = ({ city }: Props) => {
   const [isHovering, setIsHovering] = useState<boolean>(false)
   const image =
-    locationsService.toRenderableImageUrl(city.thumbnail?.source) ??
+    locationsService.toRenderableImageUrl(city.thumbnail?.source, {
+      preferredWidth: 960,
+    }) ??
     '/museo_placeholder.jpg'
 
   return (

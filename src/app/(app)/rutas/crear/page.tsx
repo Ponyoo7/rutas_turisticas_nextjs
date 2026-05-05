@@ -91,8 +91,14 @@ export default async function CrearRutaPage({
   )
   const heroImage =
     selectedApprovedContributedCover?.image ||
-    locationsService.toRenderableImageUrl(routeToEdit?.image) ||
-    (heroPlace ? locationsService.getPlaceImage(heroPlace, heroWikiInfo) : null)
+    locationsService.toRenderableImageUrl(routeToEdit?.image, {
+      preferredWidth: 1600,
+    }) ||
+    (heroPlace
+      ? locationsService.getPlaceImage(heroPlace, heroWikiInfo, {
+          preferredWidth: 1600,
+        })
+      : null)
   const heroTitle =
     cityResult?.city.name || routeToEdit?.name || 'Creador de rutas'
   const heroSubtitle = isEditMode

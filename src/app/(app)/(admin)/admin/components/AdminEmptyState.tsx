@@ -1,13 +1,19 @@
+'use client'
+
+import { useI18n } from '@/shared/i18n/I18nProvider'
+
 interface Props {
   title: string
   description: string
 }
 
 export const AdminEmptyState = ({ title, description }: Props) => {
+  const { t } = useI18n()
+
   return (
     <div className="rounded-[28px] border border-dashed border-artis-primary/20 bg-white/80 px-6 py-12 text-center shadow-sm">
       <p className="text-xs font-bold uppercase tracking-[0.35em] text-artis-primary/45">
-        Panel admin
+        {t('admin.shared.panel')}
       </p>
       <h2 className="mt-4 font-serif text-3xl font-bold text-artis-primary">
         {title}

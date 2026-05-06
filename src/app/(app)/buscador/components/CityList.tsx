@@ -1,17 +1,15 @@
-﻿'use client'
+'use client'
 
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { useCitySearch } from '../context/useCitySearch'
 import { CityCard } from './CityCard'
 
-/**
- * Componente que renderiza una cuadrícula (grid) con las tarjetas de las ciudades (`CityCard`).
- * Obtiene las ciudades filtradas directamente desde el contexto de búsqueda (`useCitySearch`).
- */
 export const CityList = () => {
+  const { t } = useI18n()
   const { filteredCities, query } = useCitySearch()
 
   if (!filteredCities.length) {
-    return <p>No hay resultados para {query}.</p>
+    return <p>{t('searchPage.noResults', { query })}</p>
   }
 
   return (

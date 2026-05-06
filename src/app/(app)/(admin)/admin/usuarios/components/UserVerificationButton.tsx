@@ -1,6 +1,7 @@
 'use client'
 
 import { updateUserVerified } from '@/actions/admin.actions'
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { Button } from '@/shared/components/ui/button'
 import { IconLoader2 } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
@@ -13,6 +14,7 @@ interface Props {
 
 export function UserVerificationButton({ userId, verified }: Props) {
   const router = useRouter()
+  const { t } = useI18n()
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -50,12 +52,12 @@ export function UserVerificationButton({ userId, verified }: Props) {
         {isPending ? (
           <>
             <IconLoader2 size={16} className="animate-spin" />
-            Guardando...
+            {t('admin.users.buttons.saving')}
           </>
         ) : verified ? (
-          'Quitar verificacion'
+          t('admin.users.buttons.unverify')
         ) : (
-          'Verificar'
+          t('admin.users.buttons.verify')
         )}
       </Button>
 

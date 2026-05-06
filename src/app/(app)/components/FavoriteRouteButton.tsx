@@ -2,6 +2,7 @@
 
 import { toggleFavoriteRoute } from '@/actions/routes.actions'
 import { cn } from '@/lib/utils'
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { Button } from '@/shared/components/ui/button'
 import { useUserStore } from '@/shared/stores/useUserStore'
 import { Heart, Loader2 } from 'lucide-react'
@@ -25,6 +26,7 @@ export function FavoriteRouteButton({
   mode = 'icon',
 }: Props) {
   const router = useRouter()
+  const { t } = useI18n()
   const { user, isLoading } = useUserStore(
     useShallow((state) => ({
       user: state.user,
@@ -68,7 +70,7 @@ export function FavoriteRouteButton({
     <div className={cn('flex flex-col items-end gap-2', className)}>
       <Button
         type="button"
-        variant={mode === 'full' ? 'outline' : 'outline'}
+        variant="outline"
         size={mode === 'full' ? 'sm' : 'icon-sm'}
         onClick={handleClick}
         disabled={isPending || isLoading}
@@ -90,7 +92,7 @@ export function FavoriteRouteButton({
         )}
         {mode === 'full' && (
           <span>
-            {isFavorite ? 'Guardada en favoritos' : 'Guardar en favoritos'}
+            {isFavorite ? t('common.savedInFavorites') : t('common.saveToFavorites')}
           </span>
         )}
       </Button>

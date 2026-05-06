@@ -1,5 +1,7 @@
 'use client'
 
+import { getPlaceTypeLabel } from '@/lib/utils'
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { OSMElement } from '@/shared/types/locations'
 
 interface MapSearchProps {
@@ -15,11 +17,13 @@ export const MapSearch = ({
   filteredPlaces,
   onSelectPlace,
 }: MapSearchProps) => {
+  const { locale, t } = useI18n()
+
   return (
     <div className="mb-4 flex w-full flex-col gap-4">
       <div className="flex items-center gap-4">
         <h2 className="font-serif text-3xl font-bold tracking-tight text-artis-primary md:text-4xl">
-          Busca tu proximo destino...
+          {t('cityPage.mapSearch.title')}
         </h2>
         <div className="h-px flex-1 bg-[#e6e9ee]"></div>
       </div>
@@ -44,7 +48,7 @@ export const MapSearch = ({
           type="text"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Buscar lugar de interes..."
+          placeholder={t('cityPage.mapSearch.placeholder')}
           className="h-12 w-full rounded-full border border-[#d9dfe7] bg-[#f5f6f8] pl-11 pr-4 text-sm shadow-[0_12px_28px_-26px_rgba(15,23,42,0.8)] transition-all focus:border-artis-primary/35 focus:outline-none focus:ring-2 focus:ring-artis-primary/12"
         />
 
@@ -79,12 +83,10 @@ export const MapSearch = ({
                 </span>
                 <div>
                   <p className="text-sm font-medium text-gray-800">
-                    {place.tags?.name || 'Sin nombre'}
+                    {place.tags?.name || t('common.unnamedPoint')}
                   </p>
                   <p className="text-xs text-gray-400">
-                    {place.tags?.historic === 'archaeological_site'
-                      ? 'Sitio arqueologico'
-                      : 'Turismo'}
+                    {getPlaceTypeLabel(place, locale)}
                   </p>
                 </div>
               </li>
@@ -94,7 +96,9 @@ export const MapSearch = ({
 
         {search.trim() && filteredPlaces.length === 0 && (
           <div className="absolute left-0 right-0 top-full z-[9999] mt-2 rounded-[22px] bg-white px-4 py-3 shadow-[0_20px_40px_-30px_rgba(15,23,42,0.55)]">
-            <p className="text-sm text-gray-400">No se encontraron resultados</p>
+            <p className="text-sm text-gray-400">
+              {t('cityPage.mapSearch.noResults')}
+            </p>
           </div>
         )}
       </div>

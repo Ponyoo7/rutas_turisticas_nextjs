@@ -1,20 +1,22 @@
 'use client'
 
-import { FeaturedRouteCard } from '@/app/(app)/components/FeaturedRouteCard'
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { useMyFavoriteRoutes } from '@/shared/hooks/useMyFavoriteRoutes'
+import { FeaturedRouteCard } from '@/app/(app)/components/FeaturedRouteCard'
 
 export function FavoriteRoutes() {
+  const { t } = useI18n()
   const { favoriteRoutes, isLoading, refetch } = useMyFavoriteRoutes()
 
   return (
     <section className="flex flex-col gap-6">
       <div className="flex items-center gap-4">
-        <h2 className="text-2xl font-bold font-serif text-artis-primary dark:text-white">
-          Rutas favoritas
+        <h2 className="font-serif text-2xl font-bold text-artis-primary dark:text-white">
+          {t('profile.favoriteRoutes.title')}
         </h2>
-        <div className="h-px bg-gray-200 flex-1"></div>
+        <div className="h-px flex-1 bg-gray-200"></div>
         <span className="text-sm font-medium text-gray-500">
-          {favoriteRoutes.length} rutas
+          {t('profile.favoriteRoutes.count', { count: favoriteRoutes.length })}
         </span>
       </div>
 
@@ -35,7 +37,7 @@ export function FavoriteRoutes() {
             favorite
           </span>
           <p className="font-medium text-gray-500">
-            Aun no has guardado rutas favoritas.
+            {t('profile.favoriteRoutes.empty')}
           </p>
         </div>
       )}
@@ -47,7 +49,7 @@ export function FavoriteRoutes() {
               key={route.id}
               route={route}
               initialIsFavorite
-              primaryBadge={route.featured ? 'Destacada' : 'Guardada'}
+              primaryBadge={route.featured ? t('common.featured') : t('common.saved')}
               href={`/rutas/destacadas/${route.id}`}
               onFavoriteChange={(isFavorite) => {
                 if (!isFavorite) refetch()

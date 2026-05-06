@@ -1,21 +1,19 @@
+import { getTranslations } from '@/shared/i18n/server'
 import { OSMElement } from '@/shared/types/locations'
-import { getPlaceTypeLabel } from '@/lib/utils'
 import { RoutePlaceCard } from './RoutePlaceCard'
 
 interface RoutePlacesListProps {
   places: OSMElement[]
 }
 
-/**
- * Componente mapeador que itera y renderiza una lista secuencial de las paradas (`RoutePlaceCard`),
- * garantizando la presentación de los lugares en el orden original del itinerario.
- */
-export const RoutePlacesList = ({ places }: RoutePlacesListProps) => {
+export const RoutePlacesList = async ({ places }: RoutePlacesListProps) => {
+  const { t } = await getTranslations()
+
   return (
     <section className="space-y-3">
       {places.length === 0 && (
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          No hay lugares guardados para esta ruta.
+          {t('routeDetail.noPlaces')}
         </p>
       )}
 

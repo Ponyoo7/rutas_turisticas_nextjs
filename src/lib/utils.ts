@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { OSMElement } from '@/shared/types/locations'
+import { Locale } from '@/shared/i18n/config'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -13,6 +14,35 @@ export const wait = (ms: number) =>
 
 const EARTH_RADIUS_KM = 6371
 const WALKING_SPEED_KMH = 5
+
+const PLACE_TYPE_LABELS: Record<
+  Locale,
+  {
+    archaeologicalSite: string
+    monument: string
+    memorial: string
+    museum: string
+    attraction: string
+    default: string
+  }
+> = {
+  es: {
+    archaeologicalSite: 'Sitio arqueologico',
+    monument: 'Monumento',
+    memorial: 'Memorial',
+    museum: 'Museo',
+    attraction: 'Atraccion',
+    default: 'Punto de interes',
+  },
+  en: {
+    archaeologicalSite: 'Archaeological site',
+    monument: 'Monument',
+    memorial: 'Memorial',
+    museum: 'Museum',
+    attraction: 'Attraction',
+    default: 'Point of interest',
+  },
+}
 
 export const getPlaceCoords = (place: OSMElement): [number, number] | null => {
   const lat = place.lat ?? place.center?.lat
@@ -74,12 +104,16 @@ export const formatDuration = (minutes: number) => {
   return `${hours} h ${remainingMinutes} min`
 }
 
-export const getPlaceTypeLabel = (place: OSMElement) => {
-  if (place.tags.historic === 'archaeological_site') return 'Sitio arqueologico'
-  if (place.tags.historic === 'monument') return 'Monumento'
-  if (place.tags.historic === 'memorial') return 'Memorial'
-  if (place.tags.tourism === 'museum') return 'Museo'
-  if (place.tags.tourism === 'attraction') return 'Atraccion'
+export const getPlaceTypeLabel = (place: OSMElement, locale: Locale = 'es') => {
+  const labels = PLACE_TYPE_LABELS[locale]
 
-  return 'Punto de interes'
+  if (place.tags.historic === 'archaeological_site') {
+    return labels.archaeologicalSite
+  }
+  if (place.tags.historic === 'monument') return labels.monument
+  if (place.tags.historic === 'memorial') return labels.memorial
+  if (place.tags.tourism === 'museum') return labels.museum
+  if (place.tags.tourism === 'attraction') return labels.attraction
+
+  return labels.default
 }

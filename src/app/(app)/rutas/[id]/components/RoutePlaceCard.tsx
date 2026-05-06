@@ -1,9 +1,10 @@
 'use client'
 
-import { OSMElement, WikiData } from '@/shared/types/locations'
 import { getPlaceTypeLabel } from '@/lib/utils'
-import { useEffect, useState } from 'react'
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { locationsService } from '@/shared/services/locations.service'
+import { OSMElement, WikiData } from '@/shared/types/locations'
+import { useEffect, useState } from 'react'
 
 interface RoutePlaceCardProps {
   place: OSMElement
@@ -11,6 +12,7 @@ interface RoutePlaceCardProps {
 }
 
 export const RoutePlaceCard = ({ place, index }: RoutePlaceCardProps) => {
+  const { locale, t } = useI18n()
   const [placeInfo, setPlaceInfo] = useState<WikiData | null>(
     place.wikiInfo ?? null,
   )
@@ -27,20 +29,20 @@ export const RoutePlaceCard = ({ place, index }: RoutePlaceCardProps) => {
     locationsService.getPlaceImage(place, placeInfo) || '/museo_placeholder.jpg'
 
   return (
-    <div className="flex bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+    <div className="flex overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
       <div
-        className="w-1/3 min-w-[120px] max-w-[200px] bg-cover bg-center shrink-0 transition-all duration-500"
+        className="w-1/3 min-w-[120px] max-w-[200px] shrink-0 bg-cover bg-center transition-all duration-500"
         style={{ backgroundImage: `url("${image}")` }}
       ></div>
-      <div className="p-4 flex flex-col justify-center gap-1 flex-1">
-        <div className="text-[10px] font-bold text-artis-secondary-blue uppercase tracking-widest">
-          PARADA {index + 1}
+      <div className="flex flex-1 flex-col justify-center gap-1 p-4">
+        <div className="text-[10px] font-bold uppercase tracking-widest text-artis-secondary-blue">
+          {t('routeDetail.stopLabel', { index: index + 1 })}
         </div>
-        <h3 className="text-artis-primary dark:text-gray-100 text-lg font-bold leading-tight font-serif">
-          {place.tags.name ?? 'Punto sin nombre'}
+        <h3 className="font-serif text-lg font-bold leading-tight text-artis-primary dark:text-gray-100">
+          {place.tags.name ?? t('common.unnamedPoint')}
         </h3>
-        <p className="text-gray-500 text-xs line-clamp-2">
-          {getPlaceTypeLabel(place)}
+        <p className="line-clamp-2 text-xs text-gray-500">
+          {getPlaceTypeLabel(place, locale)}
         </p>
       </div>
     </div>

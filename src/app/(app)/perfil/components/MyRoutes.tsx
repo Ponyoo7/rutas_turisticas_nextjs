@@ -1,5 +1,6 @@
 'use client'
 
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { Button } from '@/shared/components/ui/button'
 import {
   Carousel,
@@ -12,12 +13,9 @@ import { useMyRoutes } from '@/shared/hooks/useMyRoutes'
 import { useRouter } from 'next/navigation'
 import { RouteCardWithActions } from './RouteCardWithActions'
 
-/**
- * Muestra las rutas creadas por el usuario autenticado en un panel visual
- * mas espacioso y orientado a gestion.
- */
 export function MyRoutes() {
   const router = useRouter()
+  const { t } = useI18n()
   const { myRoutes, isLoading, refetch } = useMyRoutes()
   const shouldUseCarousel = myRoutes.length > 3
 
@@ -26,20 +24,20 @@ export function MyRoutes() {
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
-              <h2 className="font-serif text-3xl font-bold text-artis-primary md:text-4xl">
-                Mis rutas
-              </h2>
+            <h2 className="font-serif text-3xl font-bold text-artis-primary md:text-4xl">
+              {t('profile.myRoutes.title')}
+            </h2>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             <span className="inline-flex rounded-full bg-[#faf8f4] px-4 py-2 text-sm font-semibold text-artis-primary">
-              {myRoutes.length} rutas
+              {t('profile.myRoutes.count', { count: myRoutes.length })}
             </span>
             <Button
               className="rounded-full border-none bg-artis-primary px-5 py-2.5 text-sm font-bold text-white shadow-lg hover:bg-artis-primary/90"
               onClick={() => router.push('/buscador')}
             >
-              Crear nueva ruta
+              {t('profile.myRoutes.createNew')}
             </Button>
           </div>
         </div>
@@ -61,17 +59,16 @@ export function MyRoutes() {
               map
             </span>
             <p className="font-serif text-2xl font-bold text-artis-primary">
-              Tu mapa personal todavia esta vacio
+              {t('profile.myRoutes.emptyTitle')}
             </p>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-gray-600">
-              Cuando guardes una ruta, la tendras aqui con sus paradas, su
-              descripcion y las fotos que quieras aportar.
+              {t('profile.myRoutes.emptyDescription')}
             </p>
             <Button
               className="mt-6 rounded-full border-none bg-artis-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg hover:bg-artis-primary/90"
               onClick={() => router.push('/buscador')}
             >
-              Crear mi primera ruta
+              {t('profile.myRoutes.firstRoute')}
             </Button>
           </div>
         )}

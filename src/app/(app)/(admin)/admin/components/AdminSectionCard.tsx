@@ -1,3 +1,6 @@
+'use client'
+
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import Link from 'next/link'
 
 interface Props {
@@ -15,6 +18,8 @@ export const AdminSectionCard = ({
   value,
   note,
 }: Props) => {
+  const { t } = useI18n()
+
   return (
     <Link
       href={href}
@@ -33,7 +38,7 @@ export const AdminSectionCard = ({
         </div>
 
         <span className="rounded-full border border-artis-primary/15 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.25em] text-artis-primary transition-colors group-hover:bg-artis-primary group-hover:text-white">
-          Abrir
+          {t('admin.shared.open')}
         </span>
       </div>
 

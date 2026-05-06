@@ -5,6 +5,7 @@ import {
 } from '@/lib/route-images'
 import { getMyRouteById } from '@/actions/routes.actions'
 import { verifyToken } from '@/actions/user.actions'
+import { getTranslations } from '@/shared/i18n/server'
 import { Button } from '@/shared/components/ui/button'
 import { IconEdit, IconStar } from '@tabler/icons-react'
 import { cookies } from 'next/headers'
@@ -25,6 +26,7 @@ export default async function Page({ params }: PageProps) {
 
   if (!Number.isInteger(parsedId) || parsedId <= 0) notFound()
 
+  const { locale, t } = await getTranslations()
   const cookieStore = await cookies()
   const authToken = cookieStore.get('auth')
   const user = await verifyToken(authToken?.value)
@@ -38,6 +40,8 @@ export default async function Page({ params }: PageProps) {
   const selectedCoverCandidate =
     route.contributedImages.find((image) => image.selectedForCover) ?? null
   const previewImage = route.image || '/museo_placeholder.jpg'
+  const imagesCountSuffix =
+    locale === 'es' ? (route.contributedImages.length === 1 ? '' : 'es') : route.contributedImages.length === 1 ? '' : 's'
 
   return (
     <main className="h-full w-full p-4">
@@ -48,13 +52,13 @@ export default async function Page({ params }: PageProps) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={previewImage}
-                alt={`Portada de la ruta ${route.name}`}
+                alt={t('routeDetail.coverAlt', { name: route.name })}
                 className="h-full w-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-6 text-white">
                 <p className="text-xs font-bold uppercase tracking-[0.3em] text-white/70">
-                  Mi ruta
+                  {t('routeDetail.myRoute')}
                 </p>
                 <h1 className="mt-3 font-serif text-3xl font-bold md:text-4xl">
                   {route.name}
@@ -65,32 +69,38 @@ export default async function Page({ params }: PageProps) {
             <div className="flex flex-col gap-5 p-6 md:p-8">
               <div className="rounded-[24px] border border-artis-primary/10 bg-[#fcfaf7] p-5">
                 <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
-                  Descripcion
+                  {t('routeDetail.description')}
                 </p>
                 <p className="mt-3 text-sm leading-7 text-gray-600">
-                  {route.description ||
-                    'Todavia no has anadido una descripcion para esta ruta.'}
+                  {route.description || t('common.noDescription')}
                 </p>
               </div>
 
               <div className="rounded-[24px] border border-artis-primary/10 bg-[#fcfaf7] p-5">
                 <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
-                  Imagenes aportadas
+                  {t('routeDetail.contributedImages')}
                 </p>
                 <p className="mt-3 text-sm leading-7 text-gray-600">
                   {route.contributedImages.length === 0
-                    ? 'Todavia no has subido imagenes para documentar esta ruta.'
-                    : `Has aportado ${route.contributedImages.length} imagen${route.contributedImages.length === 1 ? '' : 'es'} para esta ruta.`}
+                    ? t('routeDetail.noImagesYet')
+                    : t('routeDetail.imagesCount', {
+                        count: route.contributedImages.length,
+                        suffix: imagesCountSuffix,
+                      })}
                 </p>
                 {selectedCoverCandidate && (
                   <p className="mt-3 text-sm leading-7 text-gray-600">
-                    La imagen marcada como portada esta{' '}
+                    {t('routeDetail.coverStatusPrefix')}{' '}
                     <span className="font-semibold text-artis-primary">
-                      {getRouteImageReviewLabel(selectedCoverCandidate.reviewStatus).toLowerCase()}
+                      {getRouteImageReviewLabel(
+                        selectedCoverCandidate.reviewStatus,
+                        locale,
+                      ).toLowerCase()}
                     </span>
                     .{' '}
                     {getRouteImageReviewDescription(
                       selectedCoverCandidate.reviewStatus,
+                      locale,
                     )}
                   </p>
                 )}
@@ -104,7 +114,7 @@ export default async function Page({ params }: PageProps) {
                 >
                   <Link href={`/rutas/crear?routeId=${parsedId}`}>
                     <IconEdit size={18} />
-                    Editar ruta
+                    {t('routeDetail.editRoute')}
                   </Link>
                 </Button>
                 <DeleteRouteButton routeId={parsedId} />
@@ -117,7 +127,7 @@ export default async function Page({ params }: PageProps) {
           <section className="rounded-[28px] border border-artis-primary/10 bg-white p-6 shadow-sm md:p-8">
             <div className="flex flex-row items-center gap-4 pb-6">
               <h2 className="font-serif text-2xl font-bold tracking-tight text-artis-primary">
-                Galeria aportada
+                {t('routeDetail.gallery')}
               </h2>
               <div className="h-px flex-1 bg-gray-200"></div>
             </div>
@@ -135,13 +145,13 @@ export default async function Page({ params }: PageProps) {
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={image.image}
-                        alt={`Imagen aportada a la ruta ${route.name}`}
+                        alt={t('routeDetail.imageAlt', { name: route.name })}
                         className="h-full w-full object-cover"
                       />
                       {image.selectedForCover && (
                         <span className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-artis-primary">
                           <IconStar size={14} />
-                          Portada candidata
+                          {t('routeDetail.candidateCover')}
                         </span>
                       )}
                     </div>
@@ -156,10 +166,10 @@ export default async function Page({ params }: PageProps) {
                               : 'bg-amber-50 text-amber-700'
                         }`}
                       >
-                        {getRouteImageReviewLabel(image.reviewStatus)}
+                        {getRouteImageReviewLabel(image.reviewStatus, locale)}
                       </span>
                       <p className="text-sm leading-6 text-gray-600">
-                        {getRouteImageReviewDescription(image.reviewStatus)}
+                        {getRouteImageReviewDescription(image.reviewStatus, locale)}
                       </p>
                     </div>
                   </article>
@@ -172,7 +182,7 @@ export default async function Page({ params }: PageProps) {
         <section>
           <div className="flex flex-row items-center gap-4 pb-6">
             <h2 className="font-serif text-2xl font-bold tracking-tight text-artis-primary dark:text-gray-100">
-              Estadisticas
+              {t('routeDetail.stats')}
             </h2>
             <div className="h-px flex-1 bg-gray-200"></div>
           </div>
@@ -183,7 +193,7 @@ export default async function Page({ params }: PageProps) {
           <section>
             <div className="flex flex-row items-center gap-4 pb-6">
               <h2 className="font-serif text-2xl font-bold tracking-tight text-artis-primary dark:text-gray-100">
-                Mapa
+                {t('routeDetail.map')}
               </h2>
               <div className="h-px flex-1 bg-gray-200"></div>
             </div>
@@ -194,7 +204,7 @@ export default async function Page({ params }: PageProps) {
           <section>
             <div className="flex flex-row items-center gap-4 pb-6">
               <h2 className="font-serif text-2xl font-bold tracking-tight text-artis-primary dark:text-gray-100">
-                Itinerario
+                {t('routeDetail.itinerary')}
               </h2>
               <div className="h-px flex-1 bg-gray-200"></div>
             </div>

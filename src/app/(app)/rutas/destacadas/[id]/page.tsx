@@ -3,6 +3,7 @@ import {
   getMyFavoriteRouteIds,
 } from '@/actions/routes.actions'
 import { FavoriteRouteButton } from '@/app/(app)/components/FavoriteRouteButton'
+import { getTranslations } from '@/shared/i18n/server'
 import { Button } from '@/shared/components/ui/button'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -15,6 +16,7 @@ interface PageProps {
 }
 
 export default async function FeaturedRouteDetailPage({ params }: PageProps) {
+  const { locale, t } = await getTranslations()
   const { id } = await params
   const parsedId = Number(id)
 
@@ -29,6 +31,10 @@ export default async function FeaturedRouteDetailPage({ params }: PageProps) {
 
   const isFavorite = favoriteRouteIds.includes(route.id)
   const previewImage = route.image || '/museo_placeholder.jpg'
+  const contributedImagesSuffix =
+    route.contributedImages.length === 1 ? '' : locale === 'es' ? 'es' : 's'
+  const contributedImagesPluralSuffix =
+    route.contributedImages.length === 1 ? '' : locale === 'es' ? 's' : ''
 
   return (
     <main className="h-full w-full p-4">
@@ -39,13 +45,13 @@ export default async function FeaturedRouteDetailPage({ params }: PageProps) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={previewImage}
-                alt={`Portada de la ruta ${route.name}`}
+                alt={t('routeDetail.coverAlt', { name: route.name })}
                 className="h-full w-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-6 text-white">
                 <p className="text-xs font-bold uppercase tracking-[0.3em] text-white/70">
-                  Ruta destacada
+                  {t('routeDetail.featuredLabel')}
                 </p>
                 <h1 className="mt-3 font-serif text-3xl font-bold md:text-4xl">
                   {route.name}
@@ -56,22 +62,25 @@ export default async function FeaturedRouteDetailPage({ params }: PageProps) {
             <div className="flex flex-col gap-5 p-6 md:p-8">
               <div className="rounded-[24px] border border-artis-primary/10 bg-[#fcfaf7] p-5">
                 <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
-                  Descripcion
+                  {t('routeDetail.description')}
                 </p>
                 <p className="mt-3 text-sm leading-7 text-gray-600">
-                  {route.description ||
-                    'Esta ruta destacada aun no tiene descripcion editorial.'}
+                  {route.description || t('routeDetail.featuredNoDescription')}
                 </p>
               </div>
 
               <div className="rounded-[24px] border border-artis-primary/10 bg-[#fcfaf7] p-5">
                 <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
-                  Galeria de la experiencia
+                  {t('routeDetail.experienceGallery')}
                 </p>
                 <p className="mt-3 text-sm leading-7 text-gray-600">
                   {route.contributedImages.length === 0
-                    ? 'Todavia no hay imagenes de usuarios aprobadas para esta ruta.'
-                    : `Esta ruta incluye ${route.contributedImages.length} imagen${route.contributedImages.length === 1 ? '' : 'es'} aportadas por usuarios.`}
+                    ? t('routeDetail.noApprovedImagesYet')
+                    : t('routeDetail.approvedImagesCount', {
+                        count: route.contributedImages.length,
+                        suffix: contributedImagesSuffix,
+                        pluralSuffix: contributedImagesPluralSuffix,
+                      })}
                 </p>
               </div>
 
@@ -81,7 +90,7 @@ export default async function FeaturedRouteDetailPage({ params }: PageProps) {
                   className="rounded-xl border border-artis-primary/30 bg-white font-bold text-artis-primary shadow-lg transition-colors hover:bg-gray-50"
                   asChild
                 >
-                  <Link href="/perfil">Ir a mi perfil</Link>
+                  <Link href="/perfil">{t('routeDetail.goToProfile')}</Link>
                 </Button>
                 <FavoriteRouteButton
                   routeId={route.id}
@@ -97,7 +106,7 @@ export default async function FeaturedRouteDetailPage({ params }: PageProps) {
           <section className="rounded-[28px] border border-artis-primary/10 bg-white p-6 shadow-sm md:p-8">
             <div className="flex flex-row items-center gap-4 pb-6">
               <h2 className="font-serif text-2xl font-bold tracking-tight text-artis-primary">
-                Imagenes aprobadas
+                {t('routeDetail.approvedImagesTitle')}
               </h2>
               <div className="h-px flex-1 bg-gray-200"></div>
             </div>
@@ -112,7 +121,7 @@ export default async function FeaturedRouteDetailPage({ params }: PageProps) {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={image.image}
-                      alt={`Imagen aprobada de la ruta ${route.name}`}
+                      alt={t('routeDetail.approvedImageAlt', { name: route.name })}
                       className="h-full w-full object-cover"
                     />
                   </div>
@@ -125,7 +134,7 @@ export default async function FeaturedRouteDetailPage({ params }: PageProps) {
         <section>
           <div className="flex flex-row items-center gap-4 pb-6">
             <h2 className="font-serif text-2xl font-bold tracking-tight text-artis-primary dark:text-gray-100">
-              Estadisticas
+              {t('routeDetail.stats')}
             </h2>
             <div className="h-px flex-1 bg-gray-200"></div>
           </div>
@@ -136,7 +145,7 @@ export default async function FeaturedRouteDetailPage({ params }: PageProps) {
           <section>
             <div className="flex flex-row items-center gap-4 pb-6">
               <h2 className="font-serif text-2xl font-bold tracking-tight text-artis-primary dark:text-gray-100">
-                Mapa
+                {t('routeDetail.map')}
               </h2>
               <div className="h-px flex-1 bg-gray-200"></div>
             </div>
@@ -147,7 +156,7 @@ export default async function FeaturedRouteDetailPage({ params }: PageProps) {
           <section>
             <div className="flex flex-row items-center gap-4 pb-6">
               <h2 className="font-serif text-2xl font-bold tracking-tight text-artis-primary dark:text-gray-100">
-                Itinerario
+                {t('routeDetail.itinerary')}
               </h2>
               <div className="h-px flex-1 bg-gray-200"></div>
             </div>

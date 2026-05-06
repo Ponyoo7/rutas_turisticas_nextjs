@@ -1,17 +1,18 @@
 'use client'
 
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useI18n } from '@/shared/i18n/I18nProvider'
+import { Button } from '@/shared/components/ui/button'
 import { locationsService } from '@/shared/services/locations.service'
 import { WikiData } from '@/shared/types/locations'
-
-import { Button } from '@/shared/components/ui/button'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 interface Props {
   city: WikiData
 }
 
 export const CityCard = ({ city }: Props) => {
+  const { t } = useI18n()
   const [cityInfo, setCityInfo] = useState<WikiData>(city)
   const [isHovering, setIsHovering] = useState<boolean>(false)
   const cityName = cityInfo.title || city.title
@@ -44,7 +45,7 @@ export const CityCard = ({ city }: Props) => {
       }
     }
 
-    loadCityInfo()
+    void loadCityInfo()
 
     return () => {
       cancelled = true
@@ -53,13 +54,13 @@ export const CityCard = ({ city }: Props) => {
 
   return (
     <div
-      className="flex flex-col gap-3 group h-full"
+      className="group flex h-full flex-col gap-3"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      <div className="relative w-full aspect-5/3 rounded-xl shadow-md overflow-hidden">
+      <div className="relative aspect-5/3 w-full overflow-hidden rounded-xl shadow-md">
         <div
-          className={`absolute inset-0 bg-cover bg-center transition-all duration-500 ${isHovering ? 'blur-[2px] scale-110' : 'scale-100'}`}
+          className={`absolute inset-0 bg-cover bg-center transition-all duration-500 ${isHovering ? 'scale-110 blur-[2px]' : 'scale-100'}`}
           style={{
             backgroundImage: `url("${image}")`,
           }}
@@ -71,29 +72,31 @@ export const CityCard = ({ city }: Props) => {
 
         <div
           className={`absolute inset-0 flex flex-col items-center justify-center gap-3 transition-all duration-300 ${
-            isHovering ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            isHovering ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
           }`}
         >
           <Button
-            className="w-32 bg-white text-artis-primary hover:bg-gray-100 font-bold shadow-lg"
+            className="w-32 bg-white font-bold text-artis-primary shadow-lg hover:bg-gray-100"
             asChild
           >
-            <Link href={`/ciudad/${cityName}`}>Explora</Link>
+            <Link href={`/ciudad/${cityName}`}>{t('searchPage.explore')}</Link>
           </Button>
           <Button
-            className="w-32 bg-artis-primary text-white hover:bg-artis-primary/90 font-bold shadow-lg border-none"
+            className="w-32 border-none bg-artis-primary font-bold text-white shadow-lg hover:bg-artis-primary/90"
             asChild
           >
-            <Link href={`/rutas/crear?city=${cityName}`}>Crear ruta</Link>
+            <Link href={`/rutas/crear?city=${cityName}`}>
+              {t('searchPage.createRoute')}
+            </Link>
           </Button>
         </div>
       </div>
-      <Link href={`/ciudad/${cityName}`} className="px-1 flex flex-col gap-1">
-        <p className="text-artis-primary dark:text-gray-100 text-xl font-bold font-serif group-hover:text-artis-primary/80 transition-colors">
+      <Link href={`/ciudad/${cityName}`} className="flex flex-col gap-1 px-1">
+        <p className="font-serif text-xl font-bold text-artis-primary transition-colors group-hover:text-artis-primary/80 dark:text-gray-100">
           {cityName}
         </p>
-        <p className="text-gray-500 text-sm font-medium line-clamp-2 leading-relaxed">
-          {cityInfo.extract || 'Sin descripcion disponible.'}
+        <p className="line-clamp-2 text-sm font-medium leading-relaxed text-gray-500">
+          {cityInfo.extract || t('searchPage.noDescription')}
         </p>
       </Link>
     </div>

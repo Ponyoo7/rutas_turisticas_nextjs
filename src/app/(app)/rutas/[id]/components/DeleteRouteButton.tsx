@@ -1,8 +1,9 @@
 'use client'
 
 import { deleteRoute } from '@/actions/routes.actions'
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { Button } from '@/shared/components/ui/button'
-import { IconTrash, IconLoader2 } from '@tabler/icons-react'
+import { IconLoader2, IconTrash } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -10,17 +11,13 @@ interface DeleteRouteButtonProps {
   routeId: number
 }
 
-/**
- * Botón para eliminar definitivamente una ruta.
- * Implementa un diálogo nativo de confirmación y hace uso de la Server Action `deleteRoute`.
- * Redirige a la página principal de "Mis Rutas" (/perfil) en caso de completarse con éxito.
- */
 export function DeleteRouteButton({ routeId }: DeleteRouteButtonProps) {
   const router = useRouter()
+  const { t } = useI18n()
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleDelete = async () => {
-    if (!confirm('¿Estás seguro de que quieres eliminar esta ruta?')) return
+    if (!confirm(t('routeDetail.deleteConfirm'))) return
 
     setIsDeleting(true)
     try {
@@ -37,17 +34,17 @@ export function DeleteRouteButton({ routeId }: DeleteRouteButtonProps) {
       variant="outline"
       onClick={handleDelete}
       disabled={isDeleting}
-      className="rounded-xl bg-white text-red-600 hover:bg-red-50 hover:text-red-700 font-bold shadow-lg border border-red-200 transition-colors gap-2 cursor-pointer"
+      className="cursor-pointer gap-2 rounded-xl border border-red-200 bg-white font-bold text-red-600 shadow-lg transition-colors hover:bg-red-50 hover:text-red-700"
     >
       {isDeleting ? (
         <>
           <IconLoader2 size={18} className="animate-spin" />
-          Eliminando...
+          {t('profile.myRoutes.deleting')}
         </>
       ) : (
         <>
           <IconTrash size={18} />
-          Borrar ruta
+          {t('routeDetail.deleteButton')}
         </>
       )}
     </Button>

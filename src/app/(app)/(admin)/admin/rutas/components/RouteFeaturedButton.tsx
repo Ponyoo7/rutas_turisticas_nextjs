@@ -1,6 +1,7 @@
 'use client'
 
 import { updateRouteFeatured } from '@/actions/admin.actions'
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { Button } from '@/shared/components/ui/button'
 import { IconLoader2 } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
@@ -13,6 +14,7 @@ interface Props {
 
 export function RouteFeaturedButton({ routeId, featured }: Props) {
   const router = useRouter()
+  const { t } = useI18n()
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -50,12 +52,12 @@ export function RouteFeaturedButton({ routeId, featured }: Props) {
         {isPending ? (
           <>
             <IconLoader2 size={16} className="animate-spin" />
-            Guardando...
+            {t('admin.routes.buttons.saving')}
           </>
         ) : featured ? (
-          'Quitar destacado'
+          t('admin.routes.buttons.unfeature')
         ) : (
-          'Destacar'
+          t('admin.routes.buttons.feature')
         )}
       </Button>
 

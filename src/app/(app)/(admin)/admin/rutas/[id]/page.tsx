@@ -4,6 +4,7 @@ import {
   getRouteImageReviewTone,
 } from '@/lib/route-images'
 import { getAdminRouteById } from '@/actions/admin.actions'
+import { getTranslations } from '@/shared/i18n/server'
 import { getPlaceCoords, getPlaceTypeLabel } from '@/lib/utils'
 import { Button } from '@/shared/components/ui/button'
 import { IconStar } from '@tabler/icons-react'
@@ -15,6 +16,7 @@ interface PageProps {
 }
 
 export default async function Page({ params }: PageProps) {
+  const { locale, t } = await getTranslations()
   const { id } = await params
   const parsedId = Number(id)
 
@@ -24,20 +26,26 @@ export default async function Page({ params }: PageProps) {
 
   if (!route) notFound()
 
+  const galleryCountSuffix =
+    route.contributedImages.length === 1 ? '' : locale === 'es' ? 'es' : 's'
+  const savedPlaceSuffix =
+    route.places.length === 1 ? '' : locale === 'es' ? 'es' : 's'
+  const savedPlacePluralSuffix =
+    route.places.length === 1 ? '' : locale === 'es' ? 's' : ''
+
   return (
     <section className="flex flex-col gap-6">
       <div className="rounded-[28px] border border-artis-primary/10 bg-white p-6 shadow-sm md:p-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.35em] text-artis-primary/50">
-              Ruta #{route.id}
+              {t('admin.routes.detail.eyebrow', { id: route.id })}
             </p>
             <h1 className="mt-3 font-serif text-3xl font-bold text-artis-primary md:text-4xl">
               {route.name}
             </h1>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-gray-600 md:text-base">
-              Detalle editorial de la ruta, con su autoria, descripcion,
-              portada actual, galeria aportada y estado de destacado.
+              {t('admin.routes.detail.description')}
             </p>
           </div>
 
@@ -47,14 +55,16 @@ export default async function Page({ params }: PageProps) {
               variant="outline"
               className="rounded-xl border-artis-primary/15 bg-white text-artis-primary hover:bg-[#f8f5f0]"
             >
-              <Link href="/admin/rutas">Volver al listado</Link>
+              <Link href="/admin/rutas">{t('admin.shared.backToList')}</Link>
             </Button>
             <Button
               asChild
               variant="outline"
               className="rounded-xl border-artis-primary/15 bg-white text-artis-primary hover:bg-[#f8f5f0]"
             >
-              <Link href="/admin/imagenes">Gestion de imagenes</Link>
+              <Link href="/admin/imagenes">
+                {t('admin.shared.imageManagement')}
+              </Link>
             </Button>
           </div>
         </div>
@@ -65,12 +75,12 @@ export default async function Page({ params }: PageProps) {
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={route.image}
-                alt={`Imagen principal de ${route.name}`}
+                alt={t('routeDetail.coverAlt', { name: route.name })}
                 className="h-full min-h-[320px] w-full object-cover"
               />
             ) : (
               <div className="flex min-h-[320px] items-center justify-center px-6 text-center text-sm font-medium text-gray-500">
-                Esta ruta no tiene imagen principal asignada.
+                {t('admin.routes.detail.noMainImage')}
               </div>
             )}
           </article>
@@ -78,7 +88,7 @@ export default async function Page({ params }: PageProps) {
           <div className="flex flex-col gap-4">
             <article className="rounded-[24px] border border-artis-primary/10 bg-[#fcfaf7] p-5">
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
-                Usuario propietario
+                {t('admin.routes.detail.owner')}
               </p>
               <p className="mt-3 font-serif text-2xl font-bold text-artis-primary">
                 {route.ownerFullname}
@@ -88,7 +98,7 @@ export default async function Page({ params }: PageProps) {
 
             <article className="rounded-[24px] border border-artis-primary/10 bg-[#fcfaf7] p-5">
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
-                Estado featured
+                {t('admin.routes.detail.featuredStatus')}
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-3">
                 <span
@@ -98,44 +108,51 @@ export default async function Page({ params }: PageProps) {
                       : 'bg-[#f6efe6] text-gray-600'
                   }`}
                 >
-                  {route.featured ? 'Destacada' : 'No destacada'}
+                  {route.featured
+                    ? t('admin.routes.states.featured')
+                    : t('admin.routes.states.notFeatured')}
                 </span>
                 <span className="text-sm text-gray-600">
                   {route.featured
-                    ? 'Lista para usarse en superficies editoriales.'
-                    : 'Aun no esta marcada para destacarse en el home.'}
+                    ? t('admin.routes.detail.featuredReady')
+                    : t('admin.routes.detail.featuredPending')}
                 </span>
               </div>
             </article>
 
             <article className="rounded-[24px] border border-artis-primary/10 bg-[#fcfaf7] p-5">
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
-                Descripcion
+                {t('admin.routes.detail.routeDescription')}
               </p>
               <p className="mt-3 text-sm leading-7 text-gray-600">
-                {route.description ||
-                  'La ruta todavia no tiene descripcion escrita por su autor.'}
+                {route.description || t('admin.routes.detail.missingDescription')}
               </p>
             </article>
 
             <article className="rounded-[24px] border border-artis-primary/10 bg-[#fcfaf7] p-5">
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
-                Resumen visual
+                {t('admin.routes.detail.visualSummary')}
               </p>
               <p className="mt-3 text-sm leading-7 text-gray-600">
-                {route.contributedImagesCount} imagenes aportadas: {route.approvedImagesCount}{' '}
-                aprobadas, {route.pendingImagesCount} pendientes y{' '}
-                {route.rejectedImagesCount} rechazadas.
+                {t('admin.routes.detail.visualSummaryText', {
+                  total: route.contributedImagesCount,
+                  approved: route.approvedImagesCount,
+                  pending: route.pendingImagesCount,
+                  rejected: route.rejectedImagesCount,
+                })}
               </p>
             </article>
 
             <article className="rounded-[24px] border border-artis-primary/10 bg-[#fcfaf7] p-5">
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
-                Resumen del itinerario
+                {t('admin.routes.detail.itinerarySummary')}
               </p>
               <p className="mt-3 text-sm leading-7 text-gray-600">
-                Esta ruta contiene {route.places.length}{' '}
-                {route.places.length === 1 ? 'lugar guardado.' : 'lugares guardados.'}
+                {t('admin.routes.detail.itinerarySummaryText', {
+                  count: route.places.length,
+                  suffix: savedPlaceSuffix,
+                  pluralSuffix: savedPlacePluralSuffix,
+                })}
               </p>
             </article>
           </div>
@@ -147,14 +164,17 @@ export default async function Page({ params }: PageProps) {
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.35em] text-artis-primary/50">
-                Galeria
+                {t('admin.routes.detail.galleryEyebrow')}
               </p>
               <h2 className="mt-3 font-serif text-3xl font-bold text-artis-primary">
-                Imagenes aportadas
+                {t('admin.routes.detail.galleryTitle')}
               </h2>
             </div>
             <span className="text-sm font-medium text-gray-500">
-              {route.contributedImages.length} imagenes
+              {t('admin.routes.galleryCount', {
+                count: route.contributedImages.length,
+                suffix: galleryCountSuffix,
+              })}
             </span>
           </div>
 
@@ -171,13 +191,13 @@ export default async function Page({ params }: PageProps) {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={image.image}
-                      alt={`Imagen aportada a ${route.name}`}
+                      alt={t('routeDetail.imageAlt', { name: route.name })}
                       className="h-full w-full object-cover"
                     />
                     {image.selectedForCover && (
                       <span className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-artis-primary">
                         <IconStar size={14} />
-                        Candidata a portada
+                        {t('routeDetail.candidateCover')}
                       </span>
                     )}
                   </div>
@@ -192,10 +212,10 @@ export default async function Page({ params }: PageProps) {
                             : 'bg-amber-50 text-amber-700'
                       }`}
                     >
-                      {getRouteImageReviewLabel(image.reviewStatus)}
+                      {getRouteImageReviewLabel(image.reviewStatus, locale)}
                     </span>
                     <p className="text-sm leading-6 text-gray-600">
-                      {getRouteImageReviewDescription(image.reviewStatus)}
+                      {getRouteImageReviewDescription(image.reviewStatus, locale)}
                     </p>
                   </div>
                 </article>
@@ -209,20 +229,23 @@ export default async function Page({ params }: PageProps) {
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.35em] text-artis-primary/50">
-              Places
+              {t('admin.routes.detail.placesEyebrow')}
             </p>
             <h2 className="mt-3 font-serif text-3xl font-bold text-artis-primary">
-              Itinerario guardado
+              {t('admin.routes.detail.savedItinerary')}
             </h2>
           </div>
           <span className="text-sm font-medium text-gray-500">
-            {route.places.length} paradas
+            {t('admin.routes.detail.stopsCount', {
+              count: route.places.length,
+              suffix: route.places.length === 1 ? '' : 's',
+            })}
           </span>
         </div>
 
         {route.places.length === 0 ? (
           <p className="mt-6 text-sm leading-7 text-gray-600">
-            Esta ruta no tiene lugares guardados en este momento.
+            {t('admin.routes.detail.noSavedPlaces')}
           </p>
         ) : (
           <ol className="mt-6 flex flex-col gap-4">
@@ -237,13 +260,13 @@ export default async function Page({ params }: PageProps) {
                   <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                     <div>
                       <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
-                        Parada {index + 1}
+                        {t('admin.routes.detail.stopLabel', { index: index + 1 })}
                       </p>
                       <h3 className="mt-2 font-serif text-2xl font-bold text-artis-primary">
-                        {place.tags.name ?? 'Punto sin nombre'}
+                        {place.tags.name ?? t('common.unnamedPoint')}
                       </h3>
                       <p className="mt-2 text-sm text-gray-600">
-                        {getPlaceTypeLabel(place)}
+                        {getPlaceTypeLabel(place, locale)}
                       </p>
                     </div>
 
@@ -267,7 +290,7 @@ export default async function Page({ params }: PageProps) {
                       rel="noreferrer"
                       className="mt-4 inline-flex text-sm font-semibold text-artis-primary transition-opacity hover:opacity-80"
                     >
-                      Visitar web oficial
+                      {t('admin.shared.officialWebsite')}
                     </a>
                   )}
                 </li>

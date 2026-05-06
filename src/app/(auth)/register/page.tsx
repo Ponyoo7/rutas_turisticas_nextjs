@@ -1,29 +1,27 @@
 import { RegisterForm } from '@/app/(auth)/register/components/RegisterForm'
+import { getTranslations } from '@/shared/i18n/server'
 import { Button } from '@/shared/components/ui/button'
 import { IconArrowLeft } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-/**
- * Página principal de Registro.
- * Contiene una imagen de cabecera decorativa y el componente `RegisterForm`
- * donde los nuevos usuarios se pueden crear una cuenta.
- */
-export default function Page() {
+export default async function Page() {
+  const { t } = await getTranslations()
+
   return (
     <>
-      <div className="relative w-full h-[320px] mb-8 overflow-hidden rounded-2xl shadow-xl">
-        <div className="absolute inset-0 z-20 flex flex-col justify-end p-8 bg-linear-to-t from-black/80 via-black/20 to-transparent">
-          <span className="text-white/70 uppercase tracking-widest text-xs font-bold mb-2">
-            Route Craft
+      <div className="relative mb-8 h-[320px] w-full overflow-hidden rounded-2xl shadow-xl">
+        <div className="absolute inset-0 z-20 flex flex-col justify-end bg-linear-to-t from-black/80 via-black/20 to-transparent p-8">
+          <span className="mb-2 text-xs font-bold uppercase tracking-widest text-white/70">
+            {t('common.appName')}
           </span>
-          <h1 className="text-white text-4xl font-black tracking-tight font-serif italic">
-            Registro
+          <h1 className="font-serif text-4xl font-black italic tracking-tight text-white">
+            {t('auth.register.title')}
           </h1>
         </div>
         <Image
           src="/login_image.png"
-          alt="Register representativo"
+          alt={t('auth.register.imageAlt')}
           fill
           className="object-cover transition-transform duration-700 hover:scale-105"
           priority
@@ -31,24 +29,22 @@ export default function Page() {
 
         <Button
           asChild
-          className="z-100 absolute top-2 left-2 bg-transparent hover:bg-neutral-500/40 cursor-pointer"
+          className="absolute top-2 left-2 z-100 cursor-pointer bg-transparent hover:bg-neutral-500/40"
         >
           <Link href="/">
             <IconArrowLeft />
-            <span>Volver</span>
+            <span>{t('common.back')}</span>
           </Link>
         </Button>
       </div>
 
-      <div className="w-full bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 mb-6 overflow-hidden">
+      <div className="mb-6 w-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900">
         <div className="px-6 pt-8">
-          <h2 className="text-artis-primary dark:text-white font-serif tracking-tight text-2xl font-bold leading-tight pb-3">
-            Conviértete en miembro
+          <h2 className="border-b border-artis-primary/10 pb-3 font-serif text-2xl font-bold leading-tight tracking-tight text-artis-primary dark:text-white">
+            {t('auth.register.heading')}
           </h2>
-          <p className="text-artis-primary/70 dark:text-zinc-400 text-sm font-normal leading-relaxed pb-6 border-b border-artis-primary/10">
-            Introduce tus datos para explorar ciudades a través del prisma de la
-            historia del arte y una investigación académica especializada. Tu
-            viaje por la narrativa cultural comienza aquí.
+          <p className="border-b border-artis-primary/10 pb-6 text-sm leading-relaxed font-normal text-artis-primary/70 dark:text-zinc-400">
+            {t('auth.register.description')}
           </p>
         </div>
         <div className="p-8">
@@ -56,13 +52,10 @@ export default function Page() {
         </div>
       </div>
 
-      <p className="text-gray-500 dark:text-gray-400 text-sm">
-        ¿Ya tienes cuenta?{' '}
-        <Link
-          href="/login"
-          className="text-artis-primary font-bold hover:underline"
-        >
-          Inicia sesión
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        {t('auth.register.alreadyHaveAccount')}{' '}
+        <Link href="/login" className="font-bold text-artis-primary hover:underline">
+          {t('auth.register.loginCta')}
         </Link>
       </p>
     </>

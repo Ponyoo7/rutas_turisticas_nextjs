@@ -1,25 +1,23 @@
-﻿import { getDefaultCities } from '@/shared/consts/data'
-import { FeaturedCityCard } from './FeaturedCityCard'
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
 } from '@/shared/components/ui/carousel'
+import { getDefaultCities } from '@/shared/consts/data'
+import { getTranslations } from '@/shared/i18n/server'
+import { FeaturedCityCard } from './FeaturedCityCard'
 
-/**
- * Componente que renderiza una sección con un carrusel interactivo
- * mostrando sugerencias de ciudades populares para explorar.
- */
 export const FeaturedCities = async () => {
+  const { t } = await getTranslations()
   const cities = await getDefaultCities()
 
   return (
     <section className="mt-8">
-      <div className="flex items-center justify-between pb-4 flex-row gap-4">
-        <h2 className="text-artis-primary dark:text-gray-100 text-2xl font-bold tracking-tight font-serif">
-          Ciudades populares
+      <div className="flex flex-row items-center justify-between gap-4 pb-4">
+        <h2 className="font-serif text-2xl font-bold tracking-tight text-artis-primary dark:text-gray-100">
+          {t('home.featuredCities.title')}
         </h2>
-        <div className="h-px w-full bg-gray-200 flex-1"></div>
+        <div className="h-px w-full flex-1 bg-gray-200"></div>
       </div>
 
       <div>
@@ -39,4 +37,3 @@ export const FeaturedCities = async () => {
     </section>
   )
 }
-

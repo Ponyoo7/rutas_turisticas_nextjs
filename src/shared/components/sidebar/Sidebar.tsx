@@ -1,6 +1,7 @@
 'use client'
 
 import { canAccessAdmin } from '@/lib/auth'
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { useUserStore } from '@/shared/stores/useUserStore'
 import {
   IconChartBar,
@@ -14,43 +15,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useShallow } from 'zustand/shallow'
 
-const baseItems = [
-  {
-    label: 'Inicio',
-    href: '/',
-    icon: IconHome,
-  },
-  {
-    label: 'Buscador',
-    href: '/buscador',
-    icon: IconSearch,
-  },
-]
-
-const adminItems = [
-  {
-    label: 'Resumen operativo',
-    href: '/admin',
-    icon: IconChartBar,
-  },
-  {
-    label: 'Gestion de usuarios',
-    href: '/admin/usuarios',
-    icon: IconUsers,
-  },
-  {
-    label: 'Gestion de rutas',
-    href: '/admin/rutas',
-    icon: IconRoute,
-  },
-  {
-    label: 'Gestion de imagenes',
-    href: '/admin/imagenes',
-    icon: IconPhoto,
-  },
-]
-
 export const Sidebar = () => {
+  const { t } = useI18n()
   const pathname = usePathname()
   const { user, isLoading } = useUserStore(
     useShallow((state) => ({
@@ -61,6 +27,40 @@ export const Sidebar = () => {
 
   const showAdminSection = !isLoading && canAccessAdmin(user)
   const isAdminArea = pathname.startsWith('/admin')
+  const baseItems = [
+    {
+      label: t('sidebar.home'),
+      href: '/',
+      icon: IconHome,
+    },
+    {
+      label: t('sidebar.search'),
+      href: '/buscador',
+      icon: IconSearch,
+    },
+  ]
+  const adminItems = [
+    {
+      label: t('sidebar.dashboard'),
+      href: '/admin',
+      icon: IconChartBar,
+    },
+    {
+      label: t('sidebar.users'),
+      href: '/admin/usuarios',
+      icon: IconUsers,
+    },
+    {
+      label: t('sidebar.routes'),
+      href: '/admin/rutas',
+      icon: IconRoute,
+    },
+    {
+      label: t('sidebar.images'),
+      href: '/admin/imagenes',
+      icon: IconPhoto,
+    },
+  ]
   const getItemClasses = (isActive: boolean) =>
     `flex min-h-12 flex-1 flex-row items-center justify-center gap-3 rounded-xl px-4 py-3 transition-colors duration-200 md:justify-start ${
       isActive
@@ -96,7 +96,7 @@ export const Sidebar = () => {
                   isAdminArea ? 'text-artis-primary' : 'text-artis-primary/55'
                 }`}
               >
-                Admin
+                {t('sidebar.admin')}
               </span>
               <div className="h-px flex-1 bg-artis-primary/10"></div>
             </div>

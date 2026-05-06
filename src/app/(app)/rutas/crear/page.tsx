@@ -1,5 +1,6 @@
 import { getMyRouteById } from '@/actions/routes.actions'
 import { getPlaceCoords } from '@/lib/utils'
+import { getTranslations } from '@/shared/i18n/server'
 import { locationsService } from '@/shared/services/locations.service'
 import {
   getInterestPlacesByCoordsCached,
@@ -36,6 +37,7 @@ export default async function CrearRutaPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
+  const { t } = await getTranslations()
   const params = await searchParams
   const cityParam = typeof params.city === 'string' ? params.city : undefined
   const routeIdParam =
@@ -100,12 +102,14 @@ export default async function CrearRutaPage({
         })
       : null)
   const heroTitle =
-    cityResult?.city.name || routeToEdit?.name || 'Creador de rutas'
+    cityResult?.city.name || routeToEdit?.name || t('routeBuilder.page.defaultTitle')
   const heroSubtitle = isEditMode
-    ? 'Reordena las paradas, actualiza la descripcion y deja la portada lista para publicar la mejor version del recorrido.'
+    ? t('routeBuilder.page.editSubtitle')
     : cityResult?.city.name
-      ? `Explora ${cityResult.city.name} y construye una ruta visual, clara y personalizada desde un entorno mucho mas limpio.`
-      : 'Selecciona lugares, organiza el itinerario y prepara una ruta que se entienda de un vistazo.'
+      ? t('routeBuilder.page.createSubtitleWithCity', {
+          city: cityResult.city.name,
+        })
+      : t('routeBuilder.page.createSubtitle')
 
   return (
     <main className="min-h-full bg-white px-4 py-4 md:px-6 md:py-6">

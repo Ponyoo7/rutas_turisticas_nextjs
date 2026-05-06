@@ -1,4 +1,7 @@
+'use client'
+
 import { getRouteStats } from '@/lib/utils'
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { Route } from '@/shared/types/routes'
 import Link from 'next/link'
 
@@ -6,12 +9,8 @@ interface Props {
   route: Route
 }
 
-/**
- * Componente visual de tarjeta que resume la información clave de una ruta.
- * Analiza la lista de lugares (`getRouteStats`) para extraer y mostrar
- * la distancia total, la duración estimada de recorrido y el conteo de paradas.
- */
 export const RouteCard = ({ route }: Props) => {
+  const { t } = useI18n()
   const stats = getRouteStats(route.places)
   const image = route.image || '/museo_placeholder.jpg'
 
@@ -24,14 +23,14 @@ export const RouteCard = ({ route }: Props) => {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={image}
-          alt={`Imagen de la ruta ${route.name}`}
+          alt={t('home.myRoutes.imageAlt', { name: route.name })}
           className="h-full w-full object-cover"
         />
       </div>
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 p-3.5">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-artis-secondary-blue">
-          <span className="material-symbols-outlined text-xs">Duracion</span>
-          {stats.totalMinutes} MINUTOS
+          <span className="material-symbols-outlined text-xs">schedule</span>
+          {t('common.minutesUpper', { count: stats.totalMinutes })}
         </div>
         <h3 className="font-serif text-base font-bold leading-tight text-artis-primary dark:text-gray-100">
           {route.name}
@@ -42,10 +41,10 @@ export const RouteCard = ({ route }: Props) => {
           </p>
         ) : null}
         <p className="line-clamp-1 text-xs text-gray-500">
-          {stats.placesCount} PARADAS
+          {t('common.stopsUpper', { count: stats.placesCount })}
         </p>
         <p className="line-clamp-1 text-xs text-gray-500">
-          {stats.totalDistanceKm} KM
+          {t('common.distanceKm', { count: stats.totalDistanceKm })}
         </p>
       </div>
     </Link>

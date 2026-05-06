@@ -1,6 +1,7 @@
 'use client'
 
 import { getPlaceTypeLabel } from '@/lib/utils'
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { locationsService } from '@/shared/services/locations.service'
 import { OSMElement, WikiData } from '@/shared/types/locations'
 import { IconChevronRight, IconTrash } from '@tabler/icons-react'
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export const PlaceCard = ({ place, index, onDelete }: Props) => {
+  const { locale, t } = useI18n()
   const [placeInfo, setPlaceInfo] = useState<WikiData | null>(
     place.wikiInfo ?? null,
   )
@@ -38,40 +40,42 @@ export const PlaceCard = ({ place, index, onDelete }: Props) => {
           <img
             src={image}
             className="h-full w-full object-cover"
-            alt={`Vista previa de ${place.tags.name ?? 'la parada'}`}
+            alt={t('routeBuilder.placeCard.imageAlt', {
+              name: place.tags.name ?? t('common.unnamedStop'),
+            })}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#eef2f6] via-[#fafbfd] to-[#dfe7ef] text-xs font-semibold text-artis-primary/60">
-            Sin foto
+            {t('routeBuilder.placeCard.noPhoto')}
           </div>
         )}
       </div>
 
       <div className="min-w-0 flex-1">
         <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-artis-primary/45">
-          {getPlaceTypeLabel(place)}
+          {getPlaceTypeLabel(place, locale)}
         </p>
         <h4 className="mt-1 truncate font-semibold text-artis-primary">
-          {place.tags.name || 'Sitio sin nombre'}
+          {place.tags.name || t('routeBuilder.placeCard.unnamedStop')}
         </h4>
         <p className="mt-1 truncate text-sm text-gray-500">
           {place.tags.addr_street ||
             place.tags.city ||
             place.tags.town ||
             place.tags.village ||
-            'Parada anadida al recorrido'}
+            t('routeBuilder.placeCard.addedToRoute')}
         </p>
       </div>
 
       <div className="hidden items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-artis-primary/35 md:flex">
         <IconChevronRight size={14} />
-        Ruta
+        {t('routeBuilder.placeCard.route')}
       </div>
 
       <button
         onClick={() => onDelete(place.id)}
         className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px] bg-white text-gray-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
-        title="Eliminar sitio"
+        title={t('routeBuilder.placeCard.deletePlace')}
       >
         <IconTrash size={18} />
       </button>

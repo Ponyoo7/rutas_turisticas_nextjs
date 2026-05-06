@@ -1,6 +1,7 @@
 'use client'
 
 import { approveRouteImage, rejectRouteImage } from '@/actions/admin.actions'
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { Button } from '@/shared/components/ui/button'
 import { IconLoader2 } from '@tabler/icons-react'
 import { useRouter } from 'next/navigation'
@@ -12,6 +13,7 @@ interface Props {
 
 export function RouteImageReviewControls({ imageId }: Props) {
   const router = useRouter()
+  const { t } = useI18n()
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -45,10 +47,10 @@ export function RouteImageReviewControls({ imageId }: Props) {
           {isPending ? (
             <>
               <IconLoader2 className="animate-spin" />
-              Guardando...
+              {t('admin.images.buttons.saving')}
             </>
           ) : (
-            'Aprobar imagen'
+            t('admin.images.buttons.approve')
           )}
         </Button>
 
@@ -59,7 +61,7 @@ export function RouteImageReviewControls({ imageId }: Props) {
           onClick={() => handleReview('reject')}
           className="border-rose-200 bg-white font-semibold text-rose-700 hover:bg-rose-50"
         >
-          Rechazar
+          {t('admin.images.buttons.reject')}
         </Button>
       </div>
 

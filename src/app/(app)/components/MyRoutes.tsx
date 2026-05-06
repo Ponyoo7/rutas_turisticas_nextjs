@@ -1,17 +1,14 @@
 'use client'
 
-import { useUserStore } from '@/shared/stores/useUserStore'
-import { RouteCard } from './RouteCard'
-import { useMyRoutes } from '@/shared/hooks/useMyRoutes'
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { Button } from '@/shared/components/ui/button'
+import { useMyRoutes } from '@/shared/hooks/useMyRoutes'
+import { useUserStore } from '@/shared/stores/useUserStore'
 import Link from 'next/link'
+import { RouteCard } from './RouteCard'
 
-/**
- * Sección embebida en la página inicial para usuarios autenticados.
- * Carga desde el custom hook las rutas del usuario y las renderiza
- * promoviendo la creación de una nueva en caso de no existir ninguna.
- */
 export const MyRoutes = () => {
+  const { t } = useI18n()
   const { myRoutes } = useMyRoutes()
   const user = useUserStore((state) => state.user)
 
@@ -19,27 +16,27 @@ export const MyRoutes = () => {
 
   return (
     <section className="mt-8 mb-24">
-      <div className="flex flex-row gap-4 items-center pb-6">
-        <h2 className="text-artis-primary dark:text-gray-100 text-2xl font-bold tracking-tight font-serif">
-          Mis rutas
+      <div className="flex flex-row items-center gap-4 pb-6">
+        <h2 className="font-serif text-2xl font-bold tracking-tight text-artis-primary dark:text-gray-100">
+          {t('home.myRoutes.title')}
         </h2>
-        <div className="h-px w-full bg-gray-200 flex-1"></div>
+        <div className="h-px w-full flex-1 bg-gray-200"></div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {myRoutes.length === 0 && (
-          <div className="text-center py-8">
-            <p className="text-gray-500 mb-4">No tienes ninguna ruta creada</p>
+          <div className="py-8 text-center">
+            <p className="mb-4 text-gray-500">{t('home.myRoutes.empty')}</p>
             <Button
-              className="bg-artis-primary text-white hover:bg-artis-primary/90 font-bold shadow-lg border-none"
+              className="border-none bg-artis-primary font-bold text-white shadow-lg hover:bg-artis-primary/90"
               asChild
             >
-              <Link href="/buscador">Crea tu primera ruta</Link>
+              <Link href="/buscador">{t('home.myRoutes.cta')}</Link>
             </Button>
           </div>
         )}
-        {myRoutes.map((r, i) => (
-          <RouteCard key={i} route={r} />
+        {myRoutes.map((route, index) => (
+          <RouteCard key={index} route={route} />
         ))}
       </div>
     </section>

@@ -1,5 +1,6 @@
 'use server'
 
+import { getTranslations } from '@/shared/i18n/server'
 import { User, UserCredentials, UserRegister, UserRole } from '@/shared/types/user'
 import { neon } from '@neondatabase/serverless'
 import * as bcrypt from 'bcrypt'
@@ -53,27 +54,22 @@ type CompleteJwtUser = {
   verified: boolean
 }
 
-const INVALID_CREDENTIALS_ERROR = 'Email o contraseña incorrectos'
-const LOGIN_GENERIC_ERROR = 'No se pudo iniciar sesión. Inténtalo de nuevo.'
-const EMAIL_ALREADY_REGISTERED_ERROR = 'Ya existe una cuenta con ese email'
-const REGISTER_GENERIC_ERROR = 'No se pudo crear la cuenta. Inténtalo de nuevo.'
-
 const isPgErrorWithCode = (error: unknown, code: string) => {
   if (typeof error !== 'object' || error === null) return false
   if (!('code' in error)) return false
+
   return error.code === code
 }
 
-const validatePassword = (password: string) => {
+const validatePassword = async (password: string) => {
+  const { t } = await getTranslations()
   const minLength = 8
   const hasUpperCase = /[A-Z]/.test(password)
   const hasNumber = /[0-9]/.test(password)
 
-  if (password.length < minLength)
-    return 'La contraseña debe tener al menos 8 caracteres'
-  if (!hasUpperCase)
-    return 'La contraseña debe tener al menos una letra mayúscula'
-  if (!hasNumber) return 'La contraseña debe tener al menos un número'
+  if (password.length < minLength) return t('auth.errors.passwordMin')
+  if (!hasUpperCase) return t('auth.errors.passwordUppercase')
+  if (!hasNumber) return t('auth.errors.passwordNumber')
 
   return null
 }
@@ -123,9 +119,10 @@ const getUserById = async (id: string): Promise<User | null> => {
 export const createUser = async (
   user: UserRegister,
 ): Promise<CreateUserResult> => {
+  const { t } = await getTranslations()
   const { fullname, password, email, image } = user
 
-  const passwordError = validatePassword(password)
+  const passwordError = await validatePassword(password)
   if (passwordError) {
     return {
       ok: false,
@@ -147,13 +144,13 @@ export const createUser = async (
     if (isPgErrorWithCode(error, '23505')) {
       return {
         ok: false,
-        error: EMAIL_ALREADY_REGISTERED_ERROR,
+        error: t('auth.errors.emailAlreadyRegistered'),
       }
     }
 
     return {
       ok: false,
-      error: REGISTER_GENERIC_ERROR,
+      error: t('auth.errors.registerGeneric'),
     }
   }
 }
@@ -161,11 +158,11 @@ export const createUser = async (
 export const login = async (
   credentials: UserCredentials,
 ): Promise<LoginResult> => {
+  const { t } = await getTranslations()
+
   try {
     const cookieStore = await cookies()
-
     const { email, password } = credentials
-
     const sql = neon(`${process.env.DATABASE_URL}`)
 
     const data = await sql`
@@ -178,7 +175,7 @@ export const login = async (
     if (data.length === 0) {
       return {
         ok: false,
-        error: INVALID_CREDENTIALS_ERROR,
+        error: t('auth.errors.invalidCredentials'),
       }
     }
 
@@ -187,12 +184,11 @@ export const login = async (
     if (!user.password || !bcrypt.compareSync(password, user.password)) {
       return {
         ok: false,
-        error: INVALID_CREDENTIALS_ERROR,
+        error: t('auth.errors.invalidCredentials'),
       }
     }
 
     const userData = mapDbUserToUser(user)
-
     const token = jwt.sign(userData, process.env.JWT_SECRET!)
 
     cookieStore.set({
@@ -211,7 +207,7 @@ export const login = async (
   } catch {
     return {
       ok: false,
-      error: LOGIN_GENERIC_ERROR,
+      error: t('auth.errors.loginGeneric'),
     }
   }
 }

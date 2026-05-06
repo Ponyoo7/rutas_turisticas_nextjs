@@ -2,6 +2,8 @@ import { cookies } from 'next/headers'
 import './globals.css'
 import { verifyToken } from '@/actions/user.actions'
 import { UserProvider } from '@/shared/components/providers/UserProvider'
+import { I18nProvider } from '@/shared/i18n/I18nProvider'
+import { getTranslations } from '@/shared/i18n/server'
 import { Manrope, Noto_Serif } from 'next/font/google'
 import { Metadata } from 'next'
 
@@ -28,16 +30,19 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies()
   const authToken = cookieStore.get('auth')
+  const { locale, messages } = await getTranslations()
 
   const verified = await verifyToken(authToken?.value)
 
   return (
-    <html lang="es">
+    <html lang={locale}>
       <body
         className={`antialiased h-screen w-screen ${manrope.variable} ${notoSerif.variable} font-sans`}
       >
-        {children}
-        <UserProvider user={verified} />
+        <I18nProvider locale={locale} messages={messages}>
+          {children}
+          <UserProvider user={verified} />
+        </I18nProvider>
       </body>
     </html>
   )

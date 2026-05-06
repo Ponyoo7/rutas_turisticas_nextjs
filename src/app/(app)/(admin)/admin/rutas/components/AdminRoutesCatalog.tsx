@@ -4,6 +4,7 @@ import { getAdminRoutes, type AdminRouteListItem } from '@/actions/admin.actions
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { useDebouncedValue } from '@/shared/hooks/useDebouncedValue'
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { IconLoader2 } from '@tabler/icons-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState, useTransition } from 'react'
@@ -31,6 +32,7 @@ export function AdminRoutesCatalog({
   initialRoutes,
   initialQuery = '',
 }: Props) {
+  const { locale, t } = useI18n()
   const normalizedInitialQuery = initialQuery.trim()
   const [query, setQuery] = useState(normalizedInitialQuery)
   const [appliedQuery, setAppliedQuery] = useState(normalizedInitialQuery)
@@ -70,14 +72,20 @@ export function AdminRoutesCatalog({
       .catch(() => {
         if (!active || requestIdRef.current !== requestId) return
 
-        setError('No se pudo actualizar la busqueda de rutas.')
+        setError(t('admin.routes.searchError'))
         setFailedQuery(nextQuery)
       })
 
     return () => {
       active = false
     }
-  }, [debouncedQuery, startTransition])
+  }, [debouncedQuery, startTransition, t])
+
+  const galleryCountSuffix = (count: number) => {
+    if (count === 1) return ''
+
+    return locale === 'es' ? 'es' : 's'
+  }
 
   const isLoading =
     (normalizedQuery !== appliedQuery && normalizedQuery !== failedQuery) ||
@@ -89,21 +97,23 @@ export function AdminRoutesCatalog({
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.35em] text-artis-primary/50">
-              Rutas
+              {t('admin.routes.eyebrow')}
             </p>
             <h2 className="mt-3 font-serif text-3xl font-bold text-artis-primary">
-              Catalogo global de rutas
+              {t('admin.routes.title')}
             </h2>
           </div>
           <span className="flex items-center gap-2 text-sm font-medium text-gray-500">
             {isLoading && <IconLoader2 size={16} className="animate-spin" />}
-            {routes.length} rutas
+            {t('admin.routes.count', {
+              count: routes.length,
+              suffix: routes.length === 1 ? '' : 's',
+            })}
           </span>
         </div>
 
         <p className="mt-4 max-w-3xl text-sm leading-7 text-gray-600 md:text-base">
-          Vista administrativa para revisar autoria, estado destacado y acceso
-          al detalle completo de cada ruta.
+          {t('admin.routes.description')}
         </p>
 
         <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center">
@@ -116,7 +126,7 @@ export function AdminRoutesCatalog({
                 setError(null)
                 setFailedQuery(null)
               }}
-              placeholder="Buscar por ruta o propietario"
+              placeholder={t('admin.routes.searchPlaceholder')}
               className="h-11 rounded-xl border-artis-primary/15 bg-[#fcfaf7] px-4"
             />
           </div>
@@ -132,7 +142,7 @@ export function AdminRoutesCatalog({
               }}
               className="rounded-xl border-artis-primary/15 bg-white text-artis-primary hover:bg-[#f8f5f0]"
             >
-              Limpiar
+              {t('admin.shared.clear')}
             </Button>
           )}
         </div>
@@ -140,13 +150,13 @@ export function AdminRoutesCatalog({
         <div className="mt-4 flex flex-col gap-2 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
           <p>
             {appliedQuery
-              ? `Mostrando resultados para "${appliedQuery}".`
-              : 'Mostrando todas las rutas disponibles.'}
+              ? t('admin.routes.showingResults', { query: appliedQuery })
+              : t('admin.routes.showingAll')}
           </p>
           <p>
             {isLoading
-              ? 'Buscando en la base de datos...'
-              : 'Busqueda por nombre de ruta o propietario.'}
+              ? t('admin.shared.searchingDatabase')
+              : t('admin.routes.searchHelp')}
           </p>
         </div>
 
@@ -157,13 +167,13 @@ export function AdminRoutesCatalog({
         <AdminEmptyState
           title={
             appliedQuery
-              ? 'No hay resultados para esta busqueda'
-              : 'Todavia no hay rutas creadas'
+              ? t('admin.routes.emptySearchTitle')
+              : t('admin.routes.emptyTitle')
           }
           description={
             appliedQuery
-              ? 'Prueba con otro nombre de ruta o con el nombre del usuario propietario.'
-              : 'Cuando los usuarios empiecen a guardar rutas turisticas, apareceran aqui con su propietario y su estado editorial.'
+              ? t('admin.routes.emptySearchDescription')
+              : t('admin.routes.emptyDescription')
           }
         />
       ) : (
@@ -173,22 +183,22 @@ export function AdminRoutesCatalog({
               <thead className="bg-[#f8f5f0]">
                 <tr>
                   <th className="px-4 py-4 text-left text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/55">
-                    ID
+                    {t('admin.routes.columns.id')}
                   </th>
                   <th className="px-4 py-4 text-left text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/55">
-                    Ruta
+                    {t('admin.routes.columns.route')}
                   </th>
                   <th className="px-4 py-4 text-left text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/55">
-                    Usuario
+                    {t('admin.routes.columns.user')}
                   </th>
                   <th className="px-4 py-4 text-left text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/55">
-                    Featured
+                    {t('admin.routes.columns.featured')}
                   </th>
                   <th className="px-4 py-4 text-left text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/55">
-                    Galeria
+                    {t('admin.routes.columns.gallery')}
                   </th>
                   <th className="px-4 py-4 text-right text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/55">
-                    Acciones
+                    {t('admin.routes.columns.actions')}
                   </th>
                 </tr>
               </thead>
@@ -215,7 +225,7 @@ export function AdminRoutesCatalog({
                         </p>
                       )}
                       <p className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-artis-primary/45">
-                        Abrir detalle
+                        {t('admin.shared.openDetail')}
                       </p>
                     </td>
 
@@ -236,18 +246,25 @@ export function AdminRoutesCatalog({
                             : 'bg-[#f6efe6] text-gray-600'
                         }`}
                       >
-                        {route.featured ? 'Destacada' : 'No destacada'}
+                        {route.featured
+                          ? t('admin.routes.states.featured')
+                          : t('admin.routes.states.notFeatured')}
                       </span>
                     </td>
 
                     <td className="px-4 py-4">
                       <p className="text-sm font-semibold text-artis-primary">
-                        {route.contributedImagesCount} imagenes
+                        {t('admin.routes.galleryCount', {
+                          count: route.contributedImagesCount,
+                          suffix: galleryCountSuffix(route.contributedImagesCount),
+                        })}
                       </p>
                       <p className="mt-1 text-xs text-gray-500">
-                        {route.approvedImagesCount} aprobadas,{' '}
-                        {route.pendingImagesCount} pendientes,{' '}
-                        {route.rejectedImagesCount} rechazadas
+                        {t('admin.routes.galleryBreakdown', {
+                          approved: route.approvedImagesCount,
+                          pending: route.pendingImagesCount,
+                          rejected: route.rejectedImagesCount,
+                        })}
                       </p>
                     </td>
 

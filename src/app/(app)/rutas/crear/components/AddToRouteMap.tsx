@@ -9,6 +9,7 @@ import {
 import { getDistanceKm } from '@/lib/utils'
 import { saveRoute, updateRoute } from '@/actions/routes.actions'
 import { MapWrapper } from '@/shared/components/map/MapWrapper'
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Textarea } from '@/shared/components/ui/textarea'
@@ -71,6 +72,7 @@ export const AddToRouteMap = ({
   initialRouteImages = [],
 }: Props) => {
   const router = useRouter()
+  const { locale, t } = useI18n()
   const isEditMode = typeof routeId === 'number'
   const [isSaving, setIsSaving] = useState(false)
   const [isPreparingImage, setIsPreparingImage] = useState(false)
@@ -100,7 +102,11 @@ export const AddToRouteMap = ({
     initialImage ||
     locationsService.toRenderableImageUrl(cityInfo?.thumbnail?.source)
   const routeHeading =
-    routeName.trim() || city?.name || (isEditMode ? 'Ruta en edicion' : 'Nueva ruta')
+    routeName.trim() ||
+    city?.name ||
+    (isEditMode
+      ? t('routeBuilder.identity.routeInEdit')
+      : t('routeBuilder.identity.newRoute'))
   const canUploadMoreImages =
     routeImages.length < MAX_ROUTE_CONTRIBUTED_IMAGES && !isPreparingImage
   const canSaveRoute =
@@ -108,6 +114,7 @@ export const AddToRouteMap = ({
     routePlaces.length > 0 &&
     !isSaving &&
     !isPreparingImage
+  const routePlacesCountSuffix = routePlaces.length === 1 ? '' : 's'
 
   const addPlaceToRoute = (place: OSMElement) => {
     if (routePlaces.some((p) => p.id === place.id)) return
@@ -174,7 +181,7 @@ export const AddToRouteMap = ({
 
       const wikiCity =
         cityInfo ??
-        (city ? await locationsService.getWikiInfo(`es:${city.name}`) : null)
+        (city ? await locationsService.getWikiInfo(`${locale}:${city.name}`) : null)
 
       const createdRouteId = await saveRoute({
         name: routeName,
@@ -194,7 +201,7 @@ export const AddToRouteMap = ({
       setSaveError(
         error instanceof Error
           ? error.message
-          : 'No se pudo guardar la ruta. Intentalo de nuevo.',
+          : t('routeBuilder.errors.saveGeneric'),
       )
     } finally {
       setIsSaving(false)
@@ -234,14 +241,16 @@ export const AddToRouteMap = ({
 
       if (availableSlots <= 0) {
         throw new Error(
-          `Ya has alcanzado el maximo de ${MAX_ROUTE_CONTRIBUTED_IMAGES} imagenes para esta ruta.`,
+          t('routeBuilder.errors.maxImagesPerRoute', {
+            count: MAX_ROUTE_CONTRIBUTED_IMAGES,
+          }),
         )
       }
 
       const preparedImages = await Promise.all(
         files.slice(0, availableSlots).map(async (file) => ({
           clientId: createClientId(),
-          image: await prepareRouteUploadImage(file),
+          image: await prepareRouteUploadImage(file, locale),
           reviewStatus: 'pending' as RouteImageReviewStatus,
           selectedForCover: false,
           persisted: false,
@@ -253,7 +262,7 @@ export const AddToRouteMap = ({
       setImageError(
         error instanceof Error
           ? error.message
-          : 'No se pudieron preparar las imagenes seleccionadas.',
+          : t('routeBuilder.errors.prepareImagesGeneric'),
       )
     } finally {
       event.target.value = ''
@@ -295,18 +304,20 @@ export const AddToRouteMap = ({
         <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
             <span className="inline-flex w-fit bg-[#faf8f4] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.26em] text-artis-primary/70">
-              Explorador de paradas
+              {t('routeBuilder.map.explorer')}
             </span>
           </div>
 
           <div className="flex flex-wrap gap-2">
             <span className="inline-flex items-center gap-2 rounded-full bg-[#f5f6f8] px-4 py-2 text-sm font-semibold text-artis-primary shadow-sm">
               <IconMapPin size={16} />
-              {places.length} lugares en el mapa
+              {t('routeBuilder.map.placesOnMap', { count: places.length })}
             </span>
             <span className="inline-flex items-center gap-2 rounded-full bg-[#f5f6f8] px-4 py-2 text-sm font-semibold text-artis-primary shadow-sm">
               <IconRoute2 size={16} />
-              {routePlaces.length} en tu ruta
+              {t('routeBuilder.map.placesInRoute', {
+                count: routePlaces.length,
+              })}
             </span>
           </div>
         </div>
@@ -327,14 +338,17 @@ export const AddToRouteMap = ({
             </div>
             <div>
               <p className="text-sm font-semibold text-artis-primary">
-                Organiza tu ruta
+                {t('routeBuilder.organizer.title')}
               </p>
             </div>
           </div>
 
           <div className="flex flex-col items-end gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <span className="inline-flex w-fit rounded-full bg-white px-4 py-2 text-sm font-semibold text-artis-primary shadow-sm">
-              {routePlaces.length} parada{routePlaces.length === 1 ? '' : 's'}
+              {t('routeBuilder.organizer.stopsCount', {
+                count: routePlaces.length,
+                suffix: routePlacesCountSuffix,
+              })}
             </span>
             {routePlaces.length > 1 && (
               <Button
@@ -343,7 +357,7 @@ export const AddToRouteMap = ({
                 variant="outline"
                 className="h-11 rounded-[16px] border border-[#dfd2c3] bg-white px-5 font-semibold text-artis-primary shadow-[0_14px_28px_-24px_rgba(83,61,45,0.55)] hover:border-[#c9b49e] hover:bg-[#faf8f4]"
               >
-                Reorganizar por proximidad
+                {t('routeBuilder.organizer.reorderByProximity')}
               </Button>
             )}
           </div>
@@ -357,11 +371,13 @@ export const AddToRouteMap = ({
               <div className="space-y-2">
                 <div className="space-y-2">
                   <span className="inline-flex w-fit rounded-full bg-[#faf8f4] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.26em] text-artis-primary/70">
-                    Identidad de la ruta
+                    {t('routeBuilder.identity.eyebrow')}
                   </span>
                   <div>
                     <h3 className="font-serif text-2xl font-bold text-artis-primary">
-                      {isEditMode ? 'Actualiza los detalles' : 'Presenta tu ruta'}
+                      {isEditMode
+                        ? t('routeBuilder.identity.editTitle')
+                        : t('routeBuilder.identity.createTitle')}
                     </h3>
                   </div>
                 </div>
@@ -371,7 +387,7 @@ export const AddToRouteMap = ({
                 <div className="space-y-2">
                  <div className="flex items-center justify-between gap-3">
                     <label className="text-[11px] font-bold uppercase tracking-[0.24em] text-artis-primary/55">
-                      Nombre de la ruta
+                      {t('routeBuilder.identity.routeNameLabel')}
                     </label>
                     <span
                       aria-hidden="true"
@@ -381,7 +397,7 @@ export const AddToRouteMap = ({
                     </span>
                   </div>
                   <Input
-                    placeholder="Ej. Paseo historico por el centro"
+                    placeholder={t('routeBuilder.identity.routeNamePlaceholder')}
                     value={routeName}
                     onChange={(event) => setRouteName(event.target.value)}
                     className="h-14 rounded-[22px] border border-[#d9dfe7] bg-[#f5f6f8] px-5 text-lg font-semibold text-artis-primary shadow-none focus-visible:border-artis-primary/35 focus-visible:ring-2 focus-visible:ring-artis-primary/12"
@@ -391,14 +407,14 @@ export const AddToRouteMap = ({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-3">
                     <label className="text-[11px] font-bold uppercase tracking-[0.24em] text-artis-primary/55">
-                      Descripcion
+                      {t('routeBuilder.identity.descriptionLabel')}
                     </label>
                     <span className="text-xs font-medium text-gray-500">
                       {routeDescription.length}/{MAX_ROUTE_DESCRIPTION_LENGTH}
                     </span>
                   </div>
                   <Textarea
-                    placeholder="Anade una descripcion breve para presentar la ruta, su estilo o el tipo de visita recomendada."
+                    placeholder={t('routeBuilder.identity.descriptionPlaceholder')}
                     value={routeDescription}
                     onChange={(event) =>
                       setRouteDescription(
@@ -423,7 +439,7 @@ export const AddToRouteMap = ({
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={previewImage}
-                            alt="Vista previa de la portada de la ruta"
+                            alt={t('routeBuilder.preview.coverAlt')}
                             className="h-full w-full object-cover"
                           />
                         ) : (
@@ -436,17 +452,17 @@ export const AddToRouteMap = ({
                         <div className="absolute inset-x-0 bottom-0 flex items-end gap-3 p-5 text-white">
                           <div>
                             <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/75">
-                              Portada
+                              {t('common.cover')}
                             </p>
                             <p className="mt-2 max-w-[18rem] text-lg font-semibold leading-6">
                               {routeHeading}
                             </p>
                             <p className="mt-1 max-w-[18rem] text-sm leading-6 text-white/80">
                               {selectedCoverImage
-                                ? 'Portada candidata'
+                                ? t('routeBuilder.preview.candidate')
                                 : previewImage
-                                  ? 'Portada provisional'
-                                  : 'Todavia sin portada'}
+                                  ? t('routeBuilder.preview.temporary')
+                                  : t('routeBuilder.preview.none')}
                             </p>
                           </div>
                         </div>
@@ -456,10 +472,10 @@ export const AddToRouteMap = ({
                     <div className="flex flex-col gap-4">
                       <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-artis-primary/55">
-                          Galeria
+                          {t('routeBuilder.gallery.eyebrow')}
                         </p>
                         <h4 className="mt-2 text-lg font-semibold text-artis-primary">
-                          Imagenes aportadas durante la ruta
+                          {t('routeBuilder.gallery.title')}
                         </h4>
                       </div>
 
@@ -474,12 +490,12 @@ export const AddToRouteMap = ({
                           {isPreparingImage ? (
                             <>
                               <IconLoader2 className="animate-spin" size={18} />
-                              Preparando imagenes...
+                              {t('routeBuilder.gallery.preparing')}
                             </>
                           ) : (
                             <>
                               <IconUpload size={18} />
-                              Subir imagenes
+                              {t('common.uploadImages')}
                             </>
                           )}
                           <input
@@ -501,7 +517,7 @@ export const AddToRouteMap = ({
                           disabled={routeImages.every((image) => !image.selectedForCover)}
                           className="rounded-full border-0 bg-white text-artis-primary shadow-none hover:bg-[#eef2f6]"
                         >
-                          Quitar seleccion de portada
+                          {t('common.removeCoverSelection')}
                         </Button>
                       </div>
 
@@ -515,7 +531,7 @@ export const AddToRouteMap = ({
 
                   {routeImages.length === 0 ? (
                     <div className="rounded-[22px] bg-white px-4 py-8 text-center text-sm text-gray-500">
-                      Aun no has anadido imagenes.
+                      {t('routeBuilder.gallery.empty')}
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -533,12 +549,12 @@ export const AddToRouteMap = ({
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
                                 src={image.image}
-                                alt="Imagen aportada por la ruta"
+                                alt={t('routeBuilder.gallery.imageAlt')}
                                 className="h-full w-full object-cover"
                               />
                               {image.selectedForCover && (
                                 <span className="absolute left-3 top-3 inline-flex rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-artis-primary">
-                                  Portada
+                                  {t('common.cover')}
                                 </span>
                               )}
                             </div>
@@ -555,15 +571,19 @@ export const AddToRouteMap = ({
                                   }`}
                                 >
                                   {image.persisted
-                                    ? getRouteImageReviewLabel(image.reviewStatus)
-                                    : 'Pendiente de guardar'}
+                                    ? getRouteImageReviewLabel(
+                                        image.reviewStatus,
+                                        locale,
+                                      )
+                                    : t('routeBuilder.gallery.pendingSave')}
                                 </span>
                                 <p className="text-xs leading-5 text-gray-500">
                                   {image.persisted
                                     ? getRouteImageReviewDescription(
                                         image.reviewStatus,
+                                        locale,
                                       )
-                                    : 'Se enviara a revision cuando guardes la ruta.'}
+                                    : t('routeBuilder.gallery.pendingSaveDescription')}
                                 </p>
                               </div>
 
@@ -584,8 +604,8 @@ export const AddToRouteMap = ({
                                 >
                                   <IconStar size={16} />
                                   {image.selectedForCover
-                                    ? 'Quitar de portada'
-                                    : 'Usar como portada'}
+                                    ? t('routeBuilder.gallery.removeFromCover')
+                                    : t('routeBuilder.gallery.useAsCover')}
                                 </Button>
 
                                 {!image.persisted && (
@@ -598,7 +618,7 @@ export const AddToRouteMap = ({
                                     className="rounded-full border-0 bg-rose-50 text-rose-700 shadow-none hover:bg-rose-100"
                                   >
                                     <IconTrash size={16} />
-                                    Eliminar
+                                    {t('common.delete')}
                                   </Button>
                                 )}
                               </div>
@@ -621,12 +641,12 @@ export const AddToRouteMap = ({
                     {isSaving ? (
                       <>
                         <IconLoader2 className="animate-spin" />
-                        Guardando...
+                        {t('routeBuilder.actions.saving')}
                       </>
                     ) : isEditMode ? (
-                      'Actualizar ruta'
+                      t('routeBuilder.actions.updateRoute')
                     ) : (
-                      'Guardar ruta'
+                      t('routeBuilder.actions.saveRoute')
                     )}
                   </Button>
                 </div>
@@ -647,11 +667,11 @@ export const AddToRouteMap = ({
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-3">
                   <span className="inline-flex w-fit rounded-full bg-[#faf8f4] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.26em] text-artis-primary/70">
-                    Itinerario
+                    {t('routeBuilder.itinerary.eyebrow')}
                   </span>
                   <div>
                     <h3 className="font-serif text-2xl font-bold text-artis-primary">
-                      Paradas seleccionadas
+                      {t('routeBuilder.itinerary.title')}
                     </h3>
             
                   </div>
@@ -660,16 +680,16 @@ export const AddToRouteMap = ({
                 {routePlaces.length === 0 ? (
                   <div className="rounded-[28px] border border-dashed border-[#d9dfe7] bg-[linear-gradient(180deg,#fbfcfd_0%,#f8f2e8_100%)] px-6 py-12 text-center">
                     <span className="inline-flex rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-artis-primary/60 shadow-sm">
-                      Empieza en el mapa
+                      {t('routeBuilder.itinerary.startOnMap')}
                     </span>
                     <div className="mx-auto mt-5 flex h-16 w-16 items-center justify-center rounded-full bg-white text-artis-primary shadow-sm">
                       <IconMapPin size={28} />
                     </div>
                     <p className="mt-5 font-serif text-3xl font-bold text-artis-primary">
-                      Empieza a construir la ruta
+                      {t('routeBuilder.itinerary.startBuilding')}
                     </p>
                     <p className="mx-auto mt-3 max-w-sm text-sm leading-7 text-gray-600">
-                      Toca lugares en el mapa para empezar el itinerario.
+                      {t('routeBuilder.itinerary.tapPlaces')}
                     </p>
                   </div>
                 ) : (

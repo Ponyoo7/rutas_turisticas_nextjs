@@ -1,22 +1,19 @@
+import { formatDuration, getRouteStats } from '@/lib/utils'
+import { getTranslations } from '@/shared/i18n/server'
+import { OSMElement } from '@/shared/types/locations'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card'
-import { formatDuration, getRouteStats } from '@/lib/utils'
-import { OSMElement } from '@/shared/types/locations'
 
 interface RouteStatsCardsProps {
   places: OSMElement[]
 }
 
-/**
- * Componente que expone una pequeña cuadrícula con tarjetas informativas,
- * mostrando métricas esenciales calculadas (`getRouteStats`) sobre el itinerario:
- * cantidad de paradas, distancia estimada sumada y tiempo a pie requerido.
- */
-export const RouteStatsCards = ({ places }: RouteStatsCardsProps) => {
+export const RouteStatsCards = async ({ places }: RouteStatsCardsProps) => {
+  const { t } = await getTranslations()
   const stats = getRouteStats(places)
 
   return (
@@ -24,7 +21,7 @@ export const RouteStatsCards = ({ places }: RouteStatsCardsProps) => {
       <Card>
         <CardHeader>
           <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Paradas
+            {t('profile.myRoutes.stops')}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-3xl font-bold">
@@ -35,18 +32,18 @@ export const RouteStatsCards = ({ places }: RouteStatsCardsProps) => {
       <Card>
         <CardHeader>
           <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Distancia estimada
+            {t('routeDetail.distanceEstimated')}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-3xl font-bold">
-          {stats.totalDistanceKm} km
+          {t('common.distanceKm', { count: stats.totalDistanceKm })}
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
           <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Tiempo a pie
+            {t('routeDetail.walkingTime')}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-3xl font-bold">

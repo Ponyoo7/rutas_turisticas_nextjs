@@ -17,6 +17,7 @@ import {
 } from '@/shared/types/routes'
 import { OSMElement } from '@/shared/types/locations'
 import { locationsService } from '@/shared/services/locations.service'
+import { getTranslations } from '@/shared/i18n/server'
 import { cookies } from 'next/headers'
 import { verifyToken } from './user.actions'
 import { neon } from '@neondatabase/serverless'
@@ -81,7 +82,10 @@ const normalizePositiveInteger = (value: unknown): number | null => {
     : null
 }
 
-const normalizeRouteImage = (source?: string | null) => {
+const normalizeRouteImage = (
+  source?: string | null,
+  imageTooLargeMessage = 'La imagen seleccionada supera el tamano permitido.',
+) => {
   const canonicalImage = locationsService.normalizeCanonicalImageUrl(source)
 
   if (!canonicalImage) return ''
@@ -90,16 +94,22 @@ const normalizeRouteImage = (source?: string | null) => {
     isRouteInlineImageDataUrl(canonicalImage) &&
     getRouteInlineImageBytes(canonicalImage) > MAX_ROUTE_IMAGE_UPLOAD_BYTES
   ) {
-    throw new Error('La imagen seleccionada supera el tamano permitido.')
+    throw new Error(imageTooLargeMessage)
   }
 
   return canonicalImage
 }
 
-const normalizeEditableRouteImages = (images?: RouteImageInput[]) =>
-  normalizeRouteImageInputs(images).map((image) => ({
+const normalizeEditableRouteImages = (
+  images?: RouteImageInput[],
+  options?: {
+    locale?: 'es' | 'en'
+    imageTooLargeMessage?: string
+  },
+) =>
+  normalizeRouteImageInputs(images, options?.locale).map((image) => ({
     id: normalizePositiveInteger(image.id),
-    image: normalizeRouteImage(image.image),
+    image: normalizeRouteImage(image.image, options?.imageTooLargeMessage),
     selectedForCover: image.selectedForCover,
   }))
 
@@ -177,8 +187,16 @@ const syncRouteContributedImages = async (
   sql: SqlClient,
   routeId: number,
   images: RouteImageInput[],
+  options?: {
+    locale?: 'es' | 'en'
+    imageTooLargeMessage?: string
+    imageMissingMessage?: string
+  },
 ) => {
-  const normalizedImages = normalizeEditableRouteImages(images)
+  const normalizedImages = normalizeEditableRouteImages(images, {
+    locale: options?.locale,
+    imageTooLargeMessage: options?.imageTooLargeMessage,
+  })
   const existingImages = (await sql`
     SELECT id
     FROM route_images
@@ -190,7 +208,10 @@ const syncRouteContributedImages = async (
 
   for (const image of normalizedImages) {
     if (image.id !== null && !existingImageIds.has(image.id)) {
-      throw new Error('Una de las imagenes seleccionadas ya no existe.')
+      throw new Error(
+        options?.imageMissingMessage ??
+          'Una de las imagenes seleccionadas ya no existe.',
+      )
     }
   }
 
@@ -249,11 +270,14 @@ const revalidateRouteSurfaces = (routeId?: number) => {
  * Verifica la cookie de autenticacion antes de ejecutar el INSERT.
  */
 export const saveRoute = async (createRoute: CreateRoute) => {
+  const { locale, t } = await getTranslations()
   const { name, description, places, image, contributedImages } = createRoute
   const normalizedName = name.trim()
   const normalizedDescription = normalizeRouteDescription(description)
   const canonicalImage =
-    typeof image === 'string' ? normalizeRouteImage(image) : ''
+    typeof image === 'string'
+      ? normalizeRouteImage(image, t('routeBuilder.errors.imageTooLarge'))
+      : ''
 
   const cookieStore = await cookies()
   const authToken = cookieStore.get('auth')
@@ -278,7 +302,11 @@ export const saveRoute = async (createRoute: CreateRoute) => {
   const routeId = Number(insertedRoutes[0]?.id)
 
   if (Number.isInteger(routeId) && contributedImages?.length) {
-    await syncRouteContributedImages(sql, routeId, contributedImages)
+    await syncRouteContributedImages(sql, routeId, contributedImages, {
+      locale,
+      imageTooLargeMessage: t('routeBuilder.errors.imageTooLarge'),
+      imageMissingMessage: t('routeBuilder.errors.imageMissing'),
+    })
   }
 
   revalidateRouteSurfaces(routeId)
@@ -319,6 +347,7 @@ export const updateRoute = async ({
   places,
   contributedImages,
 }: UpdateRoute) => {
+  const { locale, t } = await getTranslations()
   const cookieStore = await cookies()
   const authToken = cookieStore.get('auth')
 
@@ -340,7 +369,11 @@ export const updateRoute = async ({
   `
 
   if (Array.isArray(contributedImages)) {
-    await syncRouteContributedImages(sql, id, contributedImages)
+    await syncRouteContributedImages(sql, id, contributedImages, {
+      locale,
+      imageTooLargeMessage: t('routeBuilder.errors.imageTooLarge'),
+      imageMissingMessage: t('routeBuilder.errors.imageMissing'),
+    })
   }
 
   revalidateRouteSurfaces(id)
@@ -494,6 +527,7 @@ export const getMyFavoriteRoutes = async (): Promise<Route[]> => {
 export const toggleFavoriteRoute = async (
   routeId: number,
 ): Promise<ToggleFavoriteRouteResult> => {
+  const { t } = await getTranslations()
   const cookieStore = await cookies()
   const authToken = cookieStore.get('auth')
 
@@ -502,14 +536,14 @@ export const toggleFavoriteRoute = async (
   if (!verified) {
     return {
       ok: false,
-      error: 'Debes iniciar sesion para guardar favoritos.',
+      error: t('routesActions.loginRequired'),
     }
   }
 
   if (!Number.isInteger(routeId) || routeId <= 0) {
     return {
       ok: false,
-      error: 'Ruta no valida.',
+      error: t('routesActions.invalidRoute'),
     }
   }
 
@@ -547,14 +581,14 @@ export const toggleFavoriteRoute = async (
   if (routeData.length === 0) {
     return {
       ok: false,
-      error: 'Ruta no encontrada.',
+      error: t('routesActions.routeNotFound'),
     }
   }
 
   if (routeData[0].featured !== true) {
     return {
       ok: false,
-      error: 'Solo puedes guardar rutas destacadas como favoritas.',
+      error: t('routesActions.featuredOnly'),
     }
   }
 

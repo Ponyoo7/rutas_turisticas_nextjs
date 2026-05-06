@@ -4,6 +4,7 @@ import {
   normalizeRouteDescription,
   normalizeRouteImageReviewStatus,
 } from '@/lib/route-images'
+import { getTranslations } from '@/shared/i18n/server'
 import { verifyToken } from '@/actions/user.actions'
 import { canAccessAdmin } from '@/lib/auth'
 import { locationsService } from '@/shared/services/locations.service'
@@ -498,19 +499,20 @@ export const updateUserVerified = async (
   userId: string,
   verified: boolean,
 ): Promise<UpdateUserVerifiedResult> => {
+  const { t } = await getTranslations()
   const allowed = await hasAdminAccess()
 
   if (!allowed) {
     return {
       ok: false,
-      error: 'No tienes permisos para realizar esta accion.',
+      error: t('admin.actions.noPermission'),
     }
   }
 
   if (!userId) {
     return {
       ok: false,
-      error: 'Usuario no valido.',
+      error: t('admin.actions.invalidUser'),
     }
   }
 
@@ -526,7 +528,7 @@ export const updateUserVerified = async (
   if (userData.length === 0) {
     return {
       ok: false,
-      error: 'Usuario no encontrado.',
+      error: t('admin.actions.userNotFound'),
     }
   }
 
@@ -536,7 +538,7 @@ export const updateUserVerified = async (
   if (role !== 'user') {
     return {
       ok: false,
-      error: 'Solo se puede cambiar la verificacion de usuarios normales.',
+      error: t('admin.actions.standardUsersOnly'),
     }
   }
 
@@ -557,19 +559,20 @@ export const updateRouteFeatured = async (
   routeId: number,
   featured: boolean,
 ): Promise<UpdateRouteFeaturedResult> => {
+  const { t } = await getTranslations()
   const allowed = await hasAdminAccess()
 
   if (!allowed) {
     return {
       ok: false,
-      error: 'No tienes permisos para realizar esta accion.',
+      error: t('admin.actions.noPermission'),
     }
   }
 
   if (!Number.isInteger(routeId) || routeId <= 0) {
     return {
       ok: false,
-      error: 'Ruta no valida.',
+      error: t('admin.actions.invalidRoute'),
     }
   }
 
@@ -585,7 +588,7 @@ export const updateRouteFeatured = async (
   if (routeData.length === 0) {
     return {
       ok: false,
-      error: 'Ruta no encontrada.',
+      error: t('admin.actions.routeNotFound'),
     }
   }
 
@@ -607,12 +610,13 @@ export const updateRouteFeatured = async (
 export const approveRouteImage = async (
   imageId: number | string,
 ): Promise<ReviewRouteImageResult> => {
+  const { t } = await getTranslations()
   const allowed = await hasAdminAccess()
 
   if (!allowed) {
     return {
       ok: false,
-      error: 'No tienes permisos para realizar esta accion.',
+      error: t('admin.actions.noPermission'),
     }
   }
 
@@ -621,7 +625,7 @@ export const approveRouteImage = async (
   if (normalizedImageId === null) {
     return {
       ok: false,
-      error: 'Imagen no valida.',
+      error: t('admin.actions.invalidImage'),
     }
   }
 
@@ -637,7 +641,7 @@ export const approveRouteImage = async (
   if (imageData.length === 0) {
     return {
       ok: false,
-      error: 'Imagen no encontrada.',
+      error: t('admin.actions.imageNotFound'),
     }
   }
 
@@ -647,7 +651,7 @@ export const approveRouteImage = async (
   if (normalizedRouteId === null) {
     return {
       ok: false,
-      error: 'Ruta no valida.',
+      error: t('admin.actions.invalidRoute'),
     }
   }
 
@@ -675,12 +679,13 @@ export const approveRouteImage = async (
 export const rejectRouteImage = async (
   imageId: number | string,
 ): Promise<ReviewRouteImageResult> => {
+  const { t } = await getTranslations()
   const allowed = await hasAdminAccess()
 
   if (!allowed) {
     return {
       ok: false,
-      error: 'No tienes permisos para realizar esta accion.',
+      error: t('admin.actions.noPermission'),
     }
   }
 
@@ -689,7 +694,7 @@ export const rejectRouteImage = async (
   if (normalizedImageId === null) {
     return {
       ok: false,
-      error: 'Imagen no valida.',
+      error: t('admin.actions.invalidImage'),
     }
   }
 
@@ -705,7 +710,7 @@ export const rejectRouteImage = async (
   if (imageData.length === 0) {
     return {
       ok: false,
-      error: 'Imagen no encontrada.',
+      error: t('admin.actions.imageNotFound'),
     }
   }
 
@@ -715,7 +720,7 @@ export const rejectRouteImage = async (
   if (normalizedRouteId === null) {
     return {
       ok: false,
-      error: 'Ruta no valida.',
+      error: t('admin.actions.invalidRoute'),
     }
   }
 

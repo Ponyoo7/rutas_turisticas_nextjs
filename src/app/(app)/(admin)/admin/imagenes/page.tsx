@@ -4,11 +4,13 @@ import {
   getRouteImageReviewLabel,
   getRouteImageReviewTone,
 } from '@/lib/route-images'
+import { getTranslations } from '@/shared/i18n/server'
 import Link from 'next/link'
 import { AdminEmptyState } from '../components/AdminEmptyState'
 import { RouteImageReviewControls } from './components/RouteImageReviewControls'
 
 export default async function Page() {
+  const { locale, t } = await getTranslations()
   const [routes, queue] = await Promise.all([
     getAdminRoutes(),
     getAdminRouteImageQueue(),
@@ -30,22 +32,19 @@ export default async function Page() {
     <section className="flex flex-col gap-6">
       <div className="rounded-[28px] border border-artis-primary/10 bg-white p-6 shadow-sm">
         <p className="text-xs font-bold uppercase tracking-[0.35em] text-artis-primary/50">
-          Imagenes
+          {t('admin.images.eyebrow')}
         </p>
         <h2 className="mt-3 font-serif text-3xl font-bold text-artis-primary">
-          Revision de imagenes aportadas
+          {t('admin.images.title')}
         </h2>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-gray-600 md:text-base">
-          Cola editorial para aprobar o rechazar las fotos que los usuarios han
-          subido despues de completar sus rutas. Si una imagen aprobada esta
-          marcada como candidata a portada, pasara a convertirse en la portada
-          de la ruta.
+          {t('admin.images.description')}
         </p>
 
         <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
           <article className="rounded-[24px] border border-artis-primary/10 bg-[#f8f5f0] p-5">
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
-              Pendientes
+              {t('common.pending')}
             </p>
             <p className="mt-3 font-serif text-4xl font-bold text-artis-primary">
               {pendingCount}
@@ -53,7 +52,7 @@ export default async function Page() {
           </article>
           <article className="rounded-[24px] border border-artis-primary/10 bg-[#f8f5f0] p-5">
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
-              Rechazadas
+              {t('common.rejected')}
             </p>
             <p className="mt-3 font-serif text-4xl font-bold text-artis-primary">
               {rejectedCount}
@@ -61,7 +60,7 @@ export default async function Page() {
           </article>
           <article className="rounded-[24px] border border-artis-primary/10 bg-[#f8f5f0] p-5">
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
-              Aprobadas
+              {t('common.approved')}
             </p>
             <p className="mt-3 font-serif text-4xl font-bold text-artis-primary">
               {approvedCount}
@@ -72,8 +71,8 @@ export default async function Page() {
 
       {queue.length === 0 ? (
         <AdminEmptyState
-          title="Sin revisiones pendientes"
-          description="Todavia no hay imagenes de usuarios esperando una decision administrativa."
+          title={t('admin.images.emptyTitle')}
+          description={t('admin.images.emptyDescription')}
         />
       ) : (
         <div className="grid grid-cols-1 gap-6">
@@ -89,14 +88,14 @@ export default async function Page() {
                   <div className="flex h-full flex-col border-b border-artis-primary/10 bg-[#fcfaf7] xl:border-b-0 xl:border-r">
                     <div className="border-b border-artis-primary/10 px-5 py-4">
                       <p className="text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/45">
-                        Imagen aportada
+                        {t('admin.images.contributedImage')}
                       </p>
                     </div>
                     <div className="flex min-h-[220px] flex-1 items-center justify-center bg-[#efe4d2] p-4 xl:min-h-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={image.image}
-                        alt={`Imagen aportada a la ruta ${image.routeName}`}
+                        alt={t('admin.images.imageAlt', { name: image.routeName })}
                         className="h-full w-full object-contain"
                       />
                     </div>
@@ -116,11 +115,11 @@ export default async function Page() {
                               : 'bg-amber-50 text-amber-700'
                         }`}
                       >
-                        {getRouteImageReviewLabel(image.reviewStatus)}
+                        {getRouteImageReviewLabel(image.reviewStatus, locale)}
                       </span>
                       {image.selectedForCover && (
                         <span className="rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-artis-primary ring-1 ring-artis-primary/15">
-                          Candidata a portada
+                          {t('routeDetail.candidateCover')}
                         </span>
                       )}
                     </div>
@@ -131,7 +130,7 @@ export default async function Page() {
                       </h3>
                       <p className="mt-2 text-sm leading-7 text-gray-600">
                         {image.routeDescription ||
-                          'La ruta todavia no incluye descripcion del autor.'}
+                          t('admin.shared.noDescriptionFromAuthor')}
                       </p>
                     </div>
 
@@ -148,12 +147,11 @@ export default async function Page() {
                     </div>
 
                     <p className="text-sm leading-6 text-gray-600">
-                      {getRouteImageReviewDescription(image.reviewStatus)}
+                      {getRouteImageReviewDescription(image.reviewStatus, locale)}
                     </p>
                     {image.selectedForCover && (
                       <p className="text-sm leading-6 text-gray-600">
-                        Si la apruebas, esta imagen pasara a convertirse en la
-                        portada de la ruta.
+                        {t('admin.images.coverApprovalHint')}
                       </p>
                     )}
 
@@ -163,7 +161,7 @@ export default async function Page() {
                       href={`/admin/rutas/${image.routeId}`}
                       className="text-sm font-semibold text-artis-primary transition-opacity hover:opacity-80"
                     >
-                      Abrir detalle completo de la ruta
+                      {t('admin.shared.openFullRouteDetail')}
                     </Link>
                   </div>
                 </div>

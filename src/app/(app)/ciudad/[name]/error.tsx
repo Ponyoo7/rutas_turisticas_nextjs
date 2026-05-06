@@ -1,7 +1,7 @@
 'use client'
 
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { Button } from '@/shared/components/ui/button'
-import { useRouter } from 'next/navigation'
 import { useEffect, useTransition } from 'react'
 
 /**
@@ -15,7 +15,7 @@ export default function ErrorPage({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  const router = useRouter()
+  const { t } = useI18n()
   const [isPending, startTransition] = useTransition()
 
   useEffect(() => {
@@ -24,18 +24,19 @@ export default function ErrorPage({
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center gap-4">
-      <h2>Ha ocurrido un error con el servicio de OpenStreet</h2>
+      <h2>{t('routeBuilder.errors.serviceTitle')}</h2>
       <Button
         className="bg-artis-primary text-white hover:bg-artis-primary/90 font-bold shadow-lg border-none transition-colors"
         disabled={isPending}
-        onClick={
-          // Attempt to recover by trying to re-render the segment
-          () => {
-            window.location.reload()
-          }
-        }
+        onClick={() => {
+          startTransition(() => {
+            reset()
+          })
+        }}
       >
-        {isPending ? 'Reintentando...' : 'Volver a intentarlo'}
+        {isPending
+          ? t('routeBuilder.errors.retrying')
+          : t('routeBuilder.errors.retry')}
       </Button>
     </div>
   )

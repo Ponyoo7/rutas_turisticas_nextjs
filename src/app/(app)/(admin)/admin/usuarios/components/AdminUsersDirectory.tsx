@@ -4,6 +4,7 @@ import { getAdminUsers, type AdminUserListItem } from '@/actions/admin.actions'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { useDebouncedValue } from '@/shared/hooks/useDebouncedValue'
+import { useI18n } from '@/shared/i18n/I18nProvider'
 import { IconLoader2 } from '@tabler/icons-react'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { AdminEmptyState } from '../../components/AdminEmptyState'
@@ -36,6 +37,7 @@ export function AdminUsersDirectory({
   initialUsers,
   initialQuery = '',
 }: Props) {
+  const { t } = useI18n()
   const normalizedInitialQuery = initialQuery.trim()
   const [query, setQuery] = useState(normalizedInitialQuery)
   const [appliedQuery, setAppliedQuery] = useState(normalizedInitialQuery)
@@ -75,18 +77,23 @@ export function AdminUsersDirectory({
       .catch(() => {
         if (!active || requestIdRef.current !== requestId) return
 
-        setError('No se pudo actualizar la busqueda de usuarios.')
+        setError(t('admin.users.searchError'))
         setFailedQuery(nextQuery)
       })
 
     return () => {
       active = false
     }
-  }, [debouncedQuery, startTransition])
+  }, [debouncedQuery, startTransition, t])
 
   const isLoading =
     (normalizedQuery !== appliedQuery && normalizedQuery !== failedQuery) ||
     isPending
+  const roleLabels = {
+    master: t('admin.users.roles.master'),
+    admin: t('admin.users.roles.admin'),
+    user: t('admin.users.roles.user'),
+  }
 
   return (
     <section className="flex flex-col gap-6">
@@ -94,21 +101,23 @@ export function AdminUsersDirectory({
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.35em] text-artis-primary/50">
-              Usuarios
+              {t('admin.users.eyebrow')}
             </p>
             <h2 className="mt-3 font-serif text-3xl font-bold text-artis-primary">
-              Directorio de usuarios
+              {t('admin.users.title')}
             </h2>
           </div>
           <span className="flex items-center gap-2 text-sm font-medium text-gray-500">
             {isLoading && <IconLoader2 size={16} className="animate-spin" />}
-            {users.length} usuarios
+            {t('admin.users.count', {
+              count: users.length,
+              suffix: users.length === 1 ? '' : 's',
+            })}
           </span>
         </div>
 
         <p className="mt-4 max-w-3xl text-sm leading-7 text-gray-600 md:text-base">
-          Vista administrativa ordenada alfabeticamente por nombre para revisar
-          identidad, email, rol y estado de verificacion.
+          {t('admin.users.description')}
         </p>
 
         <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center">
@@ -121,7 +130,7 @@ export function AdminUsersDirectory({
                 setError(null)
                 setFailedQuery(null)
               }}
-              placeholder="Buscar por nombre o email"
+              placeholder={t('admin.users.searchPlaceholder')}
               className="h-11 rounded-xl border-artis-primary/15 bg-[#fcfaf7] px-4"
             />
           </div>
@@ -137,7 +146,7 @@ export function AdminUsersDirectory({
               }}
               className="rounded-xl border-artis-primary/15 bg-white text-artis-primary hover:bg-[#f8f5f0]"
             >
-              Limpiar
+              {t('admin.shared.clear')}
             </Button>
           )}
         </div>
@@ -145,10 +154,12 @@ export function AdminUsersDirectory({
         <div className="mt-4 flex flex-col gap-2 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
           <p>
             {appliedQuery
-              ? `Mostrando resultados para "${appliedQuery}".`
-              : 'Mostrando todos los usuarios del sistema.'}
+              ? t('admin.users.showingResults', { query: appliedQuery })
+              : t('admin.users.showingAll')}
           </p>
-          <p>{isLoading ? 'Buscando en la base de datos...' : 'Orden: fullname A-Z.'}</p>
+          <p>
+            {isLoading ? t('admin.shared.searchingDatabase') : t('admin.users.order')}
+          </p>
         </div>
 
         {error && <p className="mt-3 text-sm font-medium text-red-600">{error}</p>}
@@ -158,13 +169,13 @@ export function AdminUsersDirectory({
         <AdminEmptyState
           title={
             appliedQuery
-              ? 'No hay resultados para esta busqueda'
-              : 'No hay usuarios para mostrar'
+              ? t('admin.users.emptySearchTitle')
+              : t('admin.users.emptyTitle')
           }
           description={
             appliedQuery
-              ? 'Prueba con otro nombre o email para localizar al usuario dentro del directorio administrativo.'
-              : 'Cuando existan registros en la base de datos, apareceran aqui con su rol y estado de verificacion.'
+              ? t('admin.users.emptySearchDescription')
+              : t('admin.users.emptyDescription')
           }
         />
       ) : (
@@ -174,22 +185,22 @@ export function AdminUsersDirectory({
               <thead className="bg-[#f8f5f0]">
                 <tr>
                   <th className="px-4 py-4 text-left text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/55">
-                    ID
+                    {t('admin.users.columns.id')}
                   </th>
                   <th className="px-4 py-4 text-left text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/55">
-                    Email
+                    {t('admin.users.columns.email')}
                   </th>
                   <th className="px-4 py-4 text-left text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/55">
-                    Fullname
+                    {t('admin.users.columns.fullname')}
                   </th>
                   <th className="px-4 py-4 text-left text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/55">
-                    Role
+                    {t('admin.users.columns.role')}
                   </th>
                   <th className="px-4 py-4 text-left text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/55">
-                    Verified
+                    {t('admin.users.columns.verified')}
                   </th>
                   <th className="px-4 py-4 text-right text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/55">
-                    Acciones
+                    {t('admin.users.columns.actions')}
                   </th>
                 </tr>
               </thead>
@@ -217,7 +228,7 @@ export function AdminUsersDirectory({
                       <span
                         className={`inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.25em] ${roleStyles[user.role]}`}
                       >
-                        {user.role}
+                        {roleLabels[user.role]}
                       </span>
                     </td>
                     <td className="px-4 py-4">
@@ -228,7 +239,9 @@ export function AdminUsersDirectory({
                             : 'bg-amber-50 text-amber-700'
                         }`}
                       >
-                        {user.verified ? 'Verificado' : 'Pendiente'}
+                        {user.verified
+                          ? t('admin.users.verifiedState')
+                          : t('admin.users.pendingState')}
                       </span>
                     </td>
                     <td className="px-4 py-4">
@@ -240,7 +253,7 @@ export function AdminUsersDirectory({
                           />
                         ) : (
                           <span className="rounded-full border border-artis-primary/15 bg-[#f8f5f0] px-4 py-2 text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/70">
-                            Sin edicion
+                            {t('admin.users.noEdit')}
                           </span>
                         )}
                       </div>

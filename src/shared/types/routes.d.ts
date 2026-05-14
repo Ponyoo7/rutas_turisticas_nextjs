@@ -4,7 +4,7 @@ export type RouteImageReviewStatus = 'approved' | 'pending' | 'rejected'
 
 export interface RouteImageInput {
   id?: number
-  image: string
+  image?: string
   selectedForCover: boolean
 }
 

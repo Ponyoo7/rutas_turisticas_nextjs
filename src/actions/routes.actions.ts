@@ -8,6 +8,7 @@ import {
   normalizeRouteImageInputs,
   normalizeRouteImageReviewStatus,
 } from '@/lib/route-images'
+import { normalizeRoutePlacesForPersistence } from '@/lib/route-places'
 import {
   CreateRoute,
   Route,
@@ -57,12 +58,14 @@ type ToggleFavoriteRouteResult =
     }
 
 const normalizePlaces = (places: unknown): OSMElement[] => {
-  if (Array.isArray(places)) return places as OSMElement[]
+  if (Array.isArray(places)) {
+    return normalizeRoutePlacesForPersistence(places)
+  }
 
   if (typeof places === 'string') {
     try {
       const parsed = JSON.parse(places)
-      return Array.isArray(parsed) ? (parsed as OSMElement[]) : []
+      return normalizeRoutePlacesForPersistence(parsed)
     } catch {
       return []
     }
@@ -274,6 +277,7 @@ export const saveRoute = async (createRoute: CreateRoute) => {
   const { name, description, places, image, contributedImages } = createRoute
   const normalizedName = name.trim()
   const normalizedDescription = normalizeRouteDescription(description)
+  const normalizedPlaces = normalizeRoutePlacesForPersistence(places)
   const canonicalImage =
     typeof image === 'string'
       ? normalizeRouteImage(image, t('routeBuilder.errors.imageTooLarge'))
@@ -293,7 +297,7 @@ export const saveRoute = async (createRoute: CreateRoute) => {
       ${verified.id},
       ${normalizedName},
       ${normalizedDescription},
-      ${places},
+      ${normalizedPlaces},
       ${canonicalImage}
     )
     RETURNING id
@@ -358,13 +362,14 @@ export const updateRoute = async ({
   const sql = createSql()
   const normalizedName = name.trim()
   const normalizedDescription = normalizeRouteDescription(description)
+  const normalizedPlaces = normalizeRoutePlacesForPersistence(places)
 
   await sql`
     UPDATE routes
     SET
       name = ${normalizedName},
       description = ${normalizedDescription},
-      places = ${places}
+      places = ${normalizedPlaces}
     WHERE id = ${id} AND user_id = ${verified.id}
   `
 

@@ -6,6 +6,7 @@ import {
   getRouteImageReviewTone,
   prepareRouteUploadImage,
 } from '@/lib/route-images'
+import { normalizeRoutePlacesForPersistence } from '@/lib/route-places'
 import { getDistanceKm } from '@/lib/utils'
 import { saveRoute, updateRoute } from '@/actions/routes.actions'
 import { MapWrapper } from '@/shared/components/map/MapWrapper'
@@ -160,9 +161,10 @@ export const AddToRouteMap = ({
     setSaveError(null)
 
     try {
+      const normalizedPlaces = normalizeRoutePlacesForPersistence(routePlaces)
       const contributedImages = routeImages.map((image) => ({
         id: image.id,
-        image: image.image,
+        image: image.persisted ? undefined : image.image,
         selectedForCover: image.selectedForCover,
       }))
 
@@ -171,7 +173,7 @@ export const AddToRouteMap = ({
           id: routeId,
           name: routeName,
           description: routeDescription,
-          places: routePlaces,
+          places: normalizedPlaces,
           contributedImages,
         })
 
@@ -186,7 +188,7 @@ export const AddToRouteMap = ({
       const createdRouteId = await saveRoute({
         name: routeName,
         description: routeDescription,
-        places: routePlaces,
+        places: normalizedPlaces,
         image: wikiCity?.thumbnail?.source ?? initialImage,
         contributedImages,
       })

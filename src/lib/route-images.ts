@@ -108,10 +108,10 @@ export const normalizeRouteImageInputs = (
   const normalizedImages = images
     .map((image) => ({
       id: typeof image.id === 'number' ? image.id : undefined,
-      image: image.image,
+      image: typeof image.image === 'string' ? image.image : '',
       selectedForCover: image.selectedForCover === true,
     }))
-    .filter((image) => typeof image.image === 'string' && image.image.trim())
+    .filter((image) => image.id !== undefined || image.image.trim())
 
   if (normalizedImages.length > MAX_ROUTE_CONTRIBUTED_IMAGES) {
     throw new Error(

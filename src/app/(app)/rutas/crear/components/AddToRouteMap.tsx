@@ -23,7 +23,7 @@ import { locationsService } from '@/shared/services/locations.service'
 import { OSMAddress, OSMElement, WikiData } from '@/shared/types/locations'
 import { RouteImage, RouteImageReviewStatus } from '@/shared/types/routes'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   IconLoader2,
   IconMapPin,
@@ -57,6 +57,13 @@ type EditableRouteImage = {
   persisted: boolean
 }
 
+type UploadScrollSnapshot = {
+  scrollElement: HTMLElement | null
+  scrollTop: number
+  bodyOverflow: string
+  htmlOverflow: string
+}
+
 const createClientId = () =>
   `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
 
@@ -85,6 +92,10 @@ export const AddToRouteMap = ({
   const [routeName, setRouteName] = useState<string>(initialRouteName)
   const [routeDescription, setRouteDescription] =
     useState<string>(initialRouteDescription)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const isPreparingImageRef = useRef(false)
+  const uploadScrollSnapshotRef = useRef<UploadScrollSnapshot | null>(null)
+  const isFilePickerOpenRef = useRef(false)
   const [routeImages, setRouteImages] = useState<EditableRouteImage[]>(
     initialRouteImages.map((image) => ({
       clientId: `existing-${image.id}`,
@@ -116,6 +127,59 @@ export const AddToRouteMap = ({
     !isSaving &&
     !isPreparingImage
   const routePlacesCountSuffix = routePlaces.length === 1 ? '' : 's'
+
+  const getScrollElement = (source?: HTMLElement | null) => {
+    const appScrollContainer =
+      source?.closest<HTMLElement>('[data-app-scroll-container]') ?? null
+
+    if (
+      appScrollContainer &&
+      appScrollContainer.scrollHeight > appScrollContainer.clientHeight
+    ) {
+      return appScrollContainer
+    }
+
+    return document.scrollingElement instanceof HTMLElement
+      ? document.scrollingElement
+      : null
+  }
+
+  const restoreUploadScrollState = () => {
+    const snapshot = uploadScrollSnapshotRef.current
+
+    isFilePickerOpenRef.current = false
+
+    if (!snapshot) {
+      fileInputRef.current?.blur()
+      return
+    }
+
+    uploadScrollSnapshotRef.current = null
+    document.body.style.overflow = snapshot.bodyOverflow
+    document.documentElement.style.overflow = snapshot.htmlOverflow
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        if (snapshot.scrollElement) {
+          snapshot.scrollElement.scrollTop = snapshot.scrollTop
+        }
+
+        fileInputRef.current?.blur()
+      })
+    })
+  }
+
+  const preserveUploadScrollState = (source?: HTMLElement | null) => {
+    const scrollElement = getScrollElement(source)
+
+    uploadScrollSnapshotRef.current = {
+      scrollElement,
+      scrollTop: scrollElement?.scrollTop ?? 0,
+      bodyOverflow: document.body.style.overflow,
+      htmlOverflow: document.documentElement.style.overflow,
+    }
+    isFilePickerOpenRef.current = true
+  }
 
   const addPlaceToRoute = (place: OSMElement) => {
     if (routePlaces.some((p) => p.id === place.id)) return
@@ -214,25 +278,13 @@ export const AddToRouteMap = ({
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const input = event.currentTarget
-    const scrollContainer =
-      input.closest<HTMLElement>('[data-app-scroll-container]') ??
-      (document.scrollingElement instanceof HTMLElement
-        ? document.scrollingElement
-        : null)
-    const scrollTopBeforeUpload = scrollContainer?.scrollTop ?? 0
-    const restoreScrollPosition = () => {
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => {
-          if (scrollContainer) {
-            scrollContainer.scrollTop = scrollTopBeforeUpload
-          }
-          input.blur()
-        })
-      })
-    }
-    const files = Array.from(event.target.files ?? [])
+    const files = Array.from(input.files ?? [])
 
-    if (files.length === 0) return
+    if (files.length === 0) {
+      input.value = ''
+      restoreUploadScrollState()
+      return
+    }
 
     setIsPreparingImage(true)
     setImageError(null)
@@ -267,11 +319,69 @@ export const AddToRouteMap = ({
           : t('routeBuilder.errors.prepareImagesGeneric'),
       )
     } finally {
-      event.target.value = ''
+      input.value = ''
       setIsPreparingImage(false)
-      restoreScrollPosition()
+      restoreUploadScrollState()
     }
   }
+
+  const openFilePicker = () => {
+    if (!canUploadMoreImages || isSaving || isPreparingImage) return
+
+    preserveUploadScrollState(fileInputRef.current)
+    fileInputRef.current?.click()
+  }
+
+  useEffect(() => {
+    isPreparingImageRef.current = isPreparingImage
+  }, [isPreparingImage])
+
+  useEffect(() => {
+    const input = fileInputRef.current
+
+    const handleWindowFocus = () => {
+      if (!isFilePickerOpenRef.current || isPreparingImageRef.current) return
+
+      window.requestAnimationFrame(() => {
+        if ((fileInputRef.current?.files?.length ?? 0) === 0) {
+          restoreUploadScrollState()
+        }
+      })
+    }
+
+    const handleVisibilityChange = () => {
+      if (
+        document.hidden ||
+        !isFilePickerOpenRef.current ||
+        isPreparingImageRef.current
+      ) {
+        return
+      }
+
+      restoreUploadScrollState()
+    }
+
+    const handleFilePickerCancel = () => {
+      if (input) {
+        input.value = ''
+      }
+
+      if (!isPreparingImageRef.current) {
+        restoreUploadScrollState()
+      }
+    }
+
+    window.addEventListener('focus', handleWindowFocus)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    input?.addEventListener('cancel', handleFilePickerCancel)
+
+    return () => {
+      window.removeEventListener('focus', handleWindowFocus)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      input?.removeEventListener('cancel', handleFilePickerCancel)
+      restoreUploadScrollState()
+    }
+  }, [])
 
   const toggleCoverSelection = (clientId: string) => {
     setRouteImages((currentImages) =>
@@ -482,11 +592,14 @@ export const AddToRouteMap = ({
                       </div>
 
                       <div className="flex flex-col gap-2.5">
-                        <label
-                          className={`inline-flex items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-white transition-colors ${
+                        <Button
+                          type="button"
+                          onClick={openFilePicker}
+                          disabled={!canUploadMoreImages || isSaving}
+                          className={`rounded-full px-4 py-3 text-sm font-semibold text-white transition-colors ${
                             canUploadMoreImages
-                              ? 'cursor-pointer bg-artis-primary hover:bg-artis-primary/90'
-                              : 'cursor-not-allowed bg-gray-300'
+                              ? 'bg-artis-primary hover:bg-artis-primary/90'
+                              : 'bg-gray-300'
                           }`}
                         >
                           {isPreparingImage ? (
@@ -500,17 +613,18 @@ export const AddToRouteMap = ({
                               {t('common.uploadImages')}
                             </>
                           )}
-                          <input
-                            type="file"
-                            accept={ROUTE_IMAGE_ACCEPT}
-                            multiple
-                            className="sr-only"
-                            tabIndex={-1}
-                            onChange={handleImageChange}
-                            onFocus={(focusEvent) => focusEvent.currentTarget.blur()}
-                            disabled={!canUploadMoreImages || isSaving}
-                          />
-                        </label>
+                        </Button>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept={ROUTE_IMAGE_ACCEPT}
+                          multiple
+                          className="hidden"
+                          tabIndex={-1}
+                          onChange={handleImageChange}
+                          disabled={!canUploadMoreImages || isSaving}
+                          aria-hidden="true"
+                        />
 
                         <Button
                           type="button"

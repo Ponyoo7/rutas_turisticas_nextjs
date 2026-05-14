@@ -45,19 +45,23 @@ export const normalizeRoutePlaceForPersistence = (
   if (!place || typeof place !== 'object') return null
 
   const candidate = place as Partial<OSMElement>
+  const candidateId = candidate.id
+  const candidateType = candidate.type
 
-  if (!Number.isInteger(candidate.id)) return null
+  if (typeof candidateId !== 'number' || !Number.isInteger(candidateId)) {
+    return null
+  }
   if (
-    candidate.type !== 'node' &&
-    candidate.type !== 'way' &&
-    candidate.type !== 'relation'
+    candidateType !== 'node' &&
+    candidateType !== 'way' &&
+    candidateType !== 'relation'
   ) {
     return null
   }
 
   const normalizedPlace: OSMElement = {
-    id: candidate.id,
-    type: candidate.type,
+    id: candidateId,
+    type: candidateType,
     tags: normalizeRoutePlaceTags(candidate.tags),
   }
 

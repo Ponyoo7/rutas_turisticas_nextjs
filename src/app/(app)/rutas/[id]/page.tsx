@@ -2,6 +2,7 @@ import {
   getRouteImageReviewDescription,
   getRouteImageReviewLabel,
   getRouteImageReviewTone,
+  isRouteInlineImageDataUrl,
 } from '@/lib/route-images'
 import { getMyRouteById } from '@/actions/routes.actions'
 import { verifyToken } from '@/actions/user.actions'
@@ -40,6 +41,7 @@ export default async function Page({ params }: PageProps) {
   const selectedCoverCandidate =
     route.contributedImages.find((image) => image.selectedForCover) ?? null
   const previewImage = route.image || '/museo_placeholder.jpg'
+  const isInlinePreviewImage = isRouteInlineImageDataUrl(previewImage)
   const imagesCountSuffix =
     locale === 'es' ? (route.contributedImages.length === 1 ? '' : 'es') : route.contributedImages.length === 1 ? '' : 's'
 
@@ -48,12 +50,16 @@ export default async function Page({ params }: PageProps) {
       <div className="flex flex-col gap-6">
         <section className="overflow-hidden rounded-[28px] border border-artis-primary/10 bg-white shadow-sm">
           <div className="grid grid-cols-1 gap-0 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
-            <div className="relative min-h-[280px] bg-[#efe4d2]">
+            <div className="relative h-72 bg-[#efe4d2] sm:h-80 lg:h-[380px] xl:h-[420px]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={previewImage}
                 alt={t('routeDetail.coverAlt', { name: route.name })}
-                className="h-full w-full object-cover"
+                className={`h-full w-full ${
+                  isInlinePreviewImage
+                    ? 'object-contain bg-[#f8f3eb] p-2 sm:p-3'
+                    : 'object-cover'
+                }`}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-6 text-white">
@@ -132,7 +138,7 @@ export default async function Page({ params }: PageProps) {
               <div className="h-px flex-1 bg-gray-200"></div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {route.contributedImages.map((image) => {
                 const reviewTone = getRouteImageReviewTone(image.reviewStatus)
 
@@ -141,7 +147,7 @@ export default async function Page({ params }: PageProps) {
                     key={image.id}
                     className="overflow-hidden rounded-[24px] border border-artis-primary/10 bg-[#fcfaf7]"
                   >
-                    <div className="relative h-52 bg-[#efe4d2]">
+                    <div className="relative h-40 bg-[#efe4d2] md:h-44">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={image.image}

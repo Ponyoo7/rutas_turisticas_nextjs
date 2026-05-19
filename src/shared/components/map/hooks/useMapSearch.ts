@@ -1,35 +1,40 @@
 'use client'
 
-import { useState, useMemo } from "react";
+import { useMemo, useState } from 'react'
 
-export const useMapSearch = (places: any[]) => {
-    const [search, setSearch] = useState("");
-    const [flyTo, setFlyTo] = useState<[number, number] | null>(null);
+import { OSMElement } from '@/shared/types/locations'
 
-    const filteredPlaces = useMemo(() => {
-        if (!search.trim()) return [];
-        const query = search.toLowerCase();
-        return places.filter((place) => {
-            const name = place.tags?.name?.toLowerCase() || "";
-            return name.includes(query);
-        });
-    }, [search, places]);
+export const useMapSearch = (places: OSMElement[]) => {
+  const [search, setSearch] = useState('')
+  const [flyTo, setFlyTo] = useState<[number, number] | null>(null)
 
-    const handleSelectPlace = (place: any) => {
-        const lat = place.lat || place.center?.lat;
-        const lon = place.lon || place.center?.lon;
-        if (lat && lon) {
-            setFlyTo([lat, lon]);
-            setSearch(place.tags?.name || "");
-        }
-    };
+  const filteredPlaces = useMemo(() => {
+    if (!search.trim()) return []
+    const query = search.toLowerCase()
 
-    return {
-        search,
-        setSearch,
-        flyTo,
-        setFlyTo,
-        filteredPlaces,
-        handleSelectPlace
-    };
-};
+    return places.filter((place) => {
+      const name = place.tags?.name?.toLowerCase() || ''
+
+      return name.includes(query)
+    })
+  }, [places, search])
+
+  const handleSelectPlace = (place: OSMElement) => {
+    const lat = place.lat || place.center?.lat
+    const lon = place.lon || place.center?.lon
+
+    if (lat && lon) {
+      setFlyTo([lat, lon])
+      setSearch(place.tags?.name || '')
+    }
+  }
+
+  return {
+    search,
+    setSearch,
+    flyTo,
+    setFlyTo,
+    filteredPlaces,
+    handleSelectPlace,
+  }
+}

@@ -17,7 +17,7 @@ export const CityCard = ({ city }: Props) => {
   const [isHovering, setIsHovering] = useState<boolean>(false)
   const cityName = cityInfo.title || city.title
   const image =
-    locationsService.toRenderableImageUrl(cityInfo.thumbnail?.source) ??
+    locationsService.toRenderableCityImageUrl(cityInfo.thumbnail?.source) ??
     '/museo_placeholder.jpg'
 
   useEffect(() => {

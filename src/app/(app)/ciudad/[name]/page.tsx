@@ -16,7 +16,7 @@ export default async function CiudadPage({
 
   return (
     <div className="flex flex-col gap-6 min-h-screenp p-4">
-      <CityHeader places={res?.places ?? []} name={decodedName} />
+      <CityHeader name={decodedName} />
       <div className="flex flex-col gap-6 w-full z-20">
         {res && (
           <div className="grid grid-cols-1">

@@ -32,8 +32,9 @@ const buildWikimediaHeaders = () => {
   return headers
 }
 
-const getPlaceholderResponse = (request: NextRequest) =>
-  Response.redirect(new URL('/museo_placeholder.jpg', request.url), 307)
+const getPlaceholderResponse = (request: NextRequest) => {
+  return Response.redirect(new URL('/museo_placeholder.jpg', request.url), 307)
+}
 
 const getTargetUrl = (request: NextRequest) => {
   const rawUrl = request.nextUrl.searchParams.get('url')
@@ -81,7 +82,9 @@ const getRetryDelayMs = (response: Response, attempt: number) => {
 export async function GET(request: NextRequest) {
   const targetUrl = getTargetUrl(request)
 
-  if (!targetUrl) return getPlaceholderResponse(request)
+  if (!targetUrl) {
+    return getPlaceholderResponse(request)
+  }
 
   for (let attempt = 0; attempt < WIKIMEDIA_RETRY_ATTEMPTS; attempt++) {
     try {

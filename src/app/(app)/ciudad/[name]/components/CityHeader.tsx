@@ -1,33 +1,18 @@
 import { Button } from '@/shared/components/ui/button'
-import { locationsService } from '@/shared/services/locations.service'
-import { OSMElement } from '@/shared/types/locations'
 import Link from 'next/link'
 
 interface Props {
-  places: OSMElement[]
   name: string
 }
 
-export const CityHeader = async ({ places, name }: Props) => {
-  const heroPlace = places.find(
-    (place) => locationsService.getPlaceImage(place) || place.tags.wikipedia,
-  )
-  const heroWikiInfo =
-    heroPlace?.wikiInfo ??
-    (heroPlace?.tags.wikipedia
-      ? await locationsService.getWikiInfo(heroPlace.tags.wikipedia)
-      : null)
-  const heroImage = heroPlace
-    ? locationsService.getPlaceImage(heroPlace, heroWikiInfo, {
-        preferredWidth: 1600,
-      })
-    : null
+const CITY_HEADER_IMAGE = '/cupula.jpg'
 
+export const CityHeader = ({ name }: Props) => {
   return (
     <div
       className="relative flex min-h-[300px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-center justify-center px-6 pb-12 text-center rounded-xl"
       style={{
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 100%), url("${heroImage || '/museo_placeholder.jpg'}")`,
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 100%), url("${CITY_HEADER_IMAGE}")`,
       }}
     >
       <div className="flex flex-col gap-2 z-10 max-w-3xl">

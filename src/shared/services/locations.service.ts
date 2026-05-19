@@ -26,6 +26,7 @@ const OVERPASS_RETRYABLE_STATUS_CODES = new Set([408, 429, 500, 502, 503, 504])
 const WIKI_RETRY_DELAY_MS = 600
 const WIKI_RETRY_ATTEMPTS = 3
 const WIKI_RETRYABLE_STATUS_CODES = new Set([429, 500, 502, 503, 504])
+const MIN_WIKI_IMAGE_WIDTH = 900
 const IMAGE_EXTENSION_REGEX =
   /\.(?:avif|gif|jpe?g|png|svg|webp)(?:$|[?#])/i
 const COMMONS_FILE_PATH_PREFIX =
@@ -166,6 +167,27 @@ const extractCommonsFileNameFromUrl = (urlLike: string) => {
   }
 }
 
+const extractCommonsFileNameFromUploadThumbUrl = (urlLike: string) => {
+  try {
+    const url = new URL(ensureHttps(urlLike))
+
+    if (url.hostname !== 'upload.wikimedia.org') return null
+
+    const pathSegments = url.pathname.split('/').filter(Boolean)
+    const thumbIndex = pathSegments.indexOf('thumb')
+
+    if (thumbIndex === -1 || pathSegments.length < 2) return null
+
+    const originalFileName = pathSegments.at(-2)
+
+    return originalFileName
+      ? safelyDecodeURIComponent(originalFileName).trim()
+      : null
+  } catch {
+    return null
+  }
+}
+
 const shouldProxyWikiImage = (urlLike: string) => {
   try {
     const url = new URL(ensureHttps(urlLike))
@@ -183,44 +205,12 @@ const upscaleWikimediaThumbnailUrl = (
   source: string,
   preferredWidth?: number,
 ) => {
-  if (
-    !Number.isFinite(preferredWidth) ||
-    typeof preferredWidth !== 'number' ||
-    preferredWidth <= 0
-  ) {
-    return source
-  }
+  void preferredWidth
 
-  try {
-    const url = new URL(ensureHttps(source))
-
-    if (url.hostname !== 'upload.wikimedia.org') return source
-
-    const pathSegments = url.pathname.split('/').filter(Boolean)
-    const thumbIndex = pathSegments.indexOf('thumb')
-
-    if (thumbIndex === -1 || pathSegments.length === 0) return source
-
-    const lastSegment = pathSegments[pathSegments.length - 1]
-    const widthMatch = lastSegment.match(/^(.*?)(\d+)px-(.+)$/)
-
-    if (!widthMatch) return source
-
-    const [, prefix = '', currentWidthValue, suffix] = widthMatch
-    const currentWidth = Number(currentWidthValue)
-
-    if (!Number.isFinite(currentWidth) || currentWidth >= preferredWidth) {
-      return source
-    }
-
-    pathSegments[pathSegments.length - 1] =
-      `${prefix}${preferredWidth}px-${suffix}`
-    url.pathname = `/${pathSegments.join('/')}`
-
-    return url.toString()
-  } catch {
-    return source
-  }
+  // Wikimedia does not accept every synthesized thumbnail size. Rewriting the
+  // width can turn a valid thumbnail URL into a 400 response, which then makes
+  // the UI fall back to the shared placeholder image.
+  return source
 }
 
 const normalizeCanonicalImageUrl = (source?: string | null) => {
@@ -270,6 +260,18 @@ const normalizeCanonicalImageUrl = (source?: string | null) => {
   return null
 }
 
+const normalizeCanonicalCityImageUrl = (source?: string | null) => {
+  if (typeof source !== 'string') return null
+
+  const wikimediaThumbFileName = extractCommonsFileNameFromUploadThumbUrl(source)
+
+  if (wikimediaThumbFileName) {
+    return buildCommonsFilePathUrl(wikimediaThumbFileName)
+  }
+
+  return normalizeCanonicalImageUrl(source)
+}
+
 const toRenderableImageUrl = (
   source?: string | null,
   options?: { preferredWidth?: number },
@@ -289,27 +291,56 @@ const toRenderableImageUrl = (
     : preferredSource
 }
 
+const toRenderableCityImageUrl = (source?: string | null) => {
+  const canonicalSource = normalizeCanonicalCityImageUrl(source)
+
+  if (!canonicalSource) return null
+  if (canonicalSource.startsWith('/')) return canonicalSource
+
+  return shouldProxyWikiImage(canonicalSource)
+    ? `${WIKI_IMAGE_PROXY_PATH}?url=${encodeURIComponent(canonicalSource)}`
+    : canonicalSource
+}
+
 const getSummaryThumbnail = (
   data: WikiSummaryResponse,
 ): WikiData['thumbnail'] | undefined => {
-  const thumbnailSource = normalizeCanonicalImageUrl(data.thumbnail?.source)
-
-  if (thumbnailSource && data.thumbnail) {
-    return {
-      ...data.thumbnail,
-      source: thumbnailSource,
-    }
-  }
-
   const originalImageSource = normalizeCanonicalImageUrl(
     data.originalimage?.source,
   )
+  const thumbnailSource = normalizeCanonicalImageUrl(data.thumbnail?.source)
 
-  if (originalImageSource && data.originalimage) {
-    return {
-      ...data.originalimage,
-      source: originalImageSource,
-    }
+  const normalizedOriginalImage =
+    originalImageSource && data.originalimage
+      ? {
+          ...data.originalimage,
+          source: originalImageSource,
+        }
+      : null
+
+  const normalizedThumbnail =
+    thumbnailSource && data.thumbnail
+      ? {
+          ...data.thumbnail,
+          source: thumbnailSource,
+        }
+      : null
+
+  if (
+    normalizedOriginalImage &&
+    (!normalizedThumbnail ||
+      !Number.isFinite(normalizedThumbnail.width) ||
+      normalizedThumbnail.width < MIN_WIKI_IMAGE_WIDTH)
+  ) {
+    return normalizedOriginalImage
+  }
+
+  if (normalizedThumbnail) {
+    return normalizedThumbnail
+  }
+
+  if (normalizedOriginalImage) {
+    return normalizedOriginalImage
   }
 
   return undefined
@@ -579,7 +610,9 @@ const getPlaceImage = (
   for (const candidate of candidates) {
     const renderableImage = toRenderableImageUrl(candidate, options)
 
-    if (renderableImage) return renderableImage
+    if (renderableImage) {
+      return renderableImage
+    }
   }
 
   return null
@@ -594,28 +627,31 @@ const getWikiInfo = async (wikiTag: string): Promise<WikiData | null> => {
 
   return memoizeAsync(wikiInfoCache, buildWikiCacheKey(lang, title), async () => {
     const spanishTitle = await getSpanishTitle(title, lang)
+    let resolvedWikiInfo: WikiData | null = null
 
     if (spanishTitle) {
       const spanishInfo = await getWikiInfoByTitle(spanishTitle, 'es')
 
       if (spanishInfo?.thumbnail?.source || lang === 'es') {
-        return spanishInfo
-      }
+        resolvedWikiInfo = spanishInfo
+      } else {
+        const originalInfo = await getWikiInfoByTitle(title, lang)
 
-      const originalInfo = await getWikiInfoByTitle(title, lang)
-
-      if (spanishInfo) {
-        return {
-          ...spanishInfo,
-          extract: spanishInfo.extract || originalInfo?.extract || '',
-          thumbnail: spanishInfo.thumbnail ?? originalInfo?.thumbnail,
+        if (spanishInfo) {
+          resolvedWikiInfo = {
+            ...spanishInfo,
+            extract: spanishInfo.extract || originalInfo?.extract || '',
+            thumbnail: spanishInfo.thumbnail ?? originalInfo?.thumbnail,
+          }
+        } else {
+          resolvedWikiInfo = originalInfo
         }
       }
-
-      return originalInfo
+    } else {
+      resolvedWikiInfo = await getWikiInfoByTitle(title, lang)
     }
 
-    return getWikiInfoByTitle(title, lang)
+    return resolvedWikiInfo
   })
 }
 
@@ -629,5 +665,7 @@ export const locationsService = {
   getWikiInfo,
   getWikiInfoByTitle,
   normalizeCanonicalImageUrl,
+  normalizeCanonicalCityImageUrl,
   toRenderableImageUrl,
+  toRenderableCityImageUrl,
 }

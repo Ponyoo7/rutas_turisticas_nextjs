@@ -15,9 +15,8 @@ export const FeaturedCityCard = ({ city }: Props) => {
   const { t } = useI18n()
   const [isHovering, setIsHovering] = useState<boolean>(false)
   const image =
-    locationsService.toRenderableImageUrl(city.thumbnail?.source, {
-      preferredWidth: 960,
-    }) ?? '/museo_placeholder.jpg'
+    locationsService.toRenderableCityImageUrl(city.thumbnail?.source) ??
+    '/museo_placeholder.jpg'
 
   return (
     <div className="group flex w-full shrink-0 flex-col gap-4">

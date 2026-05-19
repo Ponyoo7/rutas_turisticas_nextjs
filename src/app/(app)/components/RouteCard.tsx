@@ -28,8 +28,7 @@ export const RouteCard = ({ route }: Props) => {
         />
       </div>
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 p-3.5">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-artis-secondary-blue">
-          <span className="material-symbols-outlined text-xs">schedule</span>
+        <div className="text-[10px] font-bold uppercase tracking-widest text-artis-secondary-blue">
           {t('common.minutesUpper', { count: stats.totalMinutes })}
         </div>
         <h3 className="font-serif text-base font-bold leading-tight text-artis-primary dark:text-gray-100">

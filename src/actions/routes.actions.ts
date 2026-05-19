@@ -135,7 +135,7 @@ const normalizeRoute = (
   name: route.name,
   description: normalizeRouteDescription(route.description),
   places: normalizePlaces(route.places),
-  image: locationsService.toRenderableImageUrl(route.image) ?? '',
+  image: locationsService.toRenderableCityImageUrl(route.image) ?? '',
   contributedImages,
   featured: route.featured === true,
 })

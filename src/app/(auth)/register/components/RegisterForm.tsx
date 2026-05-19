@@ -3,6 +3,7 @@
 import { createUser } from '@/actions/user.actions'
 import { Button } from '@/shared/components/ui/button'
 import { useI18n } from '@/shared/i18n/I18nProvider'
+import { isValidEmail } from '@/shared/validation/auth'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { FormField } from './FormField'
@@ -40,9 +41,8 @@ export const RegisterForm = () => {
     }
 
     if (name === 'email') {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!value) error = t('auth.validation.emailRequired')
-      else if (!emailRegex.test(value)) error = t('auth.validation.invalidEmail')
+      else if (!isValidEmail(value)) error = t('auth.validation.invalidEmail')
     }
 
     if (name === 'password') {

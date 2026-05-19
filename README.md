@@ -67,3 +67,69 @@ Sigue estos pasos para ejecutar el proyecto en tu entorno local:
 ## 🚀 Despliegue
 
 La aplicación está preparada para ser desplegada en [Vercel](https://vercel.com/), que es la plataforma óptima para aplicaciones Next.js, contando con el soporte para las variables de entorno de Neon Postgres preconfiguradas.
+
+## Testing
+
+El proyecto incluye una base de testing con:
+
+- `Jest` para pruebas unitarias e integradas
+- `Playwright` para pruebas end-to-end
+
+### Estructura
+
+- `tests/unit`: pruebas unitarias
+- `tests/integration`: pruebas integradas con Jest
+- `tests/e2e`: pruebas end-to-end con Playwright
+
+### Instalación de dependencias
+
+Si trabajas con `pnpm`, sustituye `npm` por `pnpm` y `npx` por `pnpm exec`.
+
+```bash
+npm install
+npx playwright install
+```
+
+### Scripts disponibles
+
+```bash
+npm run test
+npm run test:unit
+npm run test:integration
+npm run test:watch
+npm run test:coverage
+npm run test:e2e
+npm run test:e2e:headed
+npm run test:all
+```
+
+### Configuración incluida
+
+- `jest.config.js`: configuración principal de Jest con integración para Next.js
+- `jest.setup.ts`: carga de `@testing-library/jest-dom`
+- `playwright.config.ts`: configuración de Playwright con `baseURL`, artefactos de depuración y servidor local automático
+
+### Ejemplos incluidos
+
+- Prueba unitaria de validación: `tests/unit/shared/validation/auth.test.ts`
+- Prueba unitaria de componente React: `tests/unit/shared/components/ui/button.test.tsx`
+- Prueba integrada: `tests/integration/shared/components/language/LanguageSwitcher.test.tsx`
+- Prueba end-to-end de login: `tests/e2e/auth/login.spec.ts`
+
+### Variables para la prueba E2E de login
+
+La prueba de ejemplo de Playwright usa un usuario real existente. Configura estas variables antes de ejecutarla:
+
+```env
+E2E_USER_EMAIL="usuario@ejemplo.com"
+E2E_USER_PASSWORD="tu_password"
+```
+
+Si no están presentes, la prueba de login se marcará como omitida.
+
+### Flujo recomendado de desarrollo
+
+1. Mientras implementas lógica o componentes, ejecuta `npm run test:watch`.
+2. Antes de subir cambios, ejecuta `npm run test`.
+3. Cuando toques flujos completos de usuario, ejecuta `npm run test:e2e`.
+4. En integración continua, una secuencia habitual es `npm run test:all`.

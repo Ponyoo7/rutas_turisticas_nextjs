@@ -133,3 +133,21 @@ Si no están presentes, la prueba de login se marcará como omitida.
 2. Antes de subir cambios, ejecuta `npm run test`.
 3. Cuando toques flujos completos de usuario, ejecuta `npm run test:e2e`.
 4. En integración continua, una secuencia habitual es `npm run test:all`.
+
+### GitHub Actions
+
+El repositorio incluye un workflow de CI en `.github/workflows/ci.yml` con dos jobs:
+
+- `Lint + Jest`: instala dependencias con `pnpm`, ejecuta `eslint` y después `jest`
+- `Playwright`: ejecuta las pruebas end-to-end si existen los secretos necesarios
+
+Secrets necesarios para el job e2e:
+
+```env
+DATABASE_URL
+JWT_SECRET
+E2E_USER_EMAIL
+E2E_USER_PASSWORD
+```
+
+Si esos secrets no están configurados, el job de Playwright se omite automáticamente y sigue funcionando la parte de lint y Jest.

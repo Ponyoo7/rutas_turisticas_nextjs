@@ -24,9 +24,7 @@
       }
     ],
     "types": [
-      "jest",
-      "node",
-      "@testing-library/jest-dom"
+      "node"
     ],
     "paths": {
       "@/*": [
@@ -44,6 +42,7 @@
   ],
   "exclude": [
     "node_modules",
-    "playwright.config.ts"
+    "playwright.config.ts",
+    "tests"
   ]
 }

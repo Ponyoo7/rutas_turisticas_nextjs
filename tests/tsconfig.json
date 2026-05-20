@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "moduleResolution": "node"
+  },
+  "include": [
+    "./jest.setup.ts",
+    "./unit/**/*.ts",
+    "./unit/**/*.tsx",
+    "./integration/**/*.ts",
+    "./integration/**/*.tsx"
+  ],
+  "exclude": [
+    "../node_modules"
+  ]
+}

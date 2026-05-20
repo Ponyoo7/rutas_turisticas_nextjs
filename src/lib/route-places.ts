@@ -20,6 +20,7 @@ const ROUTE_PLACE_TAG_KEYS = [
 
 const isFiniteNumber = (value: unknown): value is number =>
   typeof value === 'number' && Number.isFinite(value)
+//prueba
 
 const normalizeRoutePlaceTags = (
   tags: OSMElement['tags'] | undefined,

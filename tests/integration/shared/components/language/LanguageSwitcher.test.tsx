@@ -6,7 +6,6 @@ import {
   type AppRouterInstance,
 } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 
-import { LanguageSwitcher } from '@/shared/components/language/LanguageSwitcher'
 import { I18nProvider } from '@/shared/i18n/I18nProvider'
 import { messages } from '@/shared/i18n/messages'
 
@@ -17,6 +16,10 @@ jest.mock('@/actions/locale.actions', () => ({
   __esModule: true,
   setLocale: setLocaleMock,
 }))
+
+// Importamos el componente despues del mock para que use la Server Action simulada.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { LanguageSwitcher } = require('@/shared/components/language/LanguageSwitcher')
 
 describe('LanguageSwitcher', () => {
   beforeEach(() => {

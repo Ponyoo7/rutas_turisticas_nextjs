@@ -4,16 +4,19 @@ import { updateUserVerified } from '@/actions/admin.actions'
 import { useI18n } from '@/shared/i18n/I18nProvider'
 import { Button } from '@/shared/components/ui/button'
 import { IconLoader2 } from '@tabler/icons-react'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 interface Props {
   userId: string
   verified: boolean
+  onVerifiedChange?: (userId: string, verified: boolean) => void
 }
 
-export function UserVerificationButton({ userId, verified }: Props) {
-  const router = useRouter()
+export function UserVerificationButton({
+  userId,
+  verified,
+  onVerifiedChange,
+}: Props) {
   const { t } = useI18n()
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -32,7 +35,7 @@ export function UserVerificationButton({ userId, verified }: Props) {
         return
       }
 
-      router.refresh()
+      onVerifiedChange?.(userId, nextVerified)
     } finally {
       setIsPending(false)
     }

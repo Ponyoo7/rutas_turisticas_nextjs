@@ -95,6 +95,14 @@ export function AdminUsersDirectory({
     user: t('admin.users.roles.user'),
   }
 
+  const handleVerifiedChange = (userId: string, verified: boolean) => {
+    setUsers((currentUsers) =>
+      currentUsers.map((user) =>
+        user.id === userId ? { ...user, verified } : user,
+      ),
+    )
+  }
+
   return (
     <section className="flex flex-col gap-6">
       <div className="rounded-[28px] border border-artis-primary/10 bg-white p-6 shadow-sm">
@@ -245,18 +253,15 @@ export function AdminUsersDirectory({
                       </span>
                     </td>
                     <td className="px-4 py-4">
-                      <div className="flex justify-end">
-                        {user.role === 'user' ? (
+                      {user.role === 'user' ? (
+                        <div className="flex justify-end">
                           <UserVerificationButton
                             userId={user.id}
                             verified={user.verified}
+                            onVerifiedChange={handleVerifiedChange}
                           />
-                        ) : (
-                          <span className="rounded-full border border-artis-primary/15 bg-[#f8f5f0] px-4 py-2 text-xs font-bold uppercase tracking-[0.25em] text-artis-primary/70">
-                            {t('admin.users.noEdit')}
-                          </span>
-                        )}
-                      </div>
+                        </div>
+                      ) : null}
                     </td>
                   </tr>
                 ))}

@@ -87,6 +87,14 @@ export function AdminRoutesCatalog({
     return locale === 'es' ? 'es' : 's'
   }
 
+  const handleFeaturedChange = (routeId: number, featured: boolean) => {
+    setRoutes((currentRoutes) =>
+      currentRoutes.map((route) =>
+        route.id === routeId ? { ...route, featured } : route,
+      ),
+    )
+  }
+
   const isLoading =
     (normalizedQuery !== appliedQuery && normalizedQuery !== failedQuery) ||
     isPending
@@ -273,6 +281,7 @@ export function AdminRoutesCatalog({
                         <RouteFeaturedButton
                           routeId={route.id}
                           featured={route.featured}
+                          onFeaturedChange={handleFeaturedChange}
                         />
                       </div>
                     </td>

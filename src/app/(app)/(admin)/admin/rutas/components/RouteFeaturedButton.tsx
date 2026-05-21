@@ -4,16 +4,19 @@ import { updateRouteFeatured } from '@/actions/admin.actions'
 import { useI18n } from '@/shared/i18n/I18nProvider'
 import { Button } from '@/shared/components/ui/button'
 import { IconLoader2 } from '@tabler/icons-react'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 interface Props {
   routeId: number
   featured: boolean
+  onFeaturedChange?: (routeId: number, featured: boolean) => void
 }
 
-export function RouteFeaturedButton({ routeId, featured }: Props) {
-  const router = useRouter()
+export function RouteFeaturedButton({
+  routeId,
+  featured,
+  onFeaturedChange,
+}: Props) {
   const { t } = useI18n()
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -32,7 +35,7 @@ export function RouteFeaturedButton({ routeId, featured }: Props) {
         return
       }
 
-      router.refresh()
+      onFeaturedChange?.(routeId, nextFeatured)
     } finally {
       setIsPending(false)
     }

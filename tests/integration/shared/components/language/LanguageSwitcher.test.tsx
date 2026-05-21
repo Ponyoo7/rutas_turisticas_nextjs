@@ -2,15 +2,15 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import { setLocale } from '@/actions/locale.actions'
 import { LanguageSwitcher } from '@/shared/components/language/LanguageSwitcher'
 import { I18nProvider } from '@/shared/i18n/I18nProvider'
 import { messages } from '@/shared/i18n/messages'
 
 const refreshMock = jest.fn()
+const setLocaleMock = jest.fn<() => Promise<void>>().mockResolvedValue(undefined)
 
 jest.mock('@/actions/locale.actions', () => ({
-  setLocale: jest.fn().mockResolvedValue(undefined),
+  setLocale: setLocaleMock,
 }))
 
 jest.mock('next/navigation', () => ({
@@ -22,7 +22,7 @@ jest.mock('next/navigation', () => ({
 describe('LanguageSwitcher', () => {
   beforeEach(() => {
     refreshMock.mockClear()
-    jest.mocked(setLocale).mockClear()
+    setLocaleMock.mockClear()
   })
 
   it('persists the selected locale and refreshes the page', async () => {
@@ -37,7 +37,7 @@ describe('LanguageSwitcher', () => {
     await user.click(screen.getByRole('button', { name: 'English' }))
 
     await waitFor(() => {
-      expect(setLocale).toHaveBeenCalledWith('en')
+      expect(setLocaleMock).toHaveBeenCalledWith('en')
       expect(refreshMock).toHaveBeenCalledTimes(1)
     })
   })

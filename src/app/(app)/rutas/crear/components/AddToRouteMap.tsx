@@ -36,6 +36,7 @@ import {
 import { PlaceCard } from './PlaceCard'
 
 interface Props {
+  viewerUserId: string
   places: OSMElement[]
   coords: number[]
   city?: OSMAddress
@@ -68,6 +69,7 @@ const createClientId = () =>
   `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
 
 export const AddToRouteMap = ({
+  viewerUserId,
   places,
   coords,
   city,
@@ -239,6 +241,7 @@ export const AddToRouteMap = ({
           description: routeDescription,
           places: normalizedPlaces,
           contributedImages,
+          expectedUserId: viewerUserId,
         })
 
         router.replace(`/rutas/${routeId}`)
@@ -255,6 +258,7 @@ export const AddToRouteMap = ({
         places: normalizedPlaces,
         image: wikiCity?.thumbnail?.source ?? initialImage,
         contributedImages,
+        expectedUserId: viewerUserId,
       })
 
       if (createdRouteId) {

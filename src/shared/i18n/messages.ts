@@ -278,6 +278,10 @@ export const messages = {
       },
       errors: {
         saveGeneric: 'No se pudo guardar la ruta. Intentalo de nuevo.',
+        sessionExpired:
+          'Tu sesion ya no esta activa. Inicia sesion de nuevo antes de guardar la ruta.',
+        sessionChanged:
+          'La sesion activa ha cambiado mientras editabas esta ruta. Recarga la pagina antes de guardar para evitar que se asocie al perfil equivocado.',
         prepareImagesGeneric:
           'No se pudieron preparar las imagenes seleccionadas.',
         serviceTitle: 'Ha ocurrido un error con el servicio de OpenStreet',
@@ -747,6 +751,10 @@ export const messages = {
       },
       errors: {
         saveGeneric: 'Could not save the route. Please try again.',
+        sessionExpired:
+          'Your session is no longer active. Log in again before saving the route.',
+        sessionChanged:
+          'The active session changed while you were editing this route. Refresh the page before saving so it does not end up under the wrong profile.',
         prepareImagesGeneric:
           'Could not prepare the selected images.',
         serviceTitle: 'An error occurred with the OpenStreet service',

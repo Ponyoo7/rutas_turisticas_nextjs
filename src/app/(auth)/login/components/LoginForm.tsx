@@ -1,6 +1,7 @@
 'use client'
 
 import { login } from '@/actions/user.actions'
+import { emitLoginSync } from '@/lib/auth-sync'
 import { Button } from '@/shared/components/ui/button'
 import { useI18n } from '@/shared/i18n/I18nProvider'
 import { Input } from '@/shared/components/ui/input'
@@ -17,7 +18,10 @@ const defaultFormLogin: UserCredentials = {
 export const LoginForm = () => {
   const router = useRouter()
   const { t } = useI18n()
-  const setUser = useUserStore((state) => state.setUser)
+  const { setIsLoading, setUser } = useUserStore((state) => ({
+    setUser: state.setUser,
+    setIsLoading: state.setIsLoading,
+  }))
 
   const [formData, setFormData] = useState<UserCredentials>({
     ...defaultFormLogin,
@@ -44,7 +48,9 @@ export const LoginForm = () => {
       return
     }
 
+    setIsLoading(false)
     setUser(result.user)
+    emitLoginSync(result.user)
     router.push('/')
   }
 

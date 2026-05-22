@@ -7,7 +7,6 @@ import { LoginForm } from './components/LoginForm'
 
 export default async function Page() {
   const { t } = await getTranslations()
-//prueba
   return (
     <>
       <div className="relative mb-8 h-[320px] w-full overflow-hidden rounded-2xl shadow-xl">

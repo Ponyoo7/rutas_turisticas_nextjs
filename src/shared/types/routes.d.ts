@@ -22,7 +22,6 @@ export interface CreateRoute {
   places: OSMElement[]
   image?: string
   contributedImages?: RouteImageInput[]
-  expectedUserId?: string
 }
 
 export interface UpdateRoute {
@@ -31,7 +30,6 @@ export interface UpdateRoute {
   description: string
   places: OSMElement[]
   contributedImages?: RouteImageInput[]
-  expectedUserId?: string
 }
 
 export interface Route {

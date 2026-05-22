@@ -8,7 +8,6 @@ import {
   normalizeRouteImageInputs,
   normalizeRouteImageReviewStatus,
 } from '@/lib/route-images'
-import { hasSessionUserChanged } from '@/lib/auth-session'
 import { normalizeRoutePlacesForPersistence } from '@/lib/route-places'
 import {
   CreateRoute,
@@ -275,14 +274,7 @@ const revalidateRouteSurfaces = (routeId?: number) => {
  */
 export const saveRoute = async (createRoute: CreateRoute) => {
   const { locale, t } = await getTranslations()
-  const {
-    name,
-    description,
-    places,
-    image,
-    contributedImages,
-    expectedUserId,
-  } = createRoute
+  const { name, description, places, image, contributedImages } = createRoute
   const normalizedName = name.trim()
   const normalizedDescription = normalizeRouteDescription(description)
   const normalizedPlaces = normalizeRoutePlacesForPersistence(places)
@@ -296,18 +288,7 @@ export const saveRoute = async (createRoute: CreateRoute) => {
 
   const verified = await verifyToken(authToken?.value)
 
-  if (!verified) {
-    throw new Error(t('routeBuilder.errors.sessionExpired'))
-  }
-
-  if (
-    hasSessionUserChanged({
-      authenticatedUserId: verified.id,
-      expectedUserId,
-    })
-  ) {
-    throw new Error(t('routeBuilder.errors.sessionChanged'))
-  }
+  if (!verified) return null
 
   const sql = createSql()
   const insertedRoutes = await sql`
@@ -369,7 +350,6 @@ export const updateRoute = async ({
   description,
   places,
   contributedImages,
-  expectedUserId,
 }: UpdateRoute) => {
   const { locale, t } = await getTranslations()
   const cookieStore = await cookies()
@@ -377,18 +357,7 @@ export const updateRoute = async ({
 
   const verified = await verifyToken(authToken?.value)
 
-  if (!verified) {
-    throw new Error(t('routeBuilder.errors.sessionExpired'))
-  }
-
-  if (
-    hasSessionUserChanged({
-      authenticatedUserId: verified.id,
-      expectedUserId,
-    })
-  ) {
-    throw new Error(t('routeBuilder.errors.sessionChanged'))
-  }
+  if (!verified) return
 
   const sql = createSql()
   const normalizedName = name.trim()

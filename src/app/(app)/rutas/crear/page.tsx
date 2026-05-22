@@ -1,4 +1,3 @@
-import { verifyToken } from '@/actions/user.actions'
 import { getMyRouteById } from '@/actions/routes.actions'
 import { getPlaceCoords } from '@/lib/utils'
 import { getTranslations } from '@/shared/i18n/server'
@@ -8,8 +7,7 @@ import {
   getInterestPlacesByNameCached,
 } from '@/shared/services/locations.cached.server'
 import { OSMElement } from '@/shared/types/locations'
-import { cookies } from 'next/headers'
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { AddToRouteMap } from './components/AddToRouteMap'
 
 const mergePlaces = (basePlaces: OSMElement[], extraPlaces: OSMElement[]) => {
@@ -40,12 +38,6 @@ export default async function CrearRutaPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const { t } = await getTranslations()
-  const cookieStore = await cookies()
-  const authToken = cookieStore.get('auth')
-  const verified = await verifyToken(authToken?.value)
-
-  if (!verified) redirect('/login')
-
   const params = await searchParams
   const cityParam = typeof params.city === 'string' ? params.city : undefined
   const routeIdParam =
@@ -141,7 +133,6 @@ export default async function CrearRutaPage({
         </section>
 
         <AddToRouteMap
-          viewerUserId={verified.id}
           places={mapPlaces}
           coords={mapCoords}
           city={cityResult?.city}

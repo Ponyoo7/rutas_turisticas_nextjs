@@ -1,7 +1,6 @@
 'use client'
 
 import { logout } from '@/actions/user.actions'
-import { emitLogoutSync } from '@/lib/auth-sync'
 import { useI18n } from '@/shared/i18n/I18nProvider'
 import { Button } from '@/shared/components/ui/button'
 import { useUserStore } from '@/shared/stores/useUserStore'
@@ -12,11 +11,10 @@ import { useShallow } from 'zustand/shallow'
 export function ProfileHeader() {
   const router = useRouter()
   const { t } = useI18n()
-  const { user, isLoading, setIsLoading, setUser } = useUserStore(
+  const { user, isLoading, setUser } = useUserStore(
     useShallow((state) => ({
       user: state.user,
       isLoading: state.isLoading,
-      setIsLoading: state.setIsLoading,
       setUser: state.setUser,
     })),
   )
@@ -30,8 +28,6 @@ export function ProfileHeader() {
       setIsSigningOut(false)
     }
 
-    emitLogoutSync()
-    setIsLoading(false)
     setUser(null)
     router.push('/')
   }
